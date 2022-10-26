@@ -1,12 +1,12 @@
 # Computer Graphics 203.3710
 ## Students Team data
 
-Name: 
+Name: Yoav Simani
 
-Student Number: 
+Student Number: 208774315
 
 
-Name: 
+Name: Alon Lapidus
 
 Student Number: 
 
