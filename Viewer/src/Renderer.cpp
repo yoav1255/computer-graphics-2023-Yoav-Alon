@@ -218,14 +218,22 @@ void Renderer::Render(const Scene& scene)
 {
 	// TODO: Replace this code with real scene rendering code
 	
-	int half_width = viewport_width / 2;
-	int half_height = viewport_height / 2;
+	const int x0 = viewport_width / 2;
+	const int y0 = viewport_height / 2;
+	glm::ivec2 center = glm::ivec2(x0, y0);
+	glm::vec3 color = glm::vec3(1.0f, 0.5f, 0.31f);
+	const int radius = min(x0, y0) / 2;
+	const int stepSize = 360;
 	
 	// draw circle
 
-
-	DrawLine(glm::ivec2(500,500), glm::ivec2(50,50), glm::vec3(1.0f, 0.5f, 0.31f));
-
+	for (int i = 0;i < 360;i++)
+	{
+		double x1 = x0 + radius * (sin((2 * M_PI * i)/stepSize));
+		double y1 = y0 + radius * (cos((2 * M_PI * i) / stepSize));
+		DrawLine(center, glm::ivec2(x1,y1), color);
+	}
+	
 }
 
 int Renderer::GetViewportWidth() const
