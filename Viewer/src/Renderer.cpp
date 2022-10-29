@@ -33,6 +33,55 @@ void Renderer::PutPixel(int i, int j, const glm::vec3& color)
 
 void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color)
 {
+	int x1, x2, y1, y2 , e , dx , dy ,m; // we init some flags
+	if (p1.x < p2.x) // TODO: divide this in to 2 options: false if no need to swich axis or true if need to switch axis, then solve individualy.
+	{
+		x1 = p1.x;
+		y1 = p1.y;
+		x2 = p2.x;
+		y2 = p2.y;
+	}
+	else 
+	{
+		x1 = p2.x;
+		y1 = p2.y;
+		x2 = p1.x;
+		y2 = p1.y;
+	}
+	dx = x2 - x1;
+	dy = y2 - y1;
+	if (dx = 0)
+		m = 2;
+	else
+	{
+		m = dy / dx;
+		if (abs(m) >= 1)
+		{
+			swap(x1, y1);
+			swap(x2, y2);
+			swap(dy, dx);
+		}
+	}
+	e = -dy;
+	while (x1 <= x2) // Bresenham algorithm
+	{
+		if (e > 0)
+		{
+			y1 += 1;
+			e -= 2 * dy;
+			PutPixel(x1, y1, color);
+		}
+		else
+		{
+			x1 += 1;
+			e += 2 * dx;
+			PutPixel(x1, y1, color);
+
+		}
+	}
+
+	
+
 	// TODO: Implement bresenham algorithm
 	// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 }
