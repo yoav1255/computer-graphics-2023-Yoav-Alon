@@ -36,9 +36,50 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 	// TODO: Implement bresenham algorithm
 	// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 
-	for (int i = 0;i < p1.x;i++) {
-		PutPixel(i, i, color);
-	}
+		int	x0 = p1.x, x1 = p2.x, y0 = p1.y, y1 = p2.y;
+		const int distanceY = -abs(y1 - y0), distanceX = abs(x1 - x0);
+		const int setX = x0 < x1 ? 1 : -1;
+		const int setY = y0 < y1 ? 1 : -1;
+		int error = distanceX + distanceY;
+		bool flagX ,flagY;
+		flagX = x0 != x1 ? false : true;
+		flagY = y0 != y1 ? false : true;
+		while (!flagX||!flagY)
+		{
+			if (x0 == x1)flagX = true;
+			if (y0 == y1)flagY = true;
+			PutPixel(x0, y0, color);
+			if (!flagX || !flagY)
+			{
+				int e2 = 2 * error;
+				if (e2 >= distanceY) {
+					if (!flagX)
+					{
+						error += distanceY;
+						x0 += setX;
+					}
+				}
+				else
+				{
+					if (e2 <= distanceX)
+					{
+						if (!flagY)
+						{
+							error += distanceX;
+							y0 += setY;
+						}
+					}
+				}
+			}
+		}
+
+
+
+
+
+
+
+
 
 }
 
@@ -183,7 +224,7 @@ void Renderer::Render(const Scene& scene)
 	// draw circle
 
 
-	DrawLine(glm::ivec2(1000), glm::ivec2(1500), glm::vec3(1.0f, 0.5f, 0.31f));
+	DrawLine(glm::ivec2(500,500), glm::ivec2(50,50), glm::vec3(1.0f, 0.5f, 0.31f));
 
 }
 
