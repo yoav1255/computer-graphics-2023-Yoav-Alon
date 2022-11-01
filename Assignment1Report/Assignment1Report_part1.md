@@ -67,16 +67,11 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 }
 ```
 ## Sanity check:
-<<<<<<< HEAD
-![Screenshot](../Assignment1Report/SainityCheck.png)
 
-## Let's put some flowers:
-!(../Assignment1Report/Flowers.png)
+![image](https://user-images.githubusercontent.com/108798956/199223418-f5669135-1038-4a7d-9597-837742821bb2.png)
 
+## Let's put some flowers (for creativity):
 
-
-=======
-![SanityCheck](https://user-images.githubusercontent.com/108798956/199223418-f5669135-1038-4a7d-9597-837742821bb2.png)
->>>>>>> b264b8014ec6c56b73115debec0d9fd6af1efa2b
+![image](https://user-images.githubusercontent.com/108798956/199250625-eb60bacc-83cf-4900-a9ff-997e99e54dd0.png)
 
 
