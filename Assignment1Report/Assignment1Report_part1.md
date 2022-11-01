@@ -61,4 +61,10 @@ void Renderer::Render(const Scene& scene)
 	
 }
 
+Sanity Check:
+
 <img src="./circle.png">
+
+A friendly face:
+
+<img src="./Drawing.png">

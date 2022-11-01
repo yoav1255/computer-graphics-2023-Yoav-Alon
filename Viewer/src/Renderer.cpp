@@ -214,25 +214,99 @@ void Renderer::ClearColorBuffer(const glm::vec3& color)
 	}
 }
 
-void Renderer::Render(const Scene& scene)
+void Renderer::DrawSunrise()
 {
-	// TODO: Replace this code with real scene rendering code
-	
-	const int x0 = viewport_width / 2;
-	const int y0 = viewport_height / 2;
-	glm::ivec2 center = glm::ivec2(x0, y0);
-	glm::vec3 color = glm::vec3(1.0f, 0.5f, 0.31f);
-	const int radius = min(x0, y0) / 2;
-	const int stepSize = 360;
-	
-	// draw circle
+}
 
+void Renderer::DrawCircle(const glm::ivec2& center, const int& radius, const int& stepSize, const glm::vec3& color)
+{
+	const int x0 = center.x;
+	const int y0 = center.y;
+	glm::ivec2 centerP = glm::ivec2(x0, y0);
 	for (int i = 0;i < 360;i++)
 	{
-		double x1 = x0 + radius * (sin((2 * M_PI * i)/stepSize));
+		double x1 = x0 + radius * (sin((2 * M_PI * i) / stepSize));
 		double y1 = y0 + radius * (cos((2 * M_PI * i) / stepSize));
-		DrawLine(center, glm::ivec2(x1,y1), color);
+		DrawLine(centerP, glm::ivec2(x1, y1), color);
 	}
+}
+
+void Renderer::PutSymmetricPixelsHalfDown(const int& xc, const int& yc, const int& x, const int& y, const glm::vec3& color)
+{
+	PutPixel(xc + y, yc - x, color);
+	PutPixel(xc - y, yc - x, color);
+	PutPixel(xc + x, yc - y, color);
+	PutPixel(xc - x, yc - y, color);
+}
+
+
+void Renderer::PutSymmetricPixels(const int& xc, const int& yc, const int& x, const int& y, const glm::vec3& color)
+{
+	PutPixel(xc + x, yc + y, color);
+	PutPixel(xc - x, yc + y, color);
+	PutPixel(xc + x, yc - y, color);
+	PutPixel(xc - x, yc - y, color);
+	PutPixel(xc + y, yc + x, color);
+	PutPixel(xc - y, yc + x, color);
+	PutPixel(xc + y, yc - x, color);
+	PutPixel(xc - y, yc - x, color);
+}
+
+void Renderer::DrawParameterCircle(const glm::ivec2& center, const int& radius, const glm::vec3& color,bool half)
+{
+	int d = 3 - (2 * radius);
+	int x = 0;
+	int y = radius;
+	const int xCenter = center.x;
+	const int yCenter = center.y;
+	if(half)	PutSymmetricPixelsHalfDown(xCenter, yCenter, x, y,color);
+	else		PutSymmetricPixels(xCenter, yCenter, x, y, color);
+	while (y >= x) {
+		x++;
+		if (d >= 0) { // X is incremented , Y is decremented
+			y--;
+			d += 4 * (x - y) + 10;
+		}
+		else { // Only X is incremented
+			d += 4 * x + 6;
+		}
+		if (half)	PutSymmetricPixelsHalfDown(xCenter, yCenter, x, y, color);
+		else		PutSymmetricPixels(xCenter, yCenter, x, y, color);
+	}
+}
+
+
+void Renderer::Render(const Scene& scene)
+{
+
+	const glm::ivec2 earRight = glm::ivec2(viewport_width*0.6,viewport_height*0.75);
+	const glm::ivec2 earLeft = glm::ivec2(viewport_width * 0.4, viewport_height * 0.75);
+
+	const glm::ivec2 face = glm::ivec2(viewport_width * 0.5, viewport_height * 0.5);
+	const glm::ivec2 nose = glm::ivec2(viewport_width * 0.5, viewport_height * 0.5);
+
+	const glm::ivec2 eyeRightOutside = glm::ivec2(viewport_width * 0.55, viewport_height * 0.62);
+	const glm::ivec2 eyeRightInside = glm::ivec2(viewport_width * 0.55, viewport_height * 0.60);
+
+	const glm::ivec2 eyeLeftOutside = glm::ivec2(viewport_width * 0.45, viewport_height * 0.62);
+	const glm::ivec2 eyeLeftInside = glm::ivec2(viewport_width * 0.45, viewport_height * 0.60);
+
+	const glm::ivec2 mouth = glm::ivec2(viewport_width * 0.5, viewport_height * 0.43);
+
+
+	const glm::vec3 color = glm::vec3(1, 0.5, 0.3);
+
+	DrawParameterCircle(earRight, 60, color);
+	DrawParameterCircle(earLeft, 60, color);
+	DrawParameterCircle(face, 150, color);
+	DrawParameterCircle(eyeRightOutside, 35, color);
+	DrawParameterCircle(eyeLeftOutside, 35, color);
+	DrawParameterCircle(mouth,50,color,true);
+
+	DrawCircle(nose, 25, 360, color);
+	DrawCircle(eyeRightInside, 22, 360, color);
+	DrawCircle(eyeLeftInside, 22, 360, color);
+
 	
 }
 
