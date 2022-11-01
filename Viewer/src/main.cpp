@@ -18,7 +18,7 @@
  */
 bool show_demo_window = false;
 bool show_another_window = false;
-glm::vec4 clear_color = glm::vec4(0.8f, 0.8f, 0.8f, 1.00f);
+glm::vec4 clear_color = glm::vec4(0.2f, 0.6f, 0.5f, 0.5f);
 
 /**
  * Function declarations

@@ -67,6 +67,12 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 }
 ```
 ## Sanity check:
-![Screenshot](~/Assignment1Report/SainityCheck.png)
+![Screenshot](../Assignment1Report/SainityCheck.png)
+
+## Let's put some flowers:
+!(../Assignment1Report/Flowers.png)
+
+
+
 
 

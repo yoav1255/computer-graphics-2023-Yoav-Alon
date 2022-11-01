@@ -225,26 +225,43 @@ void Renderer::ClearColorBuffer(const glm::vec3& color)
 		}
 	}
 }
+void Renderer::putFlower(int radius,int x ,const glm::vec3& color, int stemLen)
+{
+	int ground = 50;
+	glm::ivec2 center(x, 50 + stemLen + radius );
+	for (int i = 0, step = 180; i < step; i++)
+	{
+		glm::ivec2 b(center.x + radius * sin((2 * M_PI * i) / step), center.y + radius * cos((2 * M_PI * i) / step));
+		DrawLine(center, b, color);
+	}
+	DrawLine({ center.x,center.y - radius }, { center.x,ground }, { 0,1,0 });
+	DrawLine({ center.x,center.y - radius }, { center.x-1,ground }, { 0,1,0 });
+	DrawLine({ center.x,center.y - radius }, { center.x+1,ground }, { 0,1,0 });
+}
+void Renderer::drawSomeFlowers()
+{
+	glm::ivec2 a(0, 700);
+	glm::ivec3 color(200, 0, 0);
+	for (int i = 90, r = 200, step = 360; i <=180; i++) // draws the sun
+	{
+		glm::ivec2 b(a.x+r * sin((2 * M_PI * i) / step), a.y+r * cos((2 * M_PI * i) / step));
+		DrawLine( a, b, color);
+	}
+	putFlower(100, 400, { 70,70,70 }, 200);
+	putFlower(80, 200, { 70,70,70 }, 200);
+	putFlower(60, 600, { 70,70,70 }, 100);
+	putFlower(70, 800, { 70,70,70 }, 80);
+	putFlower(130, 1000, { 70,70,70 }, 250);
+
+	return;
+}
 
 void Renderer::Render(const Scene& scene)
 {
 	// TODO: Replace this code with real scene rendering code
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-	glm::ivec2 a(600, 300);
-	glm::ivec3 color(200, 0, 0);
-	
-	
-	
-	for (int i = 0, r = 100, step = 360; i < step; i++)
-	{
-		glm::ivec2 b(a.x + r * sin((2 * M_PI * i) / step), a.y + r * cos((2 * M_PI * i) / step));
-		DrawLine(a, b, color);
-	}
-
-	//DrawLine(c, d, color);
-	// draw circle
-
+	drawSomeFlowers();
 }
 
 int Renderer::GetViewportWidth() const
