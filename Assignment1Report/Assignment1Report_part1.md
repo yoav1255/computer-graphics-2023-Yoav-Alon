@@ -2,8 +2,7 @@
 
 void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color)
 {
-	// TODO: Implement bresenham algorithm
-	// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+
 
 		int	x0 = p1.x, x1 = p2.x, y0 = p1.y, y1 = p2.y; 
 		const int distanceY = -abs(y1 - y0), distanceX = abs(x1 - x0);
@@ -43,7 +42,6 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 
 void Renderer::Render(const Scene& scene)
 {
-	// TODO: Replace this code with real scene rendering code
 	
 	const int x0 = viewport_width / 2;
 	const int y0 = viewport_height / 2;
