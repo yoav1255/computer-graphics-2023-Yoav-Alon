@@ -5,7 +5,6 @@ Name: Yoav Simani
 
 Student Number: 208774315
 
-### checking git 
 Name: Alon Lapidus
 
 Student Number: 318402633

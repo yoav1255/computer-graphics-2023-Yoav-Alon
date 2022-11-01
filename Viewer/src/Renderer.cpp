@@ -30,10 +30,31 @@ void Renderer::PutPixel(int i, int j, const glm::vec3& color)
 	color_buffer[INDEX(viewport_width, i, j, 1)] = color.y;
 	color_buffer[INDEX(viewport_width, i, j, 2)] = color.z;
 }
+void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color)
+{
+	int e, dx, dy, reflect = 1;
+
+	dx = x2 - x1;
+	dy = y2 - y1;
+	if (x1 > x2)
+		reflect = -1;
+	e = -dy;
+	while (y1 <= y2) // Bresenham algorithm
+	{
+		if (e > 0)
+		{
+			x1 += 1 * reflect;
+			e -= 2 * dy;
+		}
+		PutPixel(x1, y1, color);
+		y1 += 1;
+		e += 2 * dx * reflect;
+	}
+}
 
 void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color)
 {
-	int x1, x2, y1, y2 , e , dx , dy ,m; // we init some flags
+	int x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
 	if (p1.x < p2.x) // TODO: divide this in to 2 options: false if no need to swich axis or true if need to switch axis, then solve individualy.
 	{
 		x1 = p1.x;
@@ -41,7 +62,7 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 		x2 = p2.x;
 		y2 = p2.y;
 	}
-	else 
+	else
 	{
 		x1 = p2.x;
 		y1 = p2.y;
@@ -50,40 +71,28 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 	}
 	dx = x2 - x1;
 	dy = y2 - y1;
-	if (dx = 0)
-		m = 2;
-	else
+	if (abs(dy) > abs(dx))
 	{
-		m = dy / dx;
-		if (abs(m) >= 1)
-		{
-			swap(x1, y1);
-			swap(x2, y2);
-			swap(dy, dx);
-		}
+		if (y1 < y2)
+			DrawLineReversedAxis(x1, y1, x2, y2, color);
+		else
+			DrawLineReversedAxis(x2, y2, x1, y1, color);
+		return;
 	}
-	e = -dy;
+	if (y1 > y2)
+		reflect = -1;
+	e = -dx;
 	while (x1 <= x2) // Bresenham algorithm
 	{
 		if (e > 0)
 		{
-			y1 += 1;
-			e -= 2 * dy;
-			PutPixel(x1, y1, color);
+			y1 += 1 * reflect;
+			e -= 2 * dx;
 		}
-		else
-		{
-			x1 += 1;
-			e += 2 * dx;
-			PutPixel(x1, y1, color);
-
-		}
+		PutPixel(x1, y1, color);
+		x1 += 1;
+		e += 2 * dy * reflect;
 	}
-
-	
-
-	// TODO: Implement bresenham algorithm
-	// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
 }
 
 void Renderer::CreateBuffers(int w, int h)
@@ -222,6 +231,18 @@ void Renderer::Render(const Scene& scene)
 	// TODO: Replace this code with real scene rendering code
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
+	glm::ivec2 a(600, 300);
+	glm::ivec3 color(200, 0, 0);
+	
+	
+	
+	for (int i = 0, r = 100, step = 360; i < step; i++)
+	{
+		glm::ivec2 b(a.x + r * sin((2 * M_PI * i) / step), a.y + r * cos((2 * M_PI * i) / step));
+		DrawLine(a, b, color);
+	}
+
+	//DrawLine(c, d, color);
 	// draw circle
 
 }

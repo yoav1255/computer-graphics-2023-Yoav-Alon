@@ -12,7 +12,7 @@
 #include "Renderer.h"
 #include "Scene.h"
 #include "Utils.h"
-
+#include <iostream>
 /**
  * Fields
  */
@@ -141,7 +141,6 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 		// TODO: Handle mouse events here
 		if (io.MouseDown[0])
 		{
-			// Left mouse button is down
 		}
 	}
 
