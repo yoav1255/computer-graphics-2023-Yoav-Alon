@@ -25,8 +25,8 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 
 void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color)
 {
-	int x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
-	if (p1.x < p2.x) // TODO: divide this in to 2 options: false if no need to swich axis or true if need to switch axis, then solve individualy.
+	int x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags and variables
+	if (p1.x < p2.x) 
 	{
 		x1 = p1.x;
 		y1 = p1.y;
