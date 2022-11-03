@@ -36,7 +36,7 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 
 	dx = x2 - x1;
 	dy = y2 - y1;
-	if (x1 > x2)
+	if (x1 > x2) // if the slope is negative
 		reflect = -1;
 	e = -dy;
 	while (y1 <= y2) // Bresenham algorithm
@@ -55,7 +55,7 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color)
 {
 	int x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
-	if (p1.x < p2.x) // TODO: divide this in to 2 options: false if no need to swich axis or true if need to switch axis, then solve individualy.
+	if (p1.x < p2.x)  // init on base of is p1.x < p2.x
 	{
 		x1 = p1.x;
 		y1 = p1.y;
@@ -69,17 +69,17 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 		x2 = p1.x;
 		y2 = p1.y;
 	}
-	dx = x2 - x1;
+	dx = x2 - x1; // init delta for x and y
 	dy = y2 - y1;
-	if (abs(dy) > abs(dx))
+	if (abs(dy) > abs(dx)) // deceiding if need to run the algo. with reversed axis for slopes that are bigger than abs(1)
 	{
-		if (y1 < y2)
+		if (y1 < y2) // same as we did for p1.x and p2.x above
 			DrawLineReversedAxis(x1, y1, x2, y2, color);
 		else
 			DrawLineReversedAxis(x2, y2, x1, y1, color);
 		return;
 	}
-	if (y1 > y2)
+	if (y1 > y2) // if the slope is negative
 		reflect = -1;
 	e = -dx;
 	while (x1 <= x2) // Bresenham algorithm
@@ -247,6 +247,7 @@ void Renderer::drawSomeFlowers()
 		glm::ivec2 b(a.x+r * sin((2 * M_PI * i) / step), a.y+r * cos((2 * M_PI * i) / step));
 		DrawLine( a, b, color);
 	}
+	// drawing the flowers
 	putFlower(100, 400, { 70,70,70 }, 200);
 	putFlower(80, 200, { 70,70,70 }, 200);
 	putFlower(60, 600, { 70,70,70 }, 100);
@@ -258,7 +259,7 @@ void Renderer::drawSomeFlowers()
 
 void Renderer::Render(const Scene& scene)
 {
-	// TODO: Replace this code with real scene rendering code
+	
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
 	drawSomeFlowers();
