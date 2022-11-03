@@ -1,4 +1,4 @@
-# My implementation of the algorithm:
+# Our implementation of the algorithm (based on the lecture):
 
 ```
 void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color)
