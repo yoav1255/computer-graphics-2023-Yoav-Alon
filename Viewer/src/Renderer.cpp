@@ -33,45 +33,42 @@ void Renderer::PutPixel(int i, int j, const glm::vec3& color)
 
 void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color)
 {
-	// TODO: Implement bresenham algorithm
-	// https://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
-
-		int	x0 = p1.x, x1 = p2.x, y0 = p1.y, y1 = p2.y;
-		const int distanceY = -abs(y1 - y0), distanceX = abs(x1 - x0);
-		const int setX = x0 < x1 ? 1 : -1;
-		const int setY = y0 < y1 ? 1 : -1;
-		int error = distanceX + distanceY;
-		bool flagX ,flagY;
-		flagX = x0 != x1 ? false : true;
-		flagY = y0 != y1 ? false : true;
-		while (!flagX||!flagY)
+	int	x0 = p1.x, x1 = p2.x, y0 = p1.y, y1 = p2.y;
+	const int distanceY = -abs(y1 - y0), distanceX = abs(x1 - x0);
+	const int setX = x0 < x1 ? 1 : -1;
+	const int setY = y0 < y1 ? 1 : -1;
+	int error = distanceX + distanceY;
+	bool flagX ,flagY;
+	flagX = x0 != x1 ? false : true;
+	flagY = y0 != y1 ? false : true;
+	while (!flagX||!flagY)
+	{
+		if (x0 == x1)flagX = true;
+		if (y0 == y1)flagY = true;
+		PutPixel(x0, y0, color);
+		if (!flagX || !flagY)
 		{
-			if (x0 == x1)flagX = true;
-			if (y0 == y1)flagY = true;
-			PutPixel(x0, y0, color);
-			if (!flagX || !flagY)
-			{
-				int e2 = 2 * error;
-				if (e2 >= distanceY) {
-					if (!flagX)
-					{
-						error += distanceY;
-						x0 += setX;
-					}
-				}
-				else
+			int e2 = 2 * error;
+			if (e2 >= distanceY) {
+				if (!flagX)
 				{
-					if (e2 <= distanceX)
+					error += distanceY;
+					x0 += setX;
+				}
+			}
+			else
+			{
+				if (e2 <= distanceX)
+				{
+					if (!flagY)
 					{
-						if (!flagY)
-						{
-							error += distanceX;
-							y0 += setY;
-						}
+						error += distanceX;
+						y0 += setY;
 					}
 				}
 			}
 		}
+	}
 
 
 
@@ -231,6 +228,24 @@ void Renderer::DrawCircle(const glm::ivec2& center, const int& radius, const int
 	}
 }
 
+void Renderer::DrawSquare(const glm::ivec2& center, const int& width, const int& height, const glm::vec3& color)
+{
+	const int x0 = center.x;
+	const int y0 = center.y;
+	glm::ivec2 centerP = glm::ivec2(x0, y0);
+	 int x = x0 - width / 2;		
+	 int y = y0 - height / 2;
+	glm::ivec2 leftButtomCorner = glm::ivec2(x,y);
+	while (x < x0 + width / 2)
+	{
+		glm::ivec2 buttom = glm::ivec2(x, y0);
+		glm::ivec2 top = glm::ivec2(x , y0+height);
+		x++;
+		DrawLine(buttom, top, color);
+	}
+}
+
+
 void Renderer::PutSymmetricPixelsHalfDown(const int& xc, const int& yc, const int& x, const int& y, const glm::vec3& color)
 {
 	PutPixel(xc + y, yc - x, color);
@@ -296,6 +311,7 @@ void Renderer::Render(const Scene& scene)
 
 	const glm::vec3 color = glm::vec3(1, 0.5, 0.3);
 
+
 	DrawParameterCircle(earRight, 60, color);
 	DrawParameterCircle(earLeft, 60, color);
 	DrawParameterCircle(face, 150, color);
@@ -306,7 +322,6 @@ void Renderer::Render(const Scene& scene)
 	DrawCircle(nose, 25, 360, color);
 	DrawCircle(eyeRightInside, 22, 360, color);
 	DrawCircle(eyeLeftInside, 22, 360, color);
-
 	
 }
 
