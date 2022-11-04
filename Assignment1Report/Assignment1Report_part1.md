@@ -74,4 +74,8 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 
 ![image](https://user-images.githubusercontent.com/108798956/199250625-eb60bacc-83cf-4900-a9ff-997e99e54dd0.png)
 
+## A friendly Face
+
+<img src ='./Drawing.png>
+
 
