@@ -76,6 +76,6 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 
 ## A friendly Face
 
-<img src ='./Drawing.png>
+<img src ='./Drawing.png'>
 
 
