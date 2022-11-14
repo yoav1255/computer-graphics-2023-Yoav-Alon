@@ -13,6 +13,7 @@
 #include "Scene.h"
 #include "Utils.h"
 #include <iostream>
+#include <string>
 /**
  * Fields
  */
@@ -53,6 +54,11 @@ int main(int argc, char **argv)
 
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
+	//load Model
+	std::string url = "C:/Users/YoavS/Documents/cube.obj";
+	std::shared_ptr<MeshModel> myFile = Utils::LoadMeshModel(url);
+	std::cout << myFile;
+
 	
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -63,6 +69,7 @@ int main(int argc, char **argv)
 		DrawImguiMenus(io, scene);
 		RenderFrame(window, scene, renderer, io);
     }
+
 
 	Cleanup(window);
     return 0;

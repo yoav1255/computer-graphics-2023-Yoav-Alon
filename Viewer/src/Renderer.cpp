@@ -262,7 +262,6 @@ void Renderer::Render(const Scene& scene)
 	
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-	drawSomeFlowers();
 }
 
 int Renderer::GetViewportWidth() const
