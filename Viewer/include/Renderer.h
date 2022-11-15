@@ -20,6 +20,7 @@ private:
 	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color);
 	void drawSomeFlowers();
 	void putFlower(int radius, int x, const glm::vec3& color , int stemLen);
+	void drawModel(const MeshModel& myModel);
 
 	void CreateBuffers(int w, int h);
 	void CreateOpenglBuffer();

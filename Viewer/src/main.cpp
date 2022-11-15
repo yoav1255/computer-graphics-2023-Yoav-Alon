@@ -5,6 +5,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <nfd.h>
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
@@ -55,9 +58,21 @@ int main(int argc, char **argv)
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
 	//load Model
-	std::string url = "C:/Users/YoavS/Documents/cube.obj";
+	std::string url = "C:/Users/YoavS/Documents/GitHub/computer-graphics-2023-yoavalon/Data/cow.obj";
 	std::shared_ptr<MeshModel> myFile = Utils::LoadMeshModel(url);
 	std::cout << myFile;
+	scene.AddModel(myFile);
+
+
+	glm::mat4 matScale = glm::scale(glm::vec3(200.0f, 200.0f, 200.0f));
+	scene.GetModel(0).setVertices(matScale);
+	glm::mat4 matTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(700.0f, 100.0f, 1.0f));
+	scene.GetModel(0).setVertices(matTranslate);
+
+
+			
+
+
 
 	
 	ImGuiIO& io = SetupDearImgui(window);

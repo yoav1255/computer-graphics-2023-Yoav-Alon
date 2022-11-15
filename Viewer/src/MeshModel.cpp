@@ -31,6 +31,15 @@ const std::vector<glm::vec3> MeshModel::GetVertices() const
 {
 	return vertices;
 }
+
+void MeshModel::setVertices(const glm::mat4& mat)
+{
+	for (int i = 0;i < vertices.size();i++)
+	{
+		vertices[i] = mat * glm::vec4(vertices[i],1);
+	}
+}
+
 std::ostream& operator<<(std::ostream &os, const std::shared_ptr<MeshModel>& myModel)
 {
 	os << "Vertices : " << std::endl;

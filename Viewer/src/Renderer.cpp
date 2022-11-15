@@ -257,11 +257,30 @@ void Renderer::drawSomeFlowers()
 	return;
 }
 
+void Renderer::drawModel(const MeshModel& myModel)
+{
+	for (int i = 0;i < myModel.GetFacesCount();i++)
+	{
+		glm::vec2 vertice0 = glm::vec2(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0)-1]);
+		glm::vec2 vertice1 = glm::vec2(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1)-1]);
+		glm::vec2 vertice2 = glm::vec2(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2)-1]);
+
+		const glm::vec3 color = glm::vec3(1, 0, 0);
+		DrawLine(vertice0, vertice1, color);
+		DrawLine(vertice0, vertice2, color);
+		DrawLine(vertice2, vertice1, color);
+
+	}
+}
+
+
 void Renderer::Render(const Scene& scene)
 {
 	
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
+	const MeshModel myModel = scene.GetModel(0);
+	drawModel(myModel);
 }
 
 int Renderer::GetViewportWidth() const
