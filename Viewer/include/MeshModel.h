@@ -14,6 +14,7 @@ public:
 	const std::string& GetModelName() const;
 	friend std::ostream& operator<< (std::ostream& out, MeshModel& mesh);
 	int getVerticesCount() const;
+	void scale(int scalar);
 	
 
 private:

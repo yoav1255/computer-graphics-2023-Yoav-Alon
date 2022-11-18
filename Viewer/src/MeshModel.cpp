@@ -13,6 +13,17 @@ MeshModel::~MeshModel()
 {
 }
 
+void MeshModel::scale(int scalar)
+{
+	for (glm::vec3 &vector : this->vertices)
+	{
+		vector.x *= scalar;
+		vector.y *= scalar;
+		vector.z *= scalar;
+	}
+	return;
+}
+
 const Face& MeshModel::GetFace(int index) const
 {
 	return faces[index];
