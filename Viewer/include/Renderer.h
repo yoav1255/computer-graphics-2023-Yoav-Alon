@@ -15,6 +15,9 @@ public:
 	int GetViewportHeight() const;
 	
 private:
+	void drawCircleMain();
+	void drawCircle(const int& x,const int& y, const int& xCenter, const int& yCenter);
+
 	void PutPixel(const int i, const int j, const glm::vec3& color);
 	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
 	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color);

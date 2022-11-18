@@ -30,6 +30,44 @@ void Renderer::PutPixel(int i, int j, const glm::vec3& color)
 	color_buffer[INDEX(viewport_width, i, j, 1)] = color.y;
 	color_buffer[INDEX(viewport_width, i, j, 2)] = color.z;
 }
+void Renderer::drawCircle(const int& x,const int& y, const int& xCenter, const int& yCenter)
+{
+	glm::vec3 color = { 10,0,0 };
+	PutPixel(x + xCenter, y + yCenter, color);
+	PutPixel(-x + xCenter, y + yCenter, color);
+	PutPixel(x + xCenter, -y + yCenter, color);
+	PutPixel(-x + xCenter, -y + yCenter, color);
+	PutPixel(y + xCenter, x + yCenter, color);
+	PutPixel(y + xCenter, -x + yCenter, color);
+	PutPixel(-y + xCenter, x + yCenter, color);
+	PutPixel(-y + xCenter, -x + yCenter, color);
+	return;
+
+}
+
+void Renderer::drawCircleMain()
+{
+	int e = 0, radius = 100, x = 0, y = 0, xCenter = 400, yCenter = 500;
+	e = 3 - 2 * radius;
+	y = radius;
+	drawCircle(x, y, xCenter, yCenter);
+	while (x < y)
+	{
+		if (e <= 0)
+		{
+			e = e + (4 * x) + 6;
+			x++;
+			drawCircle(x, y, xCenter, yCenter);
+		}
+		else
+		{
+			e = e + (4 * (x - y)) + 10;
+			x++;
+			y--;
+			drawCircle(x, y, xCenter, yCenter);
+		}
+	}
+}
 void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color)
 {
 	int e, dx, dy, reflect = 1;
@@ -262,7 +300,8 @@ void Renderer::Render(const Scene& scene)
 	
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-	drawSomeFlowers();
+	//drawSomeFlowers();
+	drawCircleMain();
 }
 
 int Renderer::GetViewportWidth() const

@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <string>
 #include "Face.h"
+#include <iostream>
 
 class MeshModel
 {
@@ -11,6 +12,9 @@ public:
 	const Face& GetFace(int index) const;
 	int GetFacesCount() const;
 	const std::string& GetModelName() const;
+	friend std::ostream& operator<< (std::ostream& out, MeshModel& mesh);
+	int getVerticesCount() const;
+	
 
 private:
 	std::vector<Face> faces;
@@ -18,3 +22,4 @@ private:
 	std::vector<glm::vec3> normals;
 	std::string model_name;
 };
+

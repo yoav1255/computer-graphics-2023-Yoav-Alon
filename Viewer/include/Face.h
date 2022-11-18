@@ -2,6 +2,7 @@
 #include "vector"
 #include <string>
 #include <glm/glm.hpp>
+#include <iostream>
 
 class Face
 {

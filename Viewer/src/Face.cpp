@@ -36,6 +36,12 @@ Face::Face(std::istream& issLine)
 
 int Face::GetVertexIndex(int internal_index) const
 {
+	if (internal_index >= vertex_indices.size())
+	{
+		std::cout << "Vertex Index max number is " << vertex_indices.size() - 1 << " , failed to return vertex indices." << std::endl;
+		return -1;
+	}
+
 	return vertex_indices[internal_index];
 }
 
