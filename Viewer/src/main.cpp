@@ -57,8 +57,10 @@ int main(int argc, char** argv)
 	std::string filePath = "C:/Haifa_University/ComputerGraphics/Data/banana.obj";
 	std::cout << filePath << std::endl;
 	std::shared_ptr<MeshModel> banana = Utils::LoadMeshModel(filePath);
-	banana->scale(800);
+	banana->scale(3000);
+	banana->move(500, 300);
 	std::cout << *banana << std::endl;
+	scene.AddModel(banana);
 
 
 	ImGuiIO& io = SetupDearImgui(window);

@@ -294,14 +294,31 @@ void Renderer::drawSomeFlowers()
 
 	return;
 }
+void Renderer::drawModel(MeshModel& model)
+{
+	int triangles = model.GetFacesCount();
+	//std::cout << "Face count is: " << triangles << std::endl;
+	for (int i = 0; i < triangles; i++)
+	{
+		int a = model.GetFace(i).GetVertexIndex(0)-1;
+		int b = model.GetFace(i).GetVertexIndex(1)-1;
+		int c = model.GetFace(i).GetVertexIndex(2)-1;
 
+		DrawLine({ model.GetVertexAt(a).x , model.GetVertexAt(a).y }, { model.GetVertexAt(b).x, model.GetVertexAt(b).y }, { 255,0,0 });
+		DrawLine({ model.GetVertexAt(a).x , model.GetVertexAt(a).y }, { model.GetVertexAt(c).x, model.GetVertexAt(c).y }, { 255,0,0 });
+		DrawLine({ model.GetVertexAt(b).x , model.GetVertexAt(b).y }, { model.GetVertexAt(c).x, model.GetVertexAt(c).y }, { 255,0,0 });
+		//std::cout << "Vertices are: " << a << " , " << b << " , " << c << std::endl;
+	}
+	return;
+}
 void Renderer::Render(const Scene& scene)
 {
 	
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
 	//drawSomeFlowers();
-	drawCircleMain();
+	MeshModel& model = scene.GetModel(0);
+	drawModel(model);
 }
 
 int Renderer::GetViewportWidth() const

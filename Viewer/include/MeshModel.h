@@ -15,6 +15,9 @@ public:
 	friend std::ostream& operator<< (std::ostream& out, MeshModel& mesh);
 	int getVerticesCount() const;
 	void scale(int scalar);
+	void move(int x, int y);
+	glm::vec3 GetVertexAt(int index);
+
 	
 
 private:
