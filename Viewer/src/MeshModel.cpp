@@ -37,12 +37,11 @@ std::vector<glm::vec3> MeshModel::GetVertices() const
 	return vertices;
 }
 
-void MeshModel::setVertices()
+void MeshModel::setVertices(const glm::mat4 mat)
 {
-	glm::mat4 transMat = GetTransform();
 	for (int i = 0;i < vertices.size();i++)
 	{
-		vertices[i] = transMat * glm::vec4(vertices[i],1);
+		vertices[i] = mat * glm::vec4(vertices[i],1);
 	}
 }
 

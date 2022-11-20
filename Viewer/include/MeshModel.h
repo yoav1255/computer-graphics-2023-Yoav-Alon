@@ -14,7 +14,7 @@ public:
 	virtual ~MeshModel();
 	const Face& GetFace(int index) const;
 	std::vector<glm::vec3> GetVertices() const;
-	void setVertices();
+	void setVertices(const glm::mat4 mat);
 	int GetFacesCount() const;
 	const std::string& GetModelName() const;
 	friend std::ostream& operator<<(std::ostream &os, const std::shared_ptr<MeshModel> &myModel);

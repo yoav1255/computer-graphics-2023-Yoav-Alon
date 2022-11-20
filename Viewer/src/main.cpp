@@ -60,18 +60,18 @@ int main(int argc, char **argv)
 	Scene scene = Scene();
 	//load Model
 	std::string url = "C:/Users/YoavS/Documents/GitHub/computer-graphics-2023-yoavalon/Data/banana.obj";
-	std::shared_ptr<MeshModel> myFile = Utils::LoadMeshModel(url);
+	shared_ptr<MeshModel>& myFile = Utils::LoadMeshModel(url);
 	//std::cout << myFile;
+
+	//Initial vertices to the center of the screen
+	myFile->SetScale(glm::vec3(2000.0f, 2000.0f, 2000.0f));
+	myFile->SetTranslation( glm::vec3(500.0f, 400.0f, 100.0f));
+	myFile->SetRotation(glm::vec3(0, 0, 0));
+	myFile->SetObjectTransform();
+
 	scene.AddModel(myFile);
 
 	MeshModel& myModel = scene.GetModel(0);
-
-	//glm::mat4 matScale = glm::scale(glm::mat4(1.0f), glm::vec3(2000.0f, 2000.0f, 2000.0f));
-	//glm::mat4 matTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(500.0f, 400.0f, 100.0f));
-	//glm::mat4 scaleAndTranslate = matTranslate * matScale;
-	//myModel.SetWorldTransform(scaleAndTranslate);
-	//myModel.setVertices();
-	//myModel.SetObjectTransform(glm::mat4(1.0f));
 	
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -242,13 +242,12 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 	{
 
-
 		MeshModel& myModel = scene.GetModel(0);
 		static float f = 0.0f;
 		static int counter = 0;
-		static glm::vec3 translation(700.0f, 500.0f, 0.0f);
-		static glm::vec3 rotation(0.0f, 0.0f, 0.0f);
-		static glm::vec3 scale(500.0f,500.0f,0.0f);
+		static glm::vec3 translation(myModel.GetTranslation());
+		static glm::vec3 rotation(myModel.GetRotation());
+		static glm::vec3 scale(myModel.GetScale());
 
 		//glm::mat4 obj = myModel.GetObjectTransform();
 		//glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), translation);
