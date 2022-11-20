@@ -276,13 +276,13 @@ void Renderer::drawModel( MeshModel& myModel)
 	//glm::mat4 objTransformatiom = matTranslation * matRotation * matScale;
 	////myModel.SetObjectTransform(objTransformatiom)
 
-	glm::mat4 objTransformation = myModel.GetObjectTransform();
+	glm::mat4 Transformation = myModel.GetTransform();
 
 	for (int i = 0;i < myModel.GetFacesCount();i++)
 	{
-		glm::vec4 vertice0 = objTransformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0)-1],1);
-		glm::vec4 vertice1 = objTransformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1)-1],1);
-		glm::vec4 vertice2 = objTransformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2)-1],1);
+		glm::vec4 vertice0 = Transformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0)-1],1);
+		glm::vec4 vertice1 = Transformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1)-1],1);
+		glm::vec4 vertice2 = Transformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2)-1],1);
 
 		const glm::vec3 color = glm::vec3(1, 0, 0);
 		DrawLine(vertice0, vertice1, color);

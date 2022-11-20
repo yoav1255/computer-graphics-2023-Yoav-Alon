@@ -64,10 +64,16 @@ int main(int argc, char **argv)
 	//std::cout << myFile;
 
 	//Initial vertices to the center of the screen
-	myFile->SetScale(glm::vec3(2000.0f, 2000.0f, 2000.0f));
-	myFile->SetTranslation( glm::vec3(500.0f, 400.0f, 100.0f));
-	myFile->SetRotation(glm::vec3(0, 0, 0));
-	myFile->SetObjectTransform();
+	
+	//myFile->SetScaleObject(glm::vec3(2000.0f, 2000.0f, 2000.0f));
+	//myFile->SetTranslationObject( glm::vec3(500.0f, 400.0f, 100.0f));
+	//myFile->SetRotationObject(glm::vec3(0, 0, 0));
+	//myFile->SetObjectTransform();
+
+	//glm::mat4 translateMat = glm::translate(glm::mat4(1.0f),glm::vec3(500.0f,500.0f,0.0f ));
+	//glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(2000.0f, 2000.0f, 2000.0f));
+	//glm::mat4 scaleAndTranslate =  translateMat*scaleMat;
+	//myFile->setVertices(scaleAndTranslate);
 
 	scene.AddModel(myFile);
 
@@ -243,36 +249,52 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	{
 
 		MeshModel& myModel = scene.GetModel(0);
-		static float f = 0.0f;
 		static int counter = 0;
-		static glm::vec3 translation(myModel.GetTranslation());
-		static glm::vec3 rotation(myModel.GetRotation());
-		static glm::vec3 scale(myModel.GetScale());
+		static glm::vec3 translationObject(myModel.GetTranslationObject());
+		static glm::vec3 rotationObject(myModel.GetRotationObject());
+		static glm::vec3 scaleObject(myModel.GetScaleObject());
+
+		static glm::vec3 translationWorld(myModel.GetTranslationWorld());
+		static glm::vec3 rotationWorld(myModel.GetRotationWorld());
+		static glm::vec3 scaleWorld(myModel.GetScaleWorld());
 
 		//glm::mat4 obj = myModel.GetObjectTransform();
 		//glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), translation);
 		//glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 1.0f));
 
-		ImGui::Begin("Change Model Position");                          // Create a window called "Hello, world!" and append into it.
-		ImGui::SliderFloat2("Translate", &translation.x, 0.0f, 1000.0f);
-		ImGui::SliderFloat3("Rotate-Local", &rotation.x, -360.0f, 360.0f);
-		ImGui::SliderFloat("Scale", &scale.x, 200.0f, 3000.0f);
-		scale.y = scale.x;
-		myModel.SetTranslation(translation);
-		myModel.SetRotation(rotation);
-		myModel.SetScale(scale);
+		ImGui::Begin("Change Model Position");   
+		ImGui::Text("Local Transformation");
+		ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
+		ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
+		ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
+		scaleObject.y = scaleObject.x;
+		scaleObject.z = scaleObject.x;
+		myModel.SetTranslationObject(translationObject);
+		myModel.SetRotationObject(rotationObject);
+		myModel.SetScaleObject(scaleObject);
 		myModel.SetObjectTransform();
+
+		ImGui::Text("World Transformation");
+
+		ImGui::SliderFloat3("Translate-World", &translationWorld.x, 0.0f, 1000.0f);
+		ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
+		ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
+		scaleWorld.y = scaleWorld.x;
+		scaleWorld.z = scaleWorld.x;
+		myModel.SetTranslationWorld(translationWorld);
+		myModel.SetRotationWorld(rotationWorld);
+		myModel.SetScaleWorld(scaleWorld);
+		myModel.SetWorldTransform();
 
 		//myModel.SetObjectTransform(translateMat);
 		//myModel.SetObjectTransform(translateMat * rotateMat * (obj-vecToZero)));
 
-		
+		ImGui::End();
 
 	
-
+		ImGui::Begin("something else");
 		ImGui::Checkbox("Another Window", &show_another_window);
 
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)

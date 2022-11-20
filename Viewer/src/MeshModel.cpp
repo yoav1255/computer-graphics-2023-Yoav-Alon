@@ -6,9 +6,12 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	normals(normals),
 	objectTransform(glm::mat4(1.0)),
 	worldTransform(glm::mat4(1.0)),
-	translation(glm::vec3(0,0,0)),
-	scale(glm::vec3(1,1,1)),
-	rotation(glm::vec3(0,0,0))
+	translationObject(glm::vec3(0,0,0)),
+	scaleObject(glm::vec3(1,1,1)),
+	rotationObject(glm::vec3(0,0,0)),
+	translationWorld(glm::vec3(0, 0, 0)),
+	scaleWorld(glm::vec3(1, 1, 1)),
+	rotationWorld(glm::vec3(0, 0, 0))
 {
 
 }
@@ -92,19 +95,26 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<MeshModel>& myM
 
  void MeshModel::SetObjectTransform()
 {
-	 glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	 glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	 glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	 glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), glm::radians(rotationObject.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	 glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(rotationObject.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	 glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotationObject.z), glm::vec3(0.0f, 0.0f, 1.0f));
 
 	 glm::mat4 matRotation = rotateX * rotateY * rotateZ;
-	 glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translation);
-	 glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scale);
+	 glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translationObject);
+	 glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scaleObject);
 
 	 objectTransform = matTranslation * matRotation * matScale;
-
 }
 
- void MeshModel::SetWorldTransform(const glm::mat4& mat)
+ void MeshModel::SetWorldTransform()
 {
-	worldTransform = mat;
-}
+	 glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), glm::radians(rotationWorld.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	 glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(rotationWorld.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	 glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotationWorld.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	 glm::mat4 matRotation = rotateX * rotateY * rotateZ;
+	 glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translationWorld);
+	 glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scaleWorld);
+
+	 worldTransform = matTranslation * matRotation * matScale;
+ }
