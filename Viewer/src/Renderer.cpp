@@ -1,7 +1,9 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <algorithm>
-
+#include <glm/glm.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "Renderer.h"
 #include "InitShader.h"
 
@@ -257,13 +259,30 @@ void Renderer::drawSomeFlowers()
 	return;
 }
 
-void Renderer::drawModel(const MeshModel& myModel)
+void Renderer::drawModel( MeshModel& myModel)
 {
+	//glm::vec3 translation = myModel.GetTranslation();
+	//glm::vec3 rotation = myModel.GetRotation();
+	//glm::vec3 scale = myModel.GetScale();
+
+	//glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f),glm::radians(rotation.x),glm::vec3(1.0f,0.0f,0.0f));
+	//glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	//glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	//glm::mat4 matRotation = rotateX * rotateY * rotateZ;
+	//glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translation);
+	//glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scale);
+
+	//glm::mat4 objTransformatiom = matTranslation * matRotation * matScale;
+	////myModel.SetObjectTransform(objTransformatiom)
+
+	glm::mat4 objTransformation = myModel.GetObjectTransform();
+
 	for (int i = 0;i < myModel.GetFacesCount();i++)
 	{
-		glm::vec2 vertice0 = glm::vec2(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0)-1]);
-		glm::vec2 vertice1 = glm::vec2(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1)-1]);
-		glm::vec2 vertice2 = glm::vec2(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2)-1]);
+		glm::vec4 vertice0 = objTransformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0)-1],1);
+		glm::vec4 vertice1 = objTransformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1)-1],1);
+		glm::vec4 vertice2 = objTransformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2)-1],1);
 
 		const glm::vec3 color = glm::vec3(1, 0, 0);
 		DrawLine(vertice0, vertice1, color);
@@ -274,12 +293,12 @@ void Renderer::drawModel(const MeshModel& myModel)
 }
 
 
-void Renderer::Render(const Scene& scene)
+void Renderer::Render( Scene& scene)
 {
 	
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-	const MeshModel myModel = scene.GetModel(0);
+	 MeshModel myModel = scene.GetModel(0);
 	drawModel(myModel);
 }
 

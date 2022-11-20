@@ -15,6 +15,7 @@
 #include "Renderer.h"
 #include "Scene.h"
 #include "Utils.h"
+#include <cmath>
 #include <iostream>
 #include <string>
 /**
@@ -58,22 +59,19 @@ int main(int argc, char **argv)
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
 	//load Model
-	std::string url = "C:/Users/YoavS/Documents/GitHub/computer-graphics-2023-yoavalon/Data/cow.obj";
+	std::string url = "C:/Users/YoavS/Documents/GitHub/computer-graphics-2023-yoavalon/Data/banana.obj";
 	std::shared_ptr<MeshModel> myFile = Utils::LoadMeshModel(url);
-	std::cout << myFile;
+	//std::cout << myFile;
 	scene.AddModel(myFile);
 
+	MeshModel& myModel = scene.GetModel(0);
 
-	glm::mat4 matScale = glm::scale(glm::vec3(200.0f, 200.0f, 200.0f));
-	scene.GetModel(0).setVertices(matScale);
-	glm::mat4 matTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(700.0f, 100.0f, 1.0f));
-	scene.GetModel(0).setVertices(matTranslate);
-
-
-			
-
-
-
+	//glm::mat4 matScale = glm::scale(glm::mat4(1.0f), glm::vec3(2000.0f, 2000.0f, 2000.0f));
+	//glm::mat4 matTranslate = glm::translate(glm::mat4(1.0f), glm::vec3(500.0f, 400.0f, 100.0f));
+	//glm::mat4 scaleAndTranslate = matTranslate * matScale;
+	//myModel.SetWorldTransform(scaleAndTranslate);
+	//myModel.setVertices();
+	//myModel.SetObjectTransform(glm::mat4(1.0f));
 	
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -142,7 +140,9 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 	int frameBufferWidth, frameBufferHeight;
 	glfwMakeContextCurrent(window);
 	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
-	
+
+
+
 	if (frameBufferWidth != renderer.GetViewportWidth() || frameBufferHeight != renderer.GetViewportHeight())
 	{
 		// TODO: Set new aspect ratio
@@ -163,6 +163,8 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 		// TODO: Handle mouse events here
 		if (io.MouseDown[0])
 		{
+
+
 		}
 	}
 
@@ -187,6 +189,7 @@ void Cleanup(GLFWwindow* window)
 
 void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 {
+
 	/**
 	 * MeshViewer menu
 	 */
@@ -236,14 +239,38 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::ShowDemoWindow(&show_demo_window);
 
 	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+
 	{
+
+
+		MeshModel& myModel = scene.GetModel(0);
 		static float f = 0.0f;
 		static int counter = 0;
+		static glm::vec3 translation(700.0f, 500.0f, 0.0f);
+		static glm::vec3 rotation(0.0f, 0.0f, 0.0f);
+		static glm::vec3 scale(500.0f,500.0f,0.0f);
 
-		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+		//glm::mat4 obj = myModel.GetObjectTransform();
+		//glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), translation);
+		//glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 1.0f));
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+		ImGui::Begin("Change Model Position");                          // Create a window called "Hello, world!" and append into it.
+		ImGui::SliderFloat2("Translate", &translation.x, 0.0f, 1000.0f);
+		ImGui::SliderFloat3("Rotate-Local", &rotation.x, -360.0f, 360.0f);
+		ImGui::SliderFloat("Scale", &scale.x, 200.0f, 3000.0f);
+		scale.y = scale.x;
+		myModel.SetTranslation(translation);
+		myModel.SetRotation(rotation);
+		myModel.SetScale(scale);
+		myModel.SetObjectTransform();
+
+		//myModel.SetObjectTransform(translateMat);
+		//myModel.SetObjectTransform(translateMat * rotateMat * (obj-vecToZero)));
+
+		
+
+	
+
 		ImGui::Checkbox("Another Window", &show_another_window);
 
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
