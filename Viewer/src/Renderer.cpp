@@ -298,8 +298,11 @@ void Renderer::Render( Scene& scene)
 	
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-	 MeshModel myModel = scene.GetModel(0);
-	drawModel(myModel);
+	if (scene.GetModelCount() > 0)
+	{
+		MeshModel myModel = scene.GetActiveModel();
+		drawModel(myModel);
+	}
 }
 
 int Renderer::GetViewportWidth() const

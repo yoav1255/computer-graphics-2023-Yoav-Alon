@@ -59,8 +59,8 @@ int main(int argc, char **argv)
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
 	//load Model
-	std::string url = "C:/Users/YoavS/Documents/GitHub/computer-graphics-2023-yoavalon/Data/banana.obj";
-	shared_ptr<MeshModel>& myFile = Utils::LoadMeshModel(url);
+		//std::string url = "C:/Users/YoavS/Documents/GitHub/computer-graphics-2023-yoavalon/Data/banana.obj";
+		//shared_ptr<MeshModel>& myFile = Utils::LoadMeshModel(url);
 	//std::cout << myFile;
 
 	//Initial vertices to the center of the screen
@@ -75,9 +75,7 @@ int main(int argc, char **argv)
 	//glm::mat4 scaleAndTranslate =  translateMat*scaleMat;
 	//myFile->setVertices(scaleAndTranslate);
 
-	scene.AddModel(myFile);
-
-	MeshModel& myModel = scene.GetModel(0);
+		//scene.AddModel(myFile);
 	
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -213,6 +211,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				if (result == NFD_OKAY)
 				{
 					scene.AddModel(Utils::LoadMeshModel(outPath));
+					scene.SetActiveModelIndex(scene.GetModelCount()-1);
 					free(outPath);
 				}
 				else if (result == NFD_CANCEL)
@@ -248,46 +247,50 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 	{
 
-		MeshModel& myModel = scene.GetModel(0);
 		static int counter = 0;
-		static glm::vec3 translationObject(myModel.GetTranslationObject());
-		static glm::vec3 rotationObject(myModel.GetRotationObject());
-		static glm::vec3 scaleObject(myModel.GetScaleObject());
 
-		static glm::vec3 translationWorld(myModel.GetTranslationWorld());
-		static glm::vec3 rotationWorld(myModel.GetRotationWorld());
-		static glm::vec3 scaleWorld(myModel.GetScaleWorld());
+		if (scene.GetModelCount() > 0)
+		{
+			MeshModel& myModel = scene.GetActiveModel();
 
-		//glm::mat4 obj = myModel.GetObjectTransform();
-		//glm::mat4 translateMat = glm::translate(glm::mat4(1.0f), translation);
-		//glm::mat4 rotateMat = glm::rotate(glm::mat4(1.0f), glm::radians(rotation), glm::vec3(0.0f, 1.0f, 1.0f));
+			static glm::vec3 translationObject(myModel.GetTranslationObject());
+			static glm::vec3 rotationObject(myModel.GetRotationObject());
+			static glm::vec3 scaleObject(myModel.GetScaleObject());
 
-		ImGui::Begin("Change Model Position");   
-		ImGui::Text("Local Transformation");
-		ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
-		ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
-		ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
-		scaleObject.y = scaleObject.x;
-		scaleObject.z = scaleObject.x;
-		myModel.SetTranslationObject(translationObject);
-		myModel.SetRotationObject(rotationObject);
-		myModel.SetScaleObject(scaleObject);
-		myModel.SetObjectTransform();
+			static glm::vec3 translationWorld(myModel.GetTranslationWorld());
+			static glm::vec3 rotationWorld(myModel.GetRotationWorld());
+			static glm::vec3 scaleWorld(myModel.GetScaleWorld());
 
-		ImGui::Text("World Transformation");
 
-		ImGui::SliderFloat3("Translate-World", &translationWorld.x, 0.0f, 1000.0f);
-		ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
-		ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
-		scaleWorld.y = scaleWorld.x;
-		scaleWorld.z = scaleWorld.x;
-		myModel.SetTranslationWorld(translationWorld);
-		myModel.SetRotationWorld(rotationWorld);
-		myModel.SetScaleWorld(scaleWorld);
-		myModel.SetWorldTransform();
 
-		//myModel.SetObjectTransform(translateMat);
-		//myModel.SetObjectTransform(translateMat * rotateMat * (obj-vecToZero)));
+
+
+			ImGui::Begin("Change Model Position");
+			ImGui::Text("Local Transformation");
+			ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
+			ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
+			ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
+			scaleObject.y = scaleObject.x;
+			scaleObject.z = scaleObject.x;
+			myModel.SetTranslationObject(translationObject);
+			myModel.SetRotationObject(rotationObject);
+			myModel.SetScaleObject(scaleObject);
+			myModel.SetObjectTransform();
+
+			ImGui::Text("World Transformation");
+
+			ImGui::SliderFloat3("Translate-World", &translationWorld.x, 0.0f, 1000.0f);
+			ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
+			ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
+			scaleWorld.y = scaleWorld.x;
+			scaleWorld.z = scaleWorld.x;
+			myModel.SetTranslationWorld(translationWorld);
+			myModel.SetRotationWorld(rotationWorld);
+			myModel.SetScaleWorld(scaleWorld);
+			myModel.SetWorldTransform();
+		}
+
+
 
 		ImGui::End();
 
