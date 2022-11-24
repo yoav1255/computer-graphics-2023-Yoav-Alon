@@ -251,7 +251,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 		if (scene.GetModelCount() > 0)
 		{
-			MeshModel& myModel = scene.GetActiveModel();
+			int index = scene.GetActiveModelIndex();
+			MeshModel& myModel = scene.GetModel(index);
 
 			static glm::vec3 translationObject(myModel.GetTranslationObject());
 			static glm::vec3 rotationObject(myModel.GetRotationObject());

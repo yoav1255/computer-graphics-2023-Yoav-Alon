@@ -300,8 +300,11 @@ void Renderer::Render( Scene& scene)
 	int half_height = viewport_height / 2;
 	if (scene.GetModelCount() > 0)
 	{
-		MeshModel myModel = scene.GetActiveModel();
-		drawModel(myModel);
+		for (int i = 0;i < scene.GetModelCount();i++)
+		{
+			MeshModel myModel = scene.GetModel(i);
+			drawModel(myModel);
+		}
 	}
 }
 
