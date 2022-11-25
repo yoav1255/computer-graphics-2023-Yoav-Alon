@@ -248,8 +248,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	{
 
 		static int counter = 0;
-
-		if (scene.GetModelCount() > 0)
+		const int modelCount = scene.GetModelCount();
+		if (modelCount > 0)
 		{
 			int index = scene.GetActiveModelIndex();
 			MeshModel& myModel = scene.GetModel(index);
@@ -262,11 +262,23 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			static glm::vec3 rotationWorld(myModel.GetRotationWorld());
 			static glm::vec3 scaleWorld(myModel.GetScaleWorld());
 
+			//const char* modelNum[] = {"0", "1", "2"};
 
 
-
+			//static char* items = new char[modelCount];
+			//for (int i = 0;i < modelCount;i++)
+			//{
+			//	char* c = new char[1];
+			//	std::to_chars(c, c + 1, i);
+			//	items[i] = *c;
+			//}
+			static char* items[]={ "0","1","2","3","4","5","6","7"};
+			static int selectedItem = 0;
 
 			ImGui::Begin("Change Model Position");
+			ImGui::Combo("modelPicker",&selectedItem,items,modelCount);
+			scene.SetActiveModelIndex(selectedItem);
+
 			ImGui::Text("Local Transformation");
 			ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
 			ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
