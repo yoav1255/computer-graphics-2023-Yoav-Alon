@@ -59,8 +59,8 @@ int main(int argc, char **argv)
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
 	//load Model
-		//std::string url = "C:/Users/YoavS/Documents/GitHub/computer-graphics-2023-yoavalon/Data/banana.obj";
-		//shared_ptr<MeshModel>& myFile = Utils::LoadMeshModel(url);
+	//std::string url = "C:/Users/YoavS/Documents/GitHub/computer-graphics-2023-yoavalon/Data/banana.obj";
+	//shared_ptr<MeshModel>& myFile = Utils::LoadMeshModel(url);
 	//std::cout << myFile;
 
 	//Initial vertices to the center of the screen
@@ -210,9 +210,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				nfdresult_t result = NFD_OpenDialog("obj;", NULL, &outPath);
 				if (result == NFD_OKAY)
 				{
-					scene.AddModel(Utils::LoadMeshModel(outPath));
+					shared_ptr<MeshModel>& myFile = Utils::LoadMeshModel(outPath);
+					scene.AddModel(myFile);
 					scene.SetActiveModelIndex(scene.GetModelCount()-1);
 					free(outPath);
+					std::cout << myFile;
 				}
 				else if (result == NFD_CANCEL)
 				{

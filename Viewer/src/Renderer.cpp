@@ -261,21 +261,6 @@ void Renderer::drawSomeFlowers()
 
 void Renderer::drawModel( MeshModel& myModel)
 {
-	//glm::vec3 translation = myModel.GetTranslation();
-	//glm::vec3 rotation = myModel.GetRotation();
-	//glm::vec3 scale = myModel.GetScale();
-
-	//glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f),glm::radians(rotation.x),glm::vec3(1.0f,0.0f,0.0f));
-	//glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	//glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
-	//glm::mat4 matRotation = rotateX * rotateY * rotateZ;
-	//glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translation);
-	//glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scale);
-
-	//glm::mat4 objTransformatiom = matTranslation * matRotation * matScale;
-	////myModel.SetObjectTransform(objTransformatiom)
-
 	glm::mat4 Transformation = myModel.GetTransform();
 
 	for (int i = 0;i < myModel.GetFacesCount();i++)
