@@ -296,17 +296,28 @@ void Renderer::drawSomeFlowers()
 }
 void Renderer::drawModel(MeshModel& model)
 {
+	glm::vec3 vecA, vecB, vecC;
+	model.setLocal();
+	glm::mat4 localMat = model.getLocal();
 	int triangles = model.GetFacesCount();
 	//std::cout << "Face count is: " << triangles << std::endl;
 	for (int i = 0; i < triangles; i++)
 	{
-		int a = model.GetFace(i).GetVertexIndex(0)-1;
-		int b = model.GetFace(i).GetVertexIndex(1)-1;
-		int c = model.GetFace(i).GetVertexIndex(2)-1;
+		int a = model.GetFace(i).GetVertexIndex(0) - 1;
+		int b = model.GetFace(i).GetVertexIndex(1) - 1;
+		int c = model.GetFace(i).GetVertexIndex(2) - 1;
+		vecA = model.GetVertexAt(a), vecB = model.GetVertexAt(b), vecC = model.GetVertexAt(c);
 
-		DrawLine({ model.GetVertexAt(a).x , model.GetVertexAt(a).y }, { model.GetVertexAt(b).x, model.GetVertexAt(b).y }, { 255,0,0 });
-		DrawLine({ model.GetVertexAt(a).x , model.GetVertexAt(a).y }, { model.GetVertexAt(c).x, model.GetVertexAt(c).y }, { 255,0,0 });
-		DrawLine({ model.GetVertexAt(b).x , model.GetVertexAt(b).y }, { model.GetVertexAt(c).x, model.GetVertexAt(c).y }, { 255,0,0 });
+
+		DrawLine(localMat * glm::vec4(vecA, 1.0f), localMat * glm::vec4(vecB, 1.0f), { 255,0,0 });
+		DrawLine(localMat * glm::vec4(vecA, 1.0f), localMat * glm::vec4(vecC, 1.0f), { 255,0,0 });
+		DrawLine(localMat * glm::vec4(vecC, 1.0f), localMat * glm::vec4(vecB, 1.0f), { 255,0,0 });
+		/*DrawLine({model.GetVertexAt(a).x , model.GetVertexAt(a).z}, {model.GetVertexAt(b).x, model.GetVertexAt(b).z}, {255,0,0});
+		DrawLine({ model.GetVertexAt(a).x , model.GetVertexAt(a).z }, { model.GetVertexAt(c).x, model.GetVertexAt(c).z }, { 255,0,0 });
+		DrawLine({ model.GetVertexAt(b).x , model.GetVertexAt(b).z }, { model.GetVertexAt(c).x, model.GetVertexAt(c).z }, { 255,0,0 });
+		DrawLine({ model.GetVertexAt(a).z , model.GetVertexAt(a).y }, { model.GetVertexAt(b).z, model.GetVertexAt(b).y }, { 255,0,0 });
+		DrawLine({ model.GetVertexAt(a).z , model.GetVertexAt(a).y }, { model.GetVertexAt(c).z, model.GetVertexAt(c).y }, { 255,0,0 });
+		DrawLine({ model.GetVertexAt(b).z , model.GetVertexAt(b).y }, { model.GetVertexAt(c).z, model.GetVertexAt(c).y }, { 255,0,0 });*/
 		//std::cout << "Vertices are: " << a << " , " << b << " , " << c << std::endl;
 	}
 	return;

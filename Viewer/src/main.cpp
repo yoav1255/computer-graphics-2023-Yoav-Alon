@@ -40,6 +40,7 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	// TODO: Handle mouse scroll here
 }
 
+
 int main(int argc, char** argv)
 {
 	int windowWidth = 1280, windowHeight = 720;
@@ -57,8 +58,8 @@ int main(int argc, char** argv)
 	std::string filePath = "C:/Haifa_University/ComputerGraphics/Data/banana.obj";
 	std::cout << filePath << std::endl;
 	std::shared_ptr<MeshModel> banana = Utils::LoadMeshModel(filePath);
-	banana->scale(3000);
-	banana->move(500, 300);
+	//banana->scale(3000);
+	//banana->move(500, 300);
 	std::cout << *banana << std::endl;
 	scene.AddModel(banana);
 
@@ -72,6 +73,7 @@ int main(int argc, char** argv)
 		DrawImguiMenus(io, scene);
 		RenderFrame(window, scene, renderer, io);
 	}
+	
 
 
 	Cleanup(window);
@@ -222,12 +224,36 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	if (show_demo_window)
 		ImGui::ShowDemoWindow(&show_demo_window);
+	{
+		ImGui::Begin("Mesh model controls: ");
+		static float scaleX = 1, scaleY = 1, scaleZ = 1, rotateByX = 0, rotateByY = 0, rotateByZ = 0, translateX = 0, translateY = 0, translateZ = 0;
+		ImGui::SliderFloat("Scale X by", &scaleX, 0.0f, 1000.0f);
+		ImGui::SliderFloat("Scale Y by", &scaleY, 0.0f, 1000.0f);
+		ImGui::SliderFloat("Scale Z by", &scaleZ, 0.0f, 1000.0f);
+		ImGui::SliderFloat("Rotate X by", &rotateByX, 0.0f, 360.0f);
+		ImGui::SliderFloat("Rotate Y by", &rotateByY, 0.0f, 360.0f);
+		ImGui::SliderFloat("Rotate Z by", &rotateByZ, 0.0f, 360.0f);
+		ImGui::SliderFloat("Translate X by", &translateX, -1000.0f, 1000.0f);
+		ImGui::SliderFloat("Translate Y by", &translateY, -1000.0f, 1000.0f);
+		ImGui::SliderFloat("Translate Z by", &translateZ, -1000.0f, 1000.0f);
+		ImGui::End();
+	}
 
 	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 	{
 		static float f = 0.0f;
 		static int counter = 0;
-
+		MeshModel& curr = scene.GetModel(0);
+		ImGui::Begin("Local controls");
+		ImGui::Text("LOCAL");
+		ImGui::SliderFloat("Scale X by", &curr.scaleLocal.x, 0.0f, 5000.0f);
+		ImGui::SliderFloat("Scale Y by", &curr.scaleLocal.y, 0.0f, 5000.0f);
+		ImGui::SliderFloat("Rotate X by", &curr.rotateLocal.x, 0.0f, 360.0f);
+		ImGui::SliderFloat("Rotate Y by", &curr.rotateLocal.y, 0.0f, 360.0f);
+		ImGui::SliderFloat("Rotate Z by", &curr.rotateLocal.z, 0.0f, 360.0f);
+		ImGui::SliderFloat("Translate X by",&curr.translateLocal.x, 0.0f, 2000.0f);
+		ImGui::SliderFloat("Translate Y by", &curr.translateLocal.y, 0.0f, 2000.0f);
+		ImGui::End();
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
