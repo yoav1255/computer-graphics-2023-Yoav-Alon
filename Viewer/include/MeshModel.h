@@ -16,8 +16,6 @@ public:
 	const std::string& GetModelName() const;
 	friend std::ostream& operator<< (std::ostream& out, MeshModel& mesh);
 	int getVerticesCount() const;
-	void scale(int scalar);
-	void move(int x, int y);
 	glm::vec3 GetVertexAt(int index);
 	glm::vec3 scaleLocal;
 	glm::vec3 translateLocal;
@@ -30,6 +28,8 @@ public:
 	glm::mat4 translateMat;
 	glm::mat4 getLocal();
 	void setLocal();
+	glm::mat4 getWorld();
+	void setWorld();
 
 
 

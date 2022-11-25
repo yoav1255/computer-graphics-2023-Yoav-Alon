@@ -298,7 +298,8 @@ void Renderer::drawModel(MeshModel& model)
 {
 	glm::vec3 vecA, vecB, vecC;
 	model.setLocal();
-	glm::mat4 localMat = model.getLocal();
+	model.setWorld();
+	glm::mat4 transformationMat = (model.getWorld() * model.getLocal());
 	int triangles = model.GetFacesCount();
 	//std::cout << "Face count is: " << triangles << std::endl;
 	for (int i = 0; i < triangles; i++)
@@ -309,9 +310,9 @@ void Renderer::drawModel(MeshModel& model)
 		vecA = model.GetVertexAt(a), vecB = model.GetVertexAt(b), vecC = model.GetVertexAt(c);
 
 
-		DrawLine(localMat * glm::vec4(vecA, 1.0f), localMat * glm::vec4(vecB, 1.0f), { 255,0,0 });
-		DrawLine(localMat * glm::vec4(vecA, 1.0f), localMat * glm::vec4(vecC, 1.0f), { 255,0,0 });
-		DrawLine(localMat * glm::vec4(vecC, 1.0f), localMat * glm::vec4(vecB, 1.0f), { 255,0,0 });
+		DrawLine(transformationMat * glm::vec4(vecA, 1.0f), transformationMat * glm::vec4(vecB, 1.0f), { 255,0,0 });
+		DrawLine(transformationMat * glm::vec4(vecA, 1.0f), transformationMat * glm::vec4(vecC, 1.0f), { 255,0,0 });
+		DrawLine(transformationMat * glm::vec4(vecC, 1.0f), transformationMat * glm::vec4(vecB, 1.0f), { 255,0,0 });
 		/*DrawLine({model.GetVertexAt(a).x , model.GetVertexAt(a).z}, {model.GetVertexAt(b).x, model.GetVertexAt(b).z}, {255,0,0});
 		DrawLine({ model.GetVertexAt(a).x , model.GetVertexAt(a).z }, { model.GetVertexAt(c).x, model.GetVertexAt(c).z }, { 255,0,0 });
 		DrawLine({ model.GetVertexAt(b).x , model.GetVertexAt(b).z }, { model.GetVertexAt(c).x, model.GetVertexAt(c).z }, { 255,0,0 });

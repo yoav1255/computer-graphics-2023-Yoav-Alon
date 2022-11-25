@@ -225,17 +225,18 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	if (show_demo_window)
 		ImGui::ShowDemoWindow(&show_demo_window);
 	{
-		ImGui::Begin("Mesh model controls: ");
-		static float scaleX = 1, scaleY = 1, scaleZ = 1, rotateByX = 0, rotateByY = 0, rotateByZ = 0, translateX = 0, translateY = 0, translateZ = 0;
-		ImGui::SliderFloat("Scale X by", &scaleX, 0.0f, 1000.0f);
-		ImGui::SliderFloat("Scale Y by", &scaleY, 0.0f, 1000.0f);
-		ImGui::SliderFloat("Scale Z by", &scaleZ, 0.0f, 1000.0f);
-		ImGui::SliderFloat("Rotate X by", &rotateByX, 0.0f, 360.0f);
-		ImGui::SliderFloat("Rotate Y by", &rotateByY, 0.0f, 360.0f);
-		ImGui::SliderFloat("Rotate Z by", &rotateByZ, 0.0f, 360.0f);
-		ImGui::SliderFloat("Translate X by", &translateX, -1000.0f, 1000.0f);
-		ImGui::SliderFloat("Translate Y by", &translateY, -1000.0f, 1000.0f);
-		ImGui::SliderFloat("Translate Z by", &translateZ, -1000.0f, 1000.0f);
+		MeshModel& curr = scene.GetModel(0);
+		ImGui::Begin("World controls");
+		ImGui::Text("WORLD");
+		ImGui::SliderFloat("Scale X by", &curr.scaleWorld.x, 0.0f, 2.0f);
+		ImGui::SliderFloat("Scale Y by", &curr.scaleWorld.y, 0.0f, 2.0f);
+		ImGui::SliderFloat("Scale Z by", &curr.scaleWorld.z, 0.0f, 2.0f);
+		ImGui::SliderFloat("Rotate X by", &curr.rotateWorld.x, 0.0f, 360.0f);
+		ImGui::SliderFloat("Rotate Y by", &curr.rotateWorld.y, 0.0f, 360.0f);
+		ImGui::SliderFloat("Rotate Z by", &curr.rotateWorld.z, 0.0f, 360.0f);
+		ImGui::SliderFloat("Translate X by", &curr.translateWorld.x, 0.0f, 2000.0f);
+		ImGui::SliderFloat("Translate Y by", &curr.translateWorld.y, 0.0f, 2000.0f);
+		ImGui::SliderFloat("Translate Z by", &curr.translateWorld.z, 0.0f, 2000.0f);
 		ImGui::End();
 	}
 
@@ -248,11 +249,13 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::Text("LOCAL");
 		ImGui::SliderFloat("Scale X by", &curr.scaleLocal.x, 0.0f, 5000.0f);
 		ImGui::SliderFloat("Scale Y by", &curr.scaleLocal.y, 0.0f, 5000.0f);
+		ImGui::SliderFloat("Scale Z by", &curr.scaleLocal.z, 0.0f, 5000.0f);
 		ImGui::SliderFloat("Rotate X by", &curr.rotateLocal.x, 0.0f, 360.0f);
 		ImGui::SliderFloat("Rotate Y by", &curr.rotateLocal.y, 0.0f, 360.0f);
 		ImGui::SliderFloat("Rotate Z by", &curr.rotateLocal.z, 0.0f, 360.0f);
 		ImGui::SliderFloat("Translate X by",&curr.translateLocal.x, 0.0f, 2000.0f);
 		ImGui::SliderFloat("Translate Y by", &curr.translateLocal.y, 0.0f, 2000.0f);
+		ImGui::SliderFloat("Translate Z by", &curr.translateLocal.z, 0.0f, 2000.0f);
 		ImGui::End();
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 

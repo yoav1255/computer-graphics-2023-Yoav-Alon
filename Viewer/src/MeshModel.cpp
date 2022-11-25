@@ -21,16 +21,7 @@ MeshModel::~MeshModel()
 {
 }
 
-void MeshModel::scale(int scalar)
-{
-	for (glm::vec3 &vector : this->vertices)
-	{
-		vector.x *= scalar;
-		vector.y *= scalar;
-		vector.z *= scalar;
-	}
-	return;
-}
+
 void MeshModel::setLocal()
 {
 	glm::mat4 xRotation = glm::rotate(glm::mat4(1.0f), glm::radians(this->rotateLocal.x), glm::vec3(1, 0, 0));
@@ -47,15 +38,23 @@ glm::mat4 MeshModel::getLocal()
 {
 	return this->local;
 }
-void MeshModel::move(int x, int y)
+void MeshModel::setWorld()
 {
-	for (glm::vec3& vector : this->vertices)
-	{
-		vector.x += x;
-		vector.y += y;
-	}
+	glm::mat4 xRotation = glm::rotate(glm::mat4(1.0f), glm::radians(this->rotateWorld.x), glm::vec3(1, 0, 0));
+	glm::mat4 yRotation = glm::rotate(glm::mat4(1.0f), glm::radians(this->rotateWorld.y), glm::vec3(0, 1, 0));
+	glm::mat4 zRotation = glm::rotate(glm::mat4(1.0f), glm::radians(this->rotateWorld.z), glm::vec3(0, 0, 1));
+	glm::mat4 rotationMatrix = xRotation * yRotation * zRotation;
+	glm::mat4 transalationMatrix = glm::translate(glm::mat4(1.0f), translateWorld);
+	glm::mat4 scaleMatrix = glm::scale(scaleWorld);
+
+	this->world = transalationMatrix * rotationMatrix * scaleMatrix;
 
 }
+glm::mat4 MeshModel::getWorld()
+{
+	return this->world;
+}
+
 
 const Face& MeshModel::GetFace(int index) const
 {
