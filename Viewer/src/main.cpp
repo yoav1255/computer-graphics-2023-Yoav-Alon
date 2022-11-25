@@ -246,38 +246,27 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 
 	{
-
 		static int counter = 0;
 		const int modelCount = scene.GetModelCount();
+		static char* items[] = { "0","1","2","3","4","5","6","7"};
+		static int selectedItem = modelCount;
 		if (modelCount > 0)
 		{
+			ImGui::Begin("Change Model Position");
+			ImGui::Combo("modelPicker", &selectedItem, items, modelCount);
+			scene.SetActiveModelIndex(selectedItem);
+
 			int index = scene.GetActiveModelIndex();
 			MeshModel& myModel = scene.GetModel(index);
 
-			static glm::vec3 translationObject(myModel.GetTranslationObject());
-			static glm::vec3 rotationObject(myModel.GetRotationObject());
-			static glm::vec3 scaleObject(myModel.GetScaleObject());
+			 glm::vec3 translationObject(myModel.GetTranslationObject());
+			 glm::vec3 rotationObject(myModel.GetRotationObject());
+			 glm::vec3 scaleObject(myModel.GetScaleObject());
 
-			static glm::vec3 translationWorld(myModel.GetTranslationWorld());
-			static glm::vec3 rotationWorld(myModel.GetRotationWorld());
-			static glm::vec3 scaleWorld(myModel.GetScaleWorld());
+			 glm::vec3 translationWorld(myModel.GetTranslationWorld());
+			 glm::vec3 rotationWorld(myModel.GetRotationWorld());
+			 glm::vec3 scaleWorld(myModel.GetScaleWorld());
 
-			//const char* modelNum[] = {"0", "1", "2"};
-
-
-			//static char* items = new char[modelCount];
-			//for (int i = 0;i < modelCount;i++)
-			//{
-			//	char* c = new char[1];
-			//	std::to_chars(c, c + 1, i);
-			//	items[i] = *c;
-			//}
-			static char* items[]={ "0","1","2","3","4","5","6","7"};
-			static int selectedItem = 0;
-
-			ImGui::Begin("Change Model Position");
-			ImGui::Combo("modelPicker",&selectedItem,items,modelCount);
-			scene.SetActiveModelIndex(selectedItem);
 
 			ImGui::Text("Local Transformation");
 			ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
@@ -308,18 +297,18 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::End();
 
 	
-		ImGui::Begin("something else");
-		ImGui::Checkbox("Another Window", &show_another_window);
+		//ImGui::Begin("something else");
+		//ImGui::Checkbox("Another Window", &show_another_window);
 
-		ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+		//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
 
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
+		//if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+		//	counter++;
+		//ImGui::SameLine();
+		//ImGui::Text("counter = %d", counter);
 
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
+		//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		//ImGui::End();
 	}
 
 	// 3. Show another simple window.
