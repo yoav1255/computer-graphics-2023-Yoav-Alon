@@ -163,4 +163,4 @@ Translate World and then Rotating Object
 
 ## loading and transforming several models, each model independently:
 
-<video src='./several_models.mp4'></video>
+<video src='./several_models.mp4'>
