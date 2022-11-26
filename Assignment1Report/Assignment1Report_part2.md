@@ -164,3 +164,9 @@ Translate World and then Rotating Object
 ## loading and transforming several models, each model independently:
 
 
+
+## Mouse and Keyboard controls
+
+```
+We made a gui explaining all the mouse and keyboard controls to scale/rotate/translate the object in the world/local environment as shown below
+```
