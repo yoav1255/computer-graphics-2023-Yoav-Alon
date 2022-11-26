@@ -58,24 +58,6 @@ int main(int argc, char **argv)
 
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
-	//load Model
-	//std::string url = "C:/Users/YoavS/Documents/GitHub/computer-graphics-2023-yoavalon/Data/banana.obj";
-	//shared_ptr<MeshModel>& myFile = Utils::LoadMeshModel(url);
-	//std::cout << myFile;
-
-	//Initial vertices to the center of the screen
-	
-	//myFile->SetScaleObject(glm::vec3(2000.0f, 2000.0f, 2000.0f));
-	//myFile->SetTranslationObject( glm::vec3(500.0f, 400.0f, 100.0f));
-	//myFile->SetRotationObject(glm::vec3(0, 0, 0));
-	//myFile->SetObjectTransform();
-
-	//glm::mat4 translateMat = glm::translate(glm::mat4(1.0f),glm::vec3(500.0f,500.0f,0.0f ));
-	//glm::mat4 scaleMat = glm::scale(glm::mat4(1.0f), glm::vec3(2000.0f, 2000.0f, 2000.0f));
-	//glm::mat4 scaleAndTranslate =  translateMat*scaleMat;
-	//myFile->setVertices(scaleAndTranslate);
-
-		//scene.AddModel(myFile);
 	
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -86,8 +68,6 @@ int main(int argc, char **argv)
 		DrawImguiMenus(io, scene);
 		RenderFrame(window, scene, renderer, io);
     }
-
-
 	Cleanup(window);
     return 0;
 }
@@ -144,31 +124,36 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 	int frameBufferWidth, frameBufferHeight;
 	glfwMakeContextCurrent(window);
 	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
-
-
-
-	if (frameBufferWidth != renderer.GetViewportWidth() || frameBufferHeight != renderer.GetViewportHeight())
+	if (scene.GetModelCount() > 0)
 	{
-		// TODO: Set new aspect ratio
-	}
+		MeshModel& curr = scene.GetActiveModel();
 
-	if (!io.WantCaptureKeyboard)
-	{
-		// TODO: Handle keyboard events here
-		if (io.KeysDown[65])
+
+
+		if (frameBufferWidth != renderer.GetViewportWidth() || frameBufferHeight != renderer.GetViewportHeight())
 		{
-			// A key is down
-			// Use the ASCII table for more key codes (https://www.asciitable.com/)
+			// TODO: Set new aspect ratio
 		}
-	}
 
-	if (!io.WantCaptureMouse)
-	{
-		// TODO: Handle mouse events here
-		if (io.MouseDown[0])
+		if (!io.WantCaptureKeyboard)
 		{
+			// TODO: Handle keyboard events here
+			if (io.KeysDown[65])
+			{
+				// A key is down
+				// Use the ASCII table for more key codes (https://www.asciitable.com/)
+			}
+		}
 
+		if (!io.WantCaptureMouse)
+		{
+			//Method #1
 
+			if (io.MouseDown[0])
+			{
+				curr.translationWorld.x = -curr.translationObject.x + io.MousePos.x;
+				curr.translationWorld.y = -curr.translationObject.y + (renderer.GetViewportHeight() - io.MousePos.y);
+			}
 		}
 	}
 
@@ -198,7 +183,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	 * MeshViewer menu
 	 */
 	ImGui::Begin("MeshViewer Menu");
-	
+
 	// Menu Bar
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -212,9 +197,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				{
 					shared_ptr<MeshModel>& myFile = Utils::LoadMeshModel(outPath);
 					scene.AddModel(myFile);
-					scene.SetActiveModelIndex(scene.GetModelCount()-1);
+					scene.SetActiveModelIndex(scene.GetModelCount() - 1);
 					free(outPath);
-					std::cout << myFile;
+					//std::cout << myFile;
 				}
 				else if (result == NFD_CANCEL)
 				{
@@ -234,92 +219,198 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	// Controls
 	ImGui::ColorEdit3("Clear Color", (float*)&clear_color);
 	// TODO: Add more controls as needed
-	
+
 	ImGui::End();
 
-	/**
-	 * Imgui demo - you can remove it once you are familiar with imgui
-	 */
+
 	
 	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	if (show_demo_window)
 		ImGui::ShowDemoWindow(&show_demo_window);
 
-	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-
+		//Method #2
+	if (scene.GetModelCount() > 0)
 	{
-		static int counter = 0;
-		const int modelCount = scene.GetModelCount();
-		static char* items[] = { "0","1","2","3","4","5","6","7"};
-		static int selectedItem = modelCount;
-		if (modelCount > 0)
+		MeshModel& curr = scene.GetActiveModel();
+
+		static bool worldFlag = false, localFlag = false;
 		{
-			ImGui::Begin("Change Model Position");
-			ImGui::Combo("modelPicker", &selectedItem, items, modelCount);
-			scene.SetActiveModelIndex(selectedItem);
-
-			int index = scene.GetActiveModelIndex();
-			MeshModel& myModel = scene.GetModel(index);
-
-			 glm::vec3 translationObject(myModel.GetTranslationObject());
-			 glm::vec3 rotationObject(myModel.GetRotationObject());
-			 glm::vec3 scaleObject(myModel.GetScaleObject());
-
-			 glm::vec3 translationWorld(myModel.GetTranslationWorld());
-			 glm::vec3 rotationWorld(myModel.GetRotationWorld());
-			 glm::vec3 scaleWorld(myModel.GetScaleWorld());
-
-
-			ImGui::Text("Local Transformation");
-			ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
-			ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
-			ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
-			scaleObject.y = scaleObject.x;
-			scaleObject.z = scaleObject.x;
-			myModel.SetTranslationObject(translationObject);
-			myModel.SetRotationObject(rotationObject);
-			myModel.SetScaleObject(scaleObject);
-			myModel.SetObjectTransform();
-
-			ImGui::Text("World Transformation");
-
-			ImGui::SliderFloat3("Translate-World", &translationWorld.x, 0.0f, 1000.0f);
-			ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
-			ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
-			scaleWorld.y = scaleWorld.x;
-			scaleWorld.z = scaleWorld.x;
-			myModel.SetTranslationWorld(translationWorld);
-			myModel.SetRotationWorld(rotationWorld);
-			myModel.SetScaleWorld(scaleWorld);
-			myModel.SetWorldTransform();
+			ImGui::Begin("Keyboard controls");
+			ImGui::Text("Chose World or Local transformation to control from keyboard");
+			if (ImGui::Checkbox("World", &worldFlag))
+				localFlag = false;
+			if (ImGui::Checkbox("Local", &localFlag))
+				worldFlag = false;
+			ImGui::Text("W to move model up");
+			ImGui::Text("S to move model down");
+			ImGui::Text("A to move model left");
+			ImGui::Text("D to move model right");
+			ImGui::Text("UP Arrow to upscale model");
+			ImGui::Text("DOWN Arrow to downscale model");
+			ImGui::Text("X to rotate x axis");
+			ImGui::Text("Y to rotate y axis");
+			ImGui::Text("Z to rotate z axis");
+			ImGui::End();
 		}
 
-
-
-		ImGui::End();
-
-	
-		//ImGui::Begin("something else");
-		//ImGui::Checkbox("Another Window", &show_another_window);
-
-		//ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-		//if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-		//	counter++;
-		//ImGui::SameLine();
-		//ImGui::Text("counter = %d", counter);
-
-		//ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		//ImGui::End();
+		if (!io.WantCaptureKeyboard) // Second method of transforming the model using the keyboard
+		{
+			if (localFlag)
+			{
+				if (io.KeysDown['W'] || io.KeysDown['w'])
+				{
+					curr.translationObject.y += 5;
+				}
+				if (io.KeysDown['S'] || io.KeysDown['s'])
+				{
+					curr.translationObject.y -= 5;
+				}
+				if (io.KeysDown['A'] || io.KeysDown['a'])
+				{
+					curr.translationObject.x -= 5;
+				}
+				if (io.KeysDown['D'] || io.KeysDown['d'])
+				{
+					curr.translationObject.x += 5;
+				}
+				if (io.KeysDown['X'] || io.KeysDown['x'])
+				{
+					curr.rotationObject.x >= 360 ? curr.rotationObject.x -= 360 : curr.rotationObject.x;
+					curr.rotationObject.x += 5;
+				}
+				if (io.KeysDown['Y'] || io.KeysDown['y'])
+				{
+					curr.rotationObject.y >= 360 ? curr.rotationObject.y -= 360 : curr.rotationObject.y;
+					curr.rotationObject.y += 5;
+				}
+				if (io.KeysDown['Z'] || io.KeysDown['z'])
+				{
+					curr.rotationObject.z >= 360 ? curr.rotationObject.z -= 360 : curr.rotationObject.z;
+					curr.rotationObject.z += 5;
+				}
+				if (io.KeysDown[264]) // DOWN Arrow
+				{
+					curr.scaleObject.x -= 5;
+					curr.scaleObject.y -= 5;
+					curr.scaleObject.z -= 5;
+				}
+				if (io.KeysDown[265]) // UP Arrow
+				{
+					curr.scaleObject.x += 5;
+					curr.scaleObject.y += 5;
+					curr.scaleObject.z += 5;
+				}
+			}
+			else if (worldFlag)
+			{
+				if (io.KeysDown['W'] || io.KeysDown['w'])
+				{
+					curr.translationWorld.y += 5;
+				}
+				if (io.KeysDown['S'] || io.KeysDown['s'])
+				{
+					curr.translationWorld.y -= 5;
+				}
+				if (io.KeysDown['A'] || io.KeysDown['a'])
+				{
+					curr.translationWorld.x -= 5;
+				}
+				if (io.KeysDown['D'] || io.KeysDown['d'])
+				{
+					curr.translationWorld.x += 5;
+				}
+				if (io.KeysDown['X'] || io.KeysDown['x'])
+				{
+					curr.rotationWorld.x >= 360 ? curr.rotationWorld.x -= 360 : curr.rotationWorld.x;
+					curr.rotationWorld.x += 5;
+				}
+				if (io.KeysDown['Y'] || io.KeysDown['y'])
+				{
+					curr.rotationWorld.y >= 360 ? curr.rotationWorld.y -= 360 : curr.rotationWorld.y;
+					curr.rotationWorld.y += 5;
+				}
+				if (io.KeysDown['Z'] || io.KeysDown['z'])
+				{
+					curr.rotationWorld.z >= 360 ? curr.rotationWorld.z -= 360 : curr.rotationWorld.z;
+					curr.rotationWorld.z += 5;
+				}
+				if (io.KeysDown[264]) // DOWN Arrow
+				{
+					curr.scaleWorld.x -= 0.1;
+					curr.scaleWorld.y -= 0.1;
+					curr.scaleWorld.z -= 0.1;
+				}
+				if (io.KeysDown[265]) // UP Arrow
+				{
+					curr.scaleWorld.x += 0.1;
+					curr.scaleWorld.y += 0.1;
+					curr.scaleWorld.z += 0.1;
+				}
+			}
+		}
 	}
 
-	// 3. Show another simple window.
-	if (show_another_window)
-	{
-		ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-		ImGui::Text("Hello from another window!");
-		if (ImGui::Button("Close Me"))
-			show_another_window = false;
-		ImGui::End();
-	}
-}
+		
+			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+
+			{
+				static int counter = 0;
+				const int modelCount = scene.GetModelCount();
+				static char* items[] = { "0","1","2","3","4","5","6","7" };
+				static int selectedItem = modelCount;
+				if (modelCount > 0)
+				{
+					ImGui::Begin("Change Model Position");
+					ImGui::Combo("modelPicker", &selectedItem, items, modelCount);
+					scene.SetActiveModelIndex(selectedItem);
+
+					int index = scene.GetActiveModelIndex();
+					MeshModel& myModel = scene.GetModel(index);
+
+					glm::vec3 translationObject(myModel.GetTranslationObject());
+					glm::vec3 rotationObject(myModel.GetRotationObject());
+					glm::vec3 scaleObject(myModel.GetScaleObject());
+
+					glm::vec3 translationWorld(myModel.GetTranslationWorld());
+					glm::vec3 rotationWorld(myModel.GetRotationWorld());
+					glm::vec3 scaleWorld(myModel.GetScaleWorld());
+
+
+					ImGui::Text("Local Transformation");
+					ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
+					ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
+					ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
+					scaleObject.y = scaleObject.x;
+					scaleObject.z = scaleObject.x;
+					myModel.SetTranslationObject(translationObject);
+					myModel.SetRotationObject(rotationObject);
+					myModel.SetScaleObject(scaleObject);
+					myModel.SetObjectTransform();
+
+					ImGui::Text("World Transformation");
+
+					ImGui::SliderFloat3("Translate-World", &translationWorld.x, 0.0f, 1000.0f);
+					ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
+					ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
+					scaleWorld.y = scaleWorld.x;
+					scaleWorld.z = scaleWorld.x;
+					myModel.SetTranslationWorld(translationWorld);
+					myModel.SetRotationWorld(rotationWorld);
+					myModel.SetScaleWorld(scaleWorld);
+					myModel.SetWorldTransform();
+				}
+
+				ImGui::End();
+
+			}
+
+			// 3. Show another simple window.
+			if (show_another_window)
+			{
+				ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+				ImGui::Text("Hello from another window!");
+				if (ImGui::Button("Close Me"))
+					show_another_window = false;
+				ImGui::End();
+			}
+		}

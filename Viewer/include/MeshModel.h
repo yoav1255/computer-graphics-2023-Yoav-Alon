@@ -41,8 +41,6 @@ public:
 	void SetRotationWorld(const glm::vec3 rotationVec) { rotationWorld = rotationVec; }
 
 	
-
-private:
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
