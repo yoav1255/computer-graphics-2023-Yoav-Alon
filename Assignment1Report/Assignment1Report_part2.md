@@ -165,8 +165,15 @@ Translate World and then Rotating Object
 
 
 
+https://user-images.githubusercontent.com/101698622/204091038-625fb221-a68f-47f7-b8af-ed924bcfcf3b.mp4
+
+
+
 ## Mouse and Keyboard controls
 
 ```
 We made a gui explaining all the mouse and keyboard controls to scale/rotate/translate the object in the world/local environment as shown below
 ```
+
+https://user-images.githubusercontent.com/101698622/204091046-27c8f84c-2167-4d39-9018-ab6f7e2430e5.mp4
+
