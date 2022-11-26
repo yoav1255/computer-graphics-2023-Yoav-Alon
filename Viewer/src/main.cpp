@@ -132,30 +132,20 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 	int frameBufferWidth, frameBufferHeight;
 	glfwMakeContextCurrent(window);
 	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
-	
+	MeshModel& curr = scene.GetModel(0);
 	if (frameBufferWidth != renderer.GetViewportWidth() || frameBufferHeight != renderer.GetViewportHeight())
 	{
 		// TODO: Set new aspect ratio
 	}
-
-	if (!io.WantCaptureKeyboard)
-	{
-		// TODO: Handle keyboard events here
-		if (io.KeysDown[65])
-		{
-			// A key is down
-			// Use the ASCII table for more key codes (https://www.asciitable.com/)
-		}
-	}
-
 	if (!io.WantCaptureMouse)
 	{
-		// TODO: Handle mouse events here
-		if (io.MouseDown[0])
+		if (io.MouseDown[0]) // First method of transforming the object - by mouse drag and mouse clicks
 		{
+			curr.translateWorld.x = -curr.translateLocal.x  + io.MousePos.x;
+			curr.translateWorld.y = -curr.translateLocal.y + (renderer.GetViewportHeight() - io.MousePos.y);
 		}
 	}
-
+	
 	renderer.ClearColorBuffer(clear_color);
 	renderer.Render(scene);
 	renderer.SwapBuffers();
@@ -220,12 +210,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	/**
 	 * Imgui demo - you can remove it once you are familiar with imgui
 	 */
-	
+	MeshModel& curr = scene.GetModel(0);
 	// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	if (show_demo_window)
 		ImGui::ShowDemoWindow(&show_demo_window);
 	{
-		MeshModel& curr = scene.GetModel(0);
 		ImGui::Begin("World controls");
 		ImGui::Text("WORLD");
 		ImGui::SliderFloat("Scale X by", &curr.scaleWorld.x, 0.0f, 2.0f);
@@ -239,12 +228,125 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::SliderFloat("Translate Z by", &curr.translateWorld.z, 0.0f, 2000.0f);
 		ImGui::End();
 	}
+	static bool worldFlag = false, localFlag = false;
+	{
+		ImGui::Begin("Keyboard controls");
+		ImGui::Text("Chose World or Local transformation to control from keyboard");
+		if(ImGui::Checkbox("World", &worldFlag))
+			localFlag = false;
+		if(ImGui::Checkbox("Local", &localFlag))
+			worldFlag = false;
+		ImGui::Text("W to move model up");
+		ImGui::Text("S to move model down");
+		ImGui::Text("A to move model left");
+		ImGui::Text("D to move model right");
+		ImGui::Text("UP Arrow to upscale model");
+		ImGui::Text("DOWN Arrow to downscale model");
+		ImGui::Text("X to rotate x axis");
+		ImGui::Text("Y to rotate y axis");
+		ImGui::Text("Z to rotate z axis");
+		ImGui::End();
 
+		if (!io.WantCaptureKeyboard) // Second method of transforming the model using the keyboard
+		{
+			if (localFlag)
+			{
+				if (io.KeysDown['W'] || io.KeysDown['w'])
+				{
+					curr.translateLocal.y += 5;
+				}
+				if (io.KeysDown['S'] || io.KeysDown['s'])
+				{
+					curr.translateLocal.y -= 5;
+				}
+				if (io.KeysDown['A'] || io.KeysDown['a'])
+				{
+					curr.translateLocal.x -= 5;
+				}
+				if (io.KeysDown['D'] || io.KeysDown['d'])
+				{
+					curr.translateLocal.x+= 5;
+				}
+				if (io.KeysDown['X'] || io.KeysDown['x'])
+				{
+					curr.rotateLocal.x >= 360 ? curr.rotateLocal.x -= 360 : curr.rotateLocal.x;
+					curr.rotateLocal.x += 5;
+				}
+				if (io.KeysDown['Y'] || io.KeysDown['y'])
+				{
+					curr.rotateLocal.y >= 360 ? curr.rotateLocal.y -= 360 : curr.rotateLocal.y;
+					curr.rotateLocal.y += 5;
+				}
+				if (io.KeysDown['Z'] || io.KeysDown['z'])
+				{
+					curr.rotateLocal.z >= 360 ? curr.rotateLocal.z -= 360 : curr.rotateLocal.z;
+					curr.rotateLocal.z += 5;
+				}
+				if (io.KeysDown[264]) // DOWN Arrow
+				{
+					curr.scaleLocal.x -= 5;
+					curr.scaleLocal.y -= 5;
+					curr.scaleLocal.z -= 5;
+				}
+				if (io.KeysDown[265]) // UP Arrow
+				{
+					curr.scaleLocal.x += 5;
+					curr.scaleLocal.y += 5;
+					curr.scaleLocal.z += 5;
+				}
+			}
+			else if (worldFlag)
+			{
+				if (io.KeysDown['W'] || io.KeysDown['w'])
+				{
+					curr.translateWorld.y += 5;
+				}
+				if (io.KeysDown['S'] || io.KeysDown['s'])
+				{
+					curr.translateWorld.y -= 5;
+				}
+				if (io.KeysDown['A'] || io.KeysDown['a'])
+				{
+					curr.translateWorld.x -= 5;
+				}
+				if (io.KeysDown['D'] || io.KeysDown['d'])
+				{
+					curr.translateWorld.x += 5;
+				}
+				if (io.KeysDown['X'] || io.KeysDown['x'])
+				{
+					curr.rotateWorld.x >= 360 ? curr.rotateWorld.x -= 360 : curr.rotateWorld.x;
+					curr.rotateWorld.x += 5;
+				}
+				if (io.KeysDown['Y'] || io.KeysDown['y'])
+				{
+					curr.rotateWorld.y >= 360 ? curr.rotateWorld.y -= 360 : curr.rotateWorld.y;
+					curr.rotateWorld.y += 5;
+				}
+				if (io.KeysDown['Z'] || io.KeysDown['z'])
+				{
+					curr.rotateWorld.z >= 360 ? curr.rotateWorld.z -= 360 : curr.rotateWorld.z;
+					curr.rotateWorld.z += 5;
+				}
+				if (io.KeysDown[264]) // DOWN Arrow
+				{
+					curr.scaleWorld.x -= 0.1;
+					curr.scaleWorld.y -= 0.1;
+					curr.scaleWorld.z -= 0.1;
+				}
+				if (io.KeysDown[265]) // UP Arrow
+				{
+					curr.scaleWorld.x += 0.1;
+					curr.scaleWorld.y += 0.1;
+					curr.scaleWorld.z += 0.1;
+				}
+			}
+		}
+	}
 	// 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
 	{
 		static float f = 0.0f;
 		static int counter = 0;
-		MeshModel& curr = scene.GetModel(0);
 		ImGui::Begin("Local controls");
 		ImGui::Text("LOCAL");
 		ImGui::SliderFloat("Scale X by", &curr.scaleLocal.x, 0.0f, 5000.0f);
@@ -257,6 +359,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		ImGui::SliderFloat("Translate Y by", &curr.translateLocal.y, 0.0f, 2000.0f);
 		ImGui::SliderFloat("Translate Z by", &curr.translateLocal.z, 0.0f, 2000.0f);
 		ImGui::End();
+		
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
