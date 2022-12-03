@@ -7,12 +7,13 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	normals(normals),
 	objectTransform(glm::mat4(1.0)),
 	worldTransform(glm::mat4(1.0)),
-	translationObject(glm::vec3(0,0,0)),
-	scaleObject(glm::vec3(1,1,1)),
-	rotationObject(glm::vec3(0,0,0)),
+	translationObject(glm::vec3(0, 0, 0)),
+	scaleObject(glm::vec3(1, 1, 1)),
+	rotationObject(glm::vec3(0, 0, 0)),
 	translationWorld(glm::vec3(0, 0, 0)),
 	scaleWorld(glm::vec3(1, 1, 1)),
-	rotationWorld(glm::vec3(0, 0, 0))
+	rotationWorld(glm::vec3(0, 0, 0)),
+	vCenter(glm::vec3(0,0,0))
 {
 
 }

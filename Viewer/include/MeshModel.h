@@ -31,10 +31,14 @@ public:
 	void SetTranslationObject(const glm::vec3 translationVec) { translationObject = translationVec; }
 	void SetScaleObject(const glm::vec3 scaleVec) { scaleObject = scaleVec; }
 	void SetRotationObject(const glm::vec3 rotationVec) { rotationObject = rotationVec; }
+	void SetVCenter(const glm::vec3 center) { vCenter = center; }
+
 
 	const glm::vec3& GetTranslationWorld() const { return translationWorld; }
 	const glm::vec3& GetScaleWorld() const { return scaleWorld; }
 	const glm::vec3& GetRotationWorld() const { return rotationWorld; }
+	const glm::vec3& GetVCenter() const { return vCenter; }
+
 
 	void SetTranslationWorld(const glm::vec3 translationVec) { translationWorld = translationVec; }
 	void SetScaleWorld(const glm::vec3 scaleVec) { scaleWorld = scaleVec; }
@@ -46,6 +50,7 @@ public:
 	std::vector<glm::vec3> normals;
 	glm::mat4 objectTransform;
 	glm::mat4 worldTransform;
+	glm::vec3 vCenter;
 	glm::vec3 translationObject;
 	glm::vec3 scaleObject;
 	glm::vec3 rotationObject;

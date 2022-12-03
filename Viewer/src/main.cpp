@@ -371,50 +371,66 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			{
 				static int counter = 0;
 				const int modelCount = scene.GetModelCount();
-				int windowWidth = 1280, windowHeight = 720; //
+				const int cameraCount = scene.GetCameraCount();
 				static char* items[] = { "0","1","2","3","4","5","6","7" };
-				static int selectedItem = modelCount;
+				static int selectedItemModel = modelCount;
+				//Model controls
+
 				if (modelCount > 0)
 				{
 					{
-						ImGui::Begin("Change Model Position");
-						ImGui::Combo("modelPicker", &selectedItem, items, modelCount);
-						scene.SetActiveModelIndex(selectedItem);
-						int index = scene.GetActiveModelIndex();
-						MeshModel& myModel = scene.GetModel(index);
-						glm::vec3 translationObject(myModel.GetTranslationObject());
-						glm::vec3 rotationObject(myModel.GetRotationObject());
-						glm::vec3 scaleObject(myModel.GetScaleObject());
+						{
+							ImGui::Begin("Change Model Position");
+							ImGui::Combo("modelPicker", &selectedItemModel, items, modelCount);
+							scene.SetActiveModelIndex(selectedItemModel);
+							int index = scene.GetActiveModelIndex();
+							MeshModel& myModel = scene.GetModel(index);
+							glm::vec3 translationObject(myModel.GetTranslationObject());
+							glm::vec3 rotationObject(myModel.GetRotationObject());
+							glm::vec3 scaleObject(myModel.GetScaleObject());
 
-						glm::vec3 translationWorld(myModel.GetTranslationWorld());
-						glm::vec3 rotationWorld(myModel.GetRotationWorld());
-						glm::vec3 scaleWorld(myModel.GetScaleWorld());
+							glm::vec3 translationWorld(myModel.GetTranslationWorld());
+							glm::vec3 rotationWorld(myModel.GetRotationWorld());
+							glm::vec3 scaleWorld(myModel.GetScaleWorld());
 
 
-						ImGui::Text("Local Transformation");
-						ImGui::SliderFloat3("Translate-Local", &translationObject.x, float(-windowWidth), float(windowWidth));
-						ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
-						ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
-						scaleObject.y = scaleObject.x;
-						scaleObject.z = scaleObject.x;
-						myModel.SetTranslationObject(translationObject);
-						myModel.SetRotationObject(rotationObject);
-						myModel.SetScaleObject(scaleObject);
-						myModel.SetObjectTransform();
+							ImGui::Text("Local Transformation");
+							ImGui::SliderFloat3("Translate-Local", &translationObject.x, -1000.0f, 1000.0f);
+							ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
+							ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
+							scaleObject.y = scaleObject.x;
+							scaleObject.z = scaleObject.x;
+							myModel.SetTranslationObject(translationObject);
+							myModel.SetRotationObject(rotationObject);
+							myModel.SetScaleObject(scaleObject);
+							myModel.SetObjectTransform();
 
-						ImGui::Text("World Transformation");
+							ImGui::Text("World Transformation");
 
-						ImGui::SliderFloat3("Translate-World", &translationWorld.x, float(-windowWidth), float(windowWidth));
-						ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
-						ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
-						scaleWorld.y = scaleWorld.x;
-						scaleWorld.z = scaleWorld.x;
-						myModel.SetTranslationWorld(translationWorld);
-						myModel.SetRotationWorld(rotationWorld);
-						myModel.SetScaleWorld(scaleWorld);
-						myModel.SetWorldTransform();
-						ImGui::End();
+							ImGui::SliderFloat3("Translate-World", &translationWorld.x, -1000.0f, 1000.0f);
+							ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
+							ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
+							scaleWorld.y = scaleWorld.x;
+							scaleWorld.z = scaleWorld.x;
+							myModel.SetTranslationWorld(translationWorld);
+							myModel.SetRotationWorld(rotationWorld);
+							myModel.SetScaleWorld(scaleWorld);
+							myModel.SetWorldTransform();
+
+							if (ImGui::Button("Center"))
+							{
+								myModel.SetTranslationObject(glm::vec3(0.0f));
+								myModel.SetRotationObject(glm::vec3(0.0f));
+								myModel.SetTranslationWorld(glm::vec3(0.0f));
+								myModel.SetRotationWorld(glm::vec3(0.0f));
+							}
+							ImGui::End();
+						}
+
 					}
+					//Camera controls
+
+					if (cameraCount > 0)
 					{
 						ImGui::Begin("Camera Controller");
 						Camera& cam = scene.GetActiveCamera();
@@ -446,11 +462,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							zFar = -1;
 						}
 
-						static glm::vec3 eye = glm::vec3(1.0f);
+						static glm::vec3 eye = glm::vec3(0.0f,0.0f,0.1f);
 						static glm::vec3 at = glm::vec3(0.0f);
 						static float upper = 1.0f;
 
-						ImGui::Text("Camera position");
+						ImGui::Text("Camera controls");
 						ImGui::SliderFloat("eye X", &eye.x, 0.0f, 10.0f);
 						ImGui::SliderFloat("eye Y", &eye.y, 0.0f, 10.0f);
 						ImGui::SliderFloat("eye Z", &eye.z, 0.0f, 10.0f);
@@ -459,16 +475,58 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						ImGui::SliderFloat("at Y", &at.y, 0.0f, 10.0f);
 						ImGui::SliderFloat("at Z", &at.z, 0.0f, 10.0f);
 
-						//ImGui::SliderFloat("Upside-Down",&upper ,-1.0f, 1.0f);
-						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f,upper,0.0f));
+						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f, upper, 0.0f));
 
-						
 						//std::vector<const char*> camera_names;
 						//for (int i = 0; i < scene.GetCameraCount(); i++)
 						//{
 						//	const std::string& name = scene.GetCamera(i).GetName();
 						//	camera_names.push_back(name.c_str());
 						//}
+						ImGui::End();
+					}
+
+					{
+
+						static int selectedItemCamera = cameraCount;
+
+						ImGui::Begin("Change Camera Position");
+						//ImGui::Combo("Camera Picker", &selectedItemCamera, items, cameraCount);
+						//scene.SetActiveCameraIndex(selectedItemCamera);
+						//
+						//int index = scene.GetActiveCameraIndex();
+						Camera& cam = scene.GetActiveCamera();
+						
+						glm::vec3 camtranslationObject(cam.GetTranslationObject());
+						glm::vec3 camrotationObject(cam.GetRotationObject());
+						glm::vec3 camscaleObject(cam.GetScaleObject());
+
+						glm::vec3 camtranslationWorld(cam.GetTranslationWorld());
+						glm::vec3 camrotationWorld(cam.GetRotationWorld());
+						glm::vec3 camscaleWorld(cam.GetScaleWorld());
+						
+						ImGui::Text("Local Transformation");
+						ImGui::SliderFloat3("Translate-Local", &camtranslationObject.x, -1000.0f, 1000.0f);
+						ImGui::SliderFloat3("Rotate-Local", &camrotationObject.x, 0.0f, 360.0f);
+						ImGui::SliderFloat("Scale-Local", &camscaleObject.x, 0.0f, 2000.0f);
+						camscaleObject.y = camscaleObject.x;
+						camscaleObject.z = camscaleObject.x;
+						cam.SetTranslationObject(camtranslationObject);
+						cam.SetRotationObject(camrotationObject);
+						cam.SetScaleObject(camscaleObject);
+						cam.SetObjectTransform();
+
+						ImGui::Text("World Transformation");
+
+						ImGui::SliderFloat3("Translate-World", &camtranslationWorld.x, -1000.0f, 1000.0f);
+						ImGui::SliderFloat3("Rotate-World", &camrotationWorld.x, 0.0f, 360.0f);
+						ImGui::SliderFloat("Scale-World", &camscaleWorld.x, 0.0f, 2.0f);
+						camscaleWorld.y = camscaleWorld.x;
+						camscaleWorld.z = camscaleWorld.x;
+						cam.SetTranslationWorld(camtranslationWorld);
+						cam.SetRotationWorld(camrotationWorld);
+						cam.SetScaleWorld(camscaleWorld);
+						cam.SetWorldTransform();
 						ImGui::End();
 					}
 				}

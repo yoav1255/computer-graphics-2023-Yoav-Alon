@@ -270,6 +270,14 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
 	glm::mat4 modelViewMatrix = view * Transformation;
 	glm::vec4 viewPort(0.0f, 0.0f, float(viewport_width), float(viewport_height));
+	const glm::vec3 color = glm::vec3(1, 0, 0);
+
+	const glm::vec3 colorX = glm::vec3(1, 0, 1);
+	const glm::vec3 colorY = glm::vec3(1, 0.5, 1);
+	const glm::vec3 colorZ = glm::vec3(0, 1, 1);
+
+	glm::vec4 vCenter = glm::vec4(0.0f);
+
 
 	for (int i = 0;i < myModel.GetFacesCount();i++)
 	{
@@ -277,15 +285,9 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
 		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
 
-
-
-		glm::vec4 verticeModel0 = projection*view*Transformation * glm::vec4(v0,1);
+		glm::vec4 verticeModel0 = projection * view * Transformation * glm::vec4(v0,1);
 		glm::vec4 verticeModel1 = projection * view * Transformation * glm::vec4(v1,1);
 		glm::vec4 verticeModel2 = projection * view * Transformation * glm::vec4(v2,1);
-
-		//glm::vec3 v0Projected = glm::project(v0, modelViewMatrix, projection, viewPort);
-		//glm::vec3 v1Projected = glm::project(v1, modelViewMatrix, projection, viewPort);
-		//glm::vec3 v2Projected = glm::project(v2, modelViewMatrix, projection, viewPort);
 
 		verticeModel0.x += half_width;
 		verticeModel0.y += half_height;
@@ -294,17 +296,18 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		verticeModel2.x += half_width;
 		verticeModel2.y += half_height;
 
-		const glm::vec3 color = glm::vec3(1, 0, 0);
-		//DrawLine(verticeModel0, verticeModel1, color);
-		//DrawLine(verticeModel0, verticeModel2, color);
-		//DrawLine(verticeModel2, verticeModel1, color);
-			DrawLine(verticeModel0, verticeModel1, color);
-			DrawLine(verticeModel0, verticeModel2, color);
-			DrawLine(verticeModel2, verticeModel1, color);
-		//DrawLine(glm::ivec2(v0Projected.x,v0Projected.y), glm::ivec2(v1Projected.x, v1Projected.y), color);
-		//DrawLine(glm::ivec2(v0Projected.x, v0Projected.y), glm::ivec2(v2Projected.x, v2Projected.y), color);
-		//DrawLine(glm::ivec2(v2Projected.x, v2Projected.y), glm::ivec2(v1Projected.x, v1Projected.y), color);
+		vCenter += (verticeModel0 + verticeModel1 + verticeModel2) / 3.0f;
+
+		DrawLine(verticeModel0, verticeModel1, color);
+		DrawLine(verticeModel0, verticeModel2, color);
+		DrawLine(verticeModel2, verticeModel1, color);
 	}
+	vCenter /= myModel.GetFacesCount();
+
+	DrawLine(vCenter - glm::vec4(100.0f, 0.0f, 0.0f, 0.0f), vCenter + glm::vec4(100.0f, 0.0f, 0.0f, 0.0f), colorX);
+	DrawLine(vCenter - glm::vec4(0.0f, 100.0f, 0.0f, 0.0f), vCenter + glm::vec4(0.0f, 100.0f, 0.0f, 0.0f), colorY);
+	DrawLine(vCenter - glm::vec4(0.0f, 0.0f, 100.0f, 0.0f), vCenter + glm::vec4(0.0f, 0.0f, 100.0f, 0.0f), colorZ);
+
 }
 
 
