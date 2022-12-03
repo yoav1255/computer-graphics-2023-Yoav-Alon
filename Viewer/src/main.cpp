@@ -46,7 +46,7 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 
 int main(int argc, char **argv)
 {
-	int windowWidth = 1280, windowHeight = 720;
+	int windowWidth = 1920, windowHeight = 1080;
 	GLFWwindow* window = SetupGlfwWindow(windowWidth, windowHeight, "Mesh Viewer");
 	if (!window)
 		return 1;
@@ -392,7 +392,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 
 						ImGui::Text("Local Transformation");
-						ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, float(windowWidth));
+						ImGui::SliderFloat3("Translate-Local", &translationObject.x, float(-windowWidth), float(windowWidth));
 						ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
 						ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
 						scaleObject.y = scaleObject.x;
@@ -404,7 +404,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 						ImGui::Text("World Transformation");
 
-						ImGui::SliderFloat3("Translate-World", &translationWorld.x, 0.0f, 1000.0f);
+						ImGui::SliderFloat3("Translate-World", &translationWorld.x, float(-windowWidth), float(windowWidth));
 						ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
 						ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
 						scaleWorld.y = scaleWorld.x;
@@ -419,31 +419,31 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						ImGui::Begin("Camera Controller");
 						Camera& cam = scene.GetActiveCamera();
 
-						static float up = 0.0f;
-						static float down = 0.0f;
-						static float left = 0.0f;
-						static float right = 0.0f;
-						static float zNear = 0.0f;
-						static float zFar = 0.0f;
+						static float up = 1.0f;
+						static float down = -1.0f;
+						static float left = -1.0f;
+						static float right = 1.0f;
+						static float zNear = 1.0f;
+						static float zFar = -1.0f;
 
 						ImGui::Text("View Volume");
-						ImGui::SliderFloat("Up", &up, -100.0f, 100.0f);
-						ImGui::SliderFloat("Down", &down, -100.0f, 100.0f);
-						ImGui::SliderFloat("Left", &left, -100.0f, 100.0f);
-						ImGui::SliderFloat("right", &right, -100.0f, 100.0f);
-						ImGui::SliderFloat("Near", &zNear, -100.0f, 100.0f);
-						ImGui::SliderFloat("Far", &zFar, -100.0f, 100.0f);
+						ImGui::SliderFloat("Up", &up, -10.0f, 10.0f);
+						ImGui::SliderFloat("Down", &down, -10.0f, 10.0f);
+						ImGui::SliderFloat("Left", &left, -10.0f, 10.0f);
+						ImGui::SliderFloat("right", &right, -10.0f, 10.0f);
+						ImGui::SliderFloat("Near", &zNear, -10.0f, 10.0f);
+						ImGui::SliderFloat("Far", &zFar, -10.0f, 10.0f);
 						cam.Ortho(left, right, down, up, zNear, zFar);
 
 
 						if (ImGui::Button("auto"))
 						{
-							up = windowHeight;
-							down = 0;
-							left = 0;
-							right = windowWidth;
-							zNear = 0;
-							zFar = 0;
+							up = 1;
+							down = -1;
+							left = -1;
+							right = 1;
+							zNear = 1;
+							zFar = -1;
 						}
 
 						static glm::vec3 eye = glm::vec3(1.0f);
@@ -459,7 +459,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						ImGui::SliderFloat("at Y", &at.y, 0.0f, 10.0f);
 						ImGui::SliderFloat("at Z", &at.z, 0.0f, 10.0f);
 
-						ImGui::SliderFloat("Upside-Down",&upper ,-1.0f, 1.0f);
+						//ImGui::SliderFloat("Upside-Down",&upper ,-1.0f, 1.0f);
 						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f,upper,0.0f));
 
 						
