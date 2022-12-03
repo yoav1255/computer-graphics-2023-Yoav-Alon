@@ -371,7 +371,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			{
 				static int counter = 0;
 				const int modelCount = scene.GetModelCount();
-
+				int windowWidth = 1280, windowHeight = 720; //
 				static char* items[] = { "0","1","2","3","4","5","6","7" };
 				static int selectedItem = modelCount;
 				if (modelCount > 0)
@@ -392,7 +392,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 
 						ImGui::Text("Local Transformation");
-						ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
+						ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, float(windowWidth));
 						ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
 						ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
 						scaleObject.y = scaleObject.x;
@@ -435,9 +435,20 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						ImGui::SliderFloat("Far", &zFar, -100.0f, 100.0f);
 						cam.Ortho(left, right, down, up, zNear, zFar);
 
+
+						if (ImGui::Button("auto"))
+						{
+							up = windowHeight;
+							down = 0;
+							left = 0;
+							right = windowWidth;
+							zNear = 0;
+							zFar = 0;
+						}
+
 						static glm::vec3 eye = glm::vec3(1.0f);
 						static glm::vec3 at = glm::vec3(0.0f);
-						//static glm::vec3 upper = glm::vec3(1.0f);
+						static float upper = 1.0f;
 
 						ImGui::Text("Camera position");
 						ImGui::SliderFloat("eye X", &eye.x, 0.0f, 10.0f);
@@ -448,10 +459,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						ImGui::SliderFloat("at Y", &at.y, 0.0f, 10.0f);
 						ImGui::SliderFloat("at Z", &at.z, 0.0f, 10.0f);
 
-						//ImGui::SliderFloat("up X", &upper.x, 0.0f, 10.0f);
-						//ImGui::SliderFloat("up Y", &upper.y, 0.0f, 10.0f);
-						//ImGui::SliderFloat("up Z", &upper.z, 0.0f, 10.0f);
-						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f,1.0f,0.0f));
+						ImGui::SliderFloat("Upside-Down",&upper ,-1.0f, 1.0f);
+						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f,upper,0.0f));
 
 						
 						//std::vector<const char*> camera_names;
