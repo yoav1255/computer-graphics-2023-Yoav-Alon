@@ -8,7 +8,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
@@ -58,7 +57,15 @@ int main(int argc, char **argv)
 
 	Renderer renderer = Renderer(frameBufferWidth, frameBufferHeight);
 	Scene scene = Scene();
-	
+
+	//
+	shared_ptr<Camera> cam = std::make_shared<Camera>();
+	cam->Ortho(0.0f, 400.0f, 0.0f, 400.0f, -1.0f, 1.0f);
+	cam->SetCameraLookAt(glm::vec3(1, 1, 1), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0));
+	scene.AddCamera(cam);
+	scene.SetActiveCameraIndex(0);
+
+	//
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
     while (!glfwWindowShouldClose(window))
@@ -124,6 +131,10 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 	int frameBufferWidth, frameBufferHeight;
 	glfwMakeContextCurrent(window);
 	glfwGetFramebufferSize(window, &frameBufferWidth, &frameBufferHeight);
+	if (scene.GetCameraCount() == 0)
+	{
+
+	}
 	if (scene.GetModelCount() > 0)
 	{
 		MeshModel& curr = scene.GetActiveModel();
@@ -253,6 +264,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			ImGui::End();
 		}
 
+		{
+
+		}
+
 		if (!io.WantCaptureKeyboard) // Second method of transforming the model using the keyboard
 		{
 			if (localFlag)
@@ -356,52 +371,98 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			{
 				static int counter = 0;
 				const int modelCount = scene.GetModelCount();
+
 				static char* items[] = { "0","1","2","3","4","5","6","7" };
 				static int selectedItem = modelCount;
 				if (modelCount > 0)
 				{
-					ImGui::Begin("Change Model Position");
-					ImGui::Combo("modelPicker", &selectedItem, items, modelCount);
-					scene.SetActiveModelIndex(selectedItem);
+					{
+						ImGui::Begin("Change Model Position");
+						ImGui::Combo("modelPicker", &selectedItem, items, modelCount);
+						scene.SetActiveModelIndex(selectedItem);
+						int index = scene.GetActiveModelIndex();
+						MeshModel& myModel = scene.GetModel(index);
+						glm::vec3 translationObject(myModel.GetTranslationObject());
+						glm::vec3 rotationObject(myModel.GetRotationObject());
+						glm::vec3 scaleObject(myModel.GetScaleObject());
 
-					int index = scene.GetActiveModelIndex();
-					MeshModel& myModel = scene.GetModel(index);
-
-					glm::vec3 translationObject(myModel.GetTranslationObject());
-					glm::vec3 rotationObject(myModel.GetRotationObject());
-					glm::vec3 scaleObject(myModel.GetScaleObject());
-
-					glm::vec3 translationWorld(myModel.GetTranslationWorld());
-					glm::vec3 rotationWorld(myModel.GetRotationWorld());
-					glm::vec3 scaleWorld(myModel.GetScaleWorld());
+						glm::vec3 translationWorld(myModel.GetTranslationWorld());
+						glm::vec3 rotationWorld(myModel.GetRotationWorld());
+						glm::vec3 scaleWorld(myModel.GetScaleWorld());
 
 
-					ImGui::Text("Local Transformation");
-					ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
-					ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
-					ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
-					scaleObject.y = scaleObject.x;
-					scaleObject.z = scaleObject.x;
-					myModel.SetTranslationObject(translationObject);
-					myModel.SetRotationObject(rotationObject);
-					myModel.SetScaleObject(scaleObject);
-					myModel.SetObjectTransform();
+						ImGui::Text("Local Transformation");
+						ImGui::SliderFloat3("Translate-Local", &translationObject.x, 0.0f, 1000.0f);
+						ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
+						ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
+						scaleObject.y = scaleObject.x;
+						scaleObject.z = scaleObject.x;
+						myModel.SetTranslationObject(translationObject);
+						myModel.SetRotationObject(rotationObject);
+						myModel.SetScaleObject(scaleObject);
+						myModel.SetObjectTransform();
 
-					ImGui::Text("World Transformation");
+						ImGui::Text("World Transformation");
 
-					ImGui::SliderFloat3("Translate-World", &translationWorld.x, 0.0f, 1000.0f);
-					ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
-					ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
-					scaleWorld.y = scaleWorld.x;
-					scaleWorld.z = scaleWorld.x;
-					myModel.SetTranslationWorld(translationWorld);
-					myModel.SetRotationWorld(rotationWorld);
-					myModel.SetScaleWorld(scaleWorld);
-					myModel.SetWorldTransform();
+						ImGui::SliderFloat3("Translate-World", &translationWorld.x, 0.0f, 1000.0f);
+						ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
+						ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
+						scaleWorld.y = scaleWorld.x;
+						scaleWorld.z = scaleWorld.x;
+						myModel.SetTranslationWorld(translationWorld);
+						myModel.SetRotationWorld(rotationWorld);
+						myModel.SetScaleWorld(scaleWorld);
+						myModel.SetWorldTransform();
+						ImGui::End();
+					}
+					{
+						ImGui::Begin("Camera Controller");
+						Camera& cam = scene.GetActiveCamera();
+
+						static float up = 0.0f;
+						static float down = 0.0f;
+						static float left = 0.0f;
+						static float right = 0.0f;
+						static float zNear = 0.0f;
+						static float zFar = 0.0f;
+
+						ImGui::Text("View Volume");
+						ImGui::SliderFloat("Up", &up, -100.0f, 100.0f);
+						ImGui::SliderFloat("Down", &down, -100.0f, 100.0f);
+						ImGui::SliderFloat("Left", &left, -100.0f, 100.0f);
+						ImGui::SliderFloat("right", &right, -100.0f, 100.0f);
+						ImGui::SliderFloat("Near", &zNear, -100.0f, 100.0f);
+						ImGui::SliderFloat("Far", &zFar, -100.0f, 100.0f);
+						cam.Ortho(left, right, down, up, zNear, zFar);
+
+						static glm::vec3 eye = glm::vec3(1.0f);
+						static glm::vec3 at = glm::vec3(0.0f);
+						//static glm::vec3 upper = glm::vec3(1.0f);
+
+						ImGui::Text("Camera position");
+						ImGui::SliderFloat("eye X", &eye.x, 0.0f, 10.0f);
+						ImGui::SliderFloat("eye Y", &eye.y, 0.0f, 10.0f);
+						ImGui::SliderFloat("eye Z", &eye.z, 0.0f, 10.0f);
+
+						ImGui::SliderFloat("at X", &at.x, 0.0f, 10.0f);
+						ImGui::SliderFloat("at Y", &at.y, 0.0f, 10.0f);
+						ImGui::SliderFloat("at Z", &at.z, 0.0f, 10.0f);
+
+						//ImGui::SliderFloat("up X", &upper.x, 0.0f, 10.0f);
+						//ImGui::SliderFloat("up Y", &upper.y, 0.0f, 10.0f);
+						//ImGui::SliderFloat("up Z", &upper.z, 0.0f, 10.0f);
+						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f,1.0f,0.0f));
+
+						
+						//std::vector<const char*> camera_names;
+						//for (int i = 0; i < scene.GetCameraCount(); i++)
+						//{
+						//	const std::string& name = scene.GetCamera(i).GetName();
+						//	camera_names.push_back(name.c_str());
+						//}
+						ImGui::End();
+					}
 				}
-
-				ImGui::End();
-
 			}
 
 			// 3. Show another simple window.

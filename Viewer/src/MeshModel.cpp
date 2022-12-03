@@ -1,6 +1,7 @@
 #include "MeshModel.h"
 
 MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, const std::string& model_name) :
+	model_name(model_name),
 	faces(faces),
 	vertices(vertices),
 	normals(normals),
@@ -78,7 +79,7 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<MeshModel>& myM
 	return os;
 }
 
-  glm::mat4x4 MeshModel::GetTransform()const
+  glm::mat4x4 MeshModel::GetTransform()
 {
 	return worldTransform * objectTransform;
 }

@@ -259,36 +259,55 @@ void Renderer::drawSomeFlowers()
 	return;
 }
 
-void Renderer::drawModel( MeshModel& myModel)
+void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
+	Camera& cam = scene.GetActiveCamera();
 	glm::mat4 Transformation = myModel.GetTransform();
+	glm::mat4 modelMatrix = myModel.GetObjectTransform();		//model
+	glm::mat4 view = cam.GetViewTransformation();				//view
+	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
+	glm::mat4 modelViewMatrix = view * Transformation;
+	glm::vec4 viewPort(0.0f, 0.0f, float(viewport_width), float(viewport_height));
 
 	for (int i = 0;i < myModel.GetFacesCount();i++)
 	{
-		glm::vec4 vertice0 = Transformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0)-1],1);
-		glm::vec4 vertice1 = Transformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1)-1],1);
-		glm::vec4 vertice2 = Transformation * glm::vec4(myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2)-1],1);
+		glm::vec3 v0 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0) - 1];
+		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
+		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
+
+		glm::vec4 verticeModel0 = Transformation * glm::vec4(v0,1);
+		glm::vec4 verticeModel1 = Transformation * glm::vec4(v1,1);
+		glm::vec4 verticeModel2 = Transformation * glm::vec4(v2,1);
+
+		glm::vec3 v0Projected = glm::project(v0, modelViewMatrix, projection, viewPort);
+		glm::vec3 v1Projected = glm::project(v1, modelViewMatrix, projection, viewPort);
+		glm::vec3 v2Projected = glm::project(v2, modelViewMatrix, projection, viewPort);
+
 
 		const glm::vec3 color = glm::vec3(1, 0, 0);
-		DrawLine(vertice0, vertice1, color);
-		DrawLine(vertice0, vertice2, color);
-		DrawLine(vertice2, vertice1, color);
-
+		//DrawLine(verticeModel0, verticeModel1, color);
+		//DrawLine(verticeModel0, verticeModel2, color);
+		//DrawLine(verticeModel2, verticeModel1, color);
+			DrawLine(v0Projected, v1Projected, color);
+			DrawLine(v0Projected, v2Projected, color);
+			DrawLine(v2Projected, v1Projected, color);
+		//DrawLine(glm::ivec2(v0Projected.x,v0Projected.y), glm::ivec2(v1Projected.x, v1Projected.y), color);
+		//DrawLine(glm::ivec2(v0Projected.x, v0Projected.y), glm::ivec2(v2Projected.x, v2Projected.y), color);
+		//DrawLine(glm::ivec2(v2Projected.x, v2Projected.y), glm::ivec2(v1Projected.x, v1Projected.y), color);
 	}
 }
 
 
 void Renderer::Render( Scene& scene)
 {
-	
-	int half_width = viewport_width / 2;
-	int half_height = viewport_height / 2;
+
+
 	if (scene.GetModelCount() > 0)
 	{
 		for (int i = 0;i < scene.GetModelCount();i++)
 		{
 			MeshModel myModel = scene.GetModel(i);
-			drawModel(myModel);
+			drawModel(myModel,scene);
 		}
 	}
 }

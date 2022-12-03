@@ -18,7 +18,7 @@ public:
 	int GetFacesCount() const;
 	const std::string& GetModelName() const;
 	friend std::ostream& operator<<(std::ostream &os, const std::shared_ptr<MeshModel> &myModel);
-	 glm::mat4x4 GetTransform()const;
+	 glm::mat4x4 GetTransform();
 	 glm::mat4x4 GetObjectTransform();
 	 glm::mat4x4 GetWorldTransform();
 	void SetObjectTransform();
