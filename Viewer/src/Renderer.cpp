@@ -258,13 +258,21 @@ void Renderer::drawSomeFlowers()
 
 	return;
 }
-void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene,glm::mat4 transform, const glm::vec3& color)
+void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene,const glm::vec3& color, bool isWorld)
 {
-	int half_width = viewport_width / 2;
-	int half_height = viewport_height / 2;
+	float half_width = viewport_width / 2;
+	float half_height = viewport_height / 2;
 	Camera& cam = scene.GetActiveCamera();
 	glm::mat4 view = cam.GetViewTransformation();				//view
 	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
+	glm::mat4 transform;
+	isWorld ? transform = myModel.GetWorldTransform():transform=myModel.GetObjectTransform();
+	glm::vec3 modelVecScale = myModel.GetScaleObject();
+	glm::mat4 matScale = glm::scale(glm::mat4(1.0f), modelVecScale);
+	if (isWorld)
+	{
+		transform = matScale * transform;
+	}
 	float x_Min = myModel.GetFace(0).GetVertexIndex(0);
 	float y_Min = myModel.GetFace(0).GetVertexIndex(1);
 	float z_Min = myModel.GetFace(0).GetVertexIndex(2);
@@ -328,11 +336,19 @@ void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene,glm::mat4 transf
 	DrawLine(b_Box7Local, b_Box8Local, color);
 }
 
-void Renderer::drawAxis(MeshModel& myModel, Scene& scene, glm::mat4 transform, const glm::vec3& color)
+void Renderer::drawAxis(MeshModel& myModel, Scene& scene, const glm::vec3& color,bool isWorld)
 {
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
 	Camera& cam = scene.GetActiveCamera();
+	glm::mat4 transform;
+	isWorld ? transform = myModel.GetWorldTransform() : transform = myModel.GetObjectTransform();
+	glm::vec3 modelVecScale = myModel.GetScaleObject();
+	glm::mat4 matScale = glm::scale(glm::mat4(1.0f), modelVecScale);
+	if (isWorld)
+	{
+		transform = matScale * transform;
+	}
 	glm::mat4 view = cam.GetViewTransformation();				//view
 	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
 	glm::vec4 vCenter = glm::vec4(0.0f);
@@ -361,9 +377,9 @@ void Renderer::drawAxis(MeshModel& myModel, Scene& scene, glm::mat4 transform, c
 	vCenter.z = (z_Min + z_Max) / 2.0f;
 
 	//draw Axis
-	DrawLine(vCenter + projection * view * transform * glm::vec4(-100.0f, 0.0f, 0.0f, 1.0f), vCenter + projection * view * transform * glm::vec4(100.0f, 0.0f, 0.0f, 1.0f), color);
-	DrawLine(vCenter + projection * view * transform * glm::vec4(0.0f, -100.0f, 0.0f, 1.0f), vCenter + projection * view * transform * glm::vec4(0.0f, 100.0f, 0.0f, 1.0f), color);
-	DrawLine(vCenter + projection * view * transform * glm::vec4(0.0f, 0.0f, -100.0f, 1.0f), vCenter + projection * view * transform * glm::vec4(0.0f, 0.0f, 100.0f, 1.0f), color);
+	DrawLine(vCenter + projection * view * transform * glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f), vCenter + projection * view * transform * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), color);
+	DrawLine(vCenter + projection * view * transform * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f), vCenter + projection * view * transform * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), color);
+	DrawLine(vCenter + projection * view * transform * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f), vCenter + projection * view * transform * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), color);
 }
 
 
@@ -379,7 +395,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 	glm::mat4 view = cam.GetViewTransformation();				//view
 	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
 	const glm::vec3 color = glm::vec3(1, 0, 0);
-	const glm::vec3 colorAxisLocal = glm::vec3(0.5, 0.7, 0.2);
+	const glm::vec3 colorAxisLocal = glm::vec3(0.5, 1, 0.2);
 	const glm::vec3 colorAxisWorld = glm::vec3(1, 0.2, 0.3);
 	const glm::vec3 colorBBoxLocal = glm::vec3(0.5, 0.3, 0);
 	const glm::vec3 colorBBoxWorld = glm::vec3(0.3, 0, 1);
@@ -410,10 +426,10 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 	}
 
 
-	if (myModel.getAxisLocal()) { drawAxis(myModel,scene,modelTransform,colorAxisLocal); }
-	if (myModel.getAxisWorld()) { drawAxis(myModel, scene, worldTransform,colorAxisWorld); }
-	if (myModel.getbBoxLocal()) { drawBoundingBox(myModel, scene, modelTransform,colorBBoxLocal); }
-	if (myModel.getbBoxWorld()) { drawBoundingBox(myModel, scene, worldTransform,colorBBoxWorld); }
+	if (myModel.getAxisLocal()) { drawAxis(myModel,scene,colorAxisLocal,false); }
+	if (myModel.getAxisWorld()) { drawAxis(myModel, scene,colorAxisWorld,true); }
+	if (myModel.getbBoxLocal()) { drawBoundingBox(myModel, scene,colorBBoxLocal,false); }
+	if (myModel.getbBoxWorld()) { drawBoundingBox(myModel, scene,colorBBoxWorld,true); }
 
 }
 
