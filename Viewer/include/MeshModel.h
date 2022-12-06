@@ -45,8 +45,6 @@ public:
 	bool getbBoxWorld() { return bounding_box_world; }
 
 
-
-
 	void SetTranslationWorld(const glm::vec3 translationVec) { translationWorld = translationVec; }
 	void SetScaleWorld(const glm::vec3 scaleVec) { scaleWorld = scaleVec; }
 	void SetRotationWorld(const glm::vec3 rotationVec) { rotationWorld = rotationVec; }
@@ -69,4 +67,5 @@ public:
 	bool axisWorld;
 	bool bounding_box_local;
 	bool bounding_box_world;
+	bool drawNormals;
 };

@@ -17,7 +17,8 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	axisLocal(false),
 	axisWorld(false),
 	bounding_box_local(false),
-	bounding_box_world(false)
+	bounding_box_world(false),
+	drawNormals(false)
 {
 
 }

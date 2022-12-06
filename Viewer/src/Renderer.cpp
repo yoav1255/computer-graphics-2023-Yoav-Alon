@@ -258,6 +258,7 @@ void Renderer::drawSomeFlowers()
 
 	return;
 }
+
 void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene,const glm::vec3& color, bool isWorld)
 {
 	float half_width = viewport_width / 2;
@@ -335,7 +336,6 @@ void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene,const glm::vec3&
 	DrawLine(b_Box6Local, b_Box8Local, color);
 	DrawLine(b_Box7Local, b_Box8Local, color);
 }
-
 void Renderer::drawAxis(MeshModel& myModel, Scene& scene, const glm::vec3& color,bool isWorld)
 {
 	int half_width = viewport_width / 2;
@@ -383,23 +383,62 @@ void Renderer::drawAxis(MeshModel& myModel, Scene& scene, const glm::vec3& color
 }
 
 
+void Renderer::drawVerticeNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color)
+{
+	int half_width = viewport_width / 2;
+	int half_height = viewport_height / 2;
+
+	Camera& cam = scene.GetActiveCamera();
+	glm::mat4 Transformation = myModel.GetTransform();
+	glm::mat4 modelTransform = myModel.GetObjectTransform();
+	glm::mat4 worldTransform = myModel.GetWorldTransform();
+	glm::mat4 view = cam.GetViewTransformation();				//view
+	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
+
+	
+
+	for (int i = 0;i <myModel.GetFacesCount();i++)
+	{
+		glm::vec3 v0 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0) - 1];
+		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
+		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
+
+		glm::vec3 v1_to_v0 = v1 - v0;
+		glm::vec3 v2_to_v0 = v2 - v0;
+		glm::vec3 v0_cross = glm::cross(v1_to_v0, v2_to_v0)+v0;
+
+		glm::vec4 v0_cross_projected = projection * view * Transformation * glm::vec4(v0_cross, 1);
+		glm::vec4 v0_projected = projection * view * Transformation * glm::vec4(v0, 1);
+
+		v0_projected.x += half_width;
+		v0_projected.y += half_height;
+
+		v0_cross_projected.x += half_width;
+		v0_cross_projected.y += half_height;
+
+		DrawLine(v0_cross_projected, v0_projected, color);
+
+	}
+}
+
 
 void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
+
 	Camera& cam = scene.GetActiveCamera();
 	glm::mat4 Transformation = myModel.GetTransform();
 	glm::mat4 modelTransform = myModel.GetObjectTransform();	
 	glm::mat4 worldTransform = myModel.GetWorldTransform();
 	glm::mat4 view = cam.GetViewTransformation();				//view
 	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
+
 	const glm::vec3 color = glm::vec3(1, 0, 0);
 	const glm::vec3 colorAxisLocal = glm::vec3(0.5, 1, 0.2);
 	const glm::vec3 colorAxisWorld = glm::vec3(1, 0.2, 0.3);
 	const glm::vec3 colorBBoxLocal = glm::vec3(0.5, 0.3, 0);
 	const glm::vec3 colorBBoxWorld = glm::vec3(0.3, 0, 1);
-
 
 	glm::vec4 vCenter = glm::vec4(0.0f);
 
@@ -409,9 +448,9 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
 		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
 
-		glm::vec4 verticeModel0 = projection * view * Transformation * glm::vec4(v0,1);
-		glm::vec4 verticeModel1 = projection * view * Transformation * glm::vec4(v1,1);
-		glm::vec4 verticeModel2 = projection * view * Transformation * glm::vec4(v2,1);
+		glm::vec4 verticeModel0 = projection * view * Transformation * glm::vec4(v0, 1);
+		glm::vec4 verticeModel1 = projection * view * Transformation * glm::vec4(v1, 1);
+		glm::vec4 verticeModel2 = projection * view * Transformation * glm::vec4(v2, 1);
 
 		verticeModel0.x += half_width;
 		verticeModel0.y += half_height;
@@ -423,13 +462,16 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		DrawLine(verticeModel0, verticeModel1, color);
 		DrawLine(verticeModel0, verticeModel2, color);
 		DrawLine(verticeModel2, verticeModel1, color);
+
 	}
+		if (myModel.getAxisLocal()) { drawAxis(myModel, scene, colorAxisLocal, false); }
+		if (myModel.getAxisWorld()) { drawAxis(myModel, scene, colorAxisWorld, true); }
+		if (myModel.getbBoxLocal()) { drawBoundingBox(myModel, scene, colorBBoxLocal, false); }
+		if (myModel.getbBoxWorld()) { drawBoundingBox(myModel, scene, colorBBoxWorld, true); }
+		if (myModel.drawNormals) { drawVerticeNormals(myModel, scene, colorAxisLocal); }
 
-
-	if (myModel.getAxisLocal()) { drawAxis(myModel,scene,colorAxisLocal,false); }
-	if (myModel.getAxisWorld()) { drawAxis(myModel, scene,colorAxisWorld,true); }
-	if (myModel.getbBoxLocal()) { drawBoundingBox(myModel, scene,colorBBoxLocal,false); }
-	if (myModel.getbBoxWorld()) { drawBoundingBox(myModel, scene,colorBBoxWorld,true); }
+		//face Normals
+	
 
 }
 
