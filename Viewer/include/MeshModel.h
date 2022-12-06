@@ -39,6 +39,13 @@ public:
 	const glm::vec3& GetRotationWorld() const { return rotationWorld; }
 	const glm::vec3& GetVCenter() const { return vCenter; }
 
+	bool getAxisLocal() { return axisLocal; }
+	bool getAxisWorld() { return axisWorld; }
+	bool getbBoxLocal() { return bounding_box_local; }
+	bool getbBoxWorld() { return bounding_box_world; }
+
+
+
 
 	void SetTranslationWorld(const glm::vec3 translationVec) { translationWorld = translationVec; }
 	void SetScaleWorld(const glm::vec3 scaleVec) { scaleWorld = scaleVec; }
@@ -58,4 +65,8 @@ public:
 	glm::vec3 scaleWorld;
 	glm::vec3 rotationWorld;
 	std::string model_name;
+	bool axisLocal;
+	bool axisWorld;
+	bool bounding_box_local;
+	bool bounding_box_world;
 };

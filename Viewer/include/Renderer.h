@@ -22,7 +22,9 @@ private:
 	void drawSomeFlowers();
 	void putFlower(int radius, int x, const glm::vec3& color , int stemLen);
 	void drawModel( MeshModel& myModel,Scene& scene);
-	void drawBoundingBox(MeshModel &myModel,Scene& scene)
+	void drawBoundingBox(MeshModel& myModel, Scene& scene, glm::mat4 transform, const glm::vec3& color);
+	void drawAxis(MeshModel& myModel, Scene& scene,glm::mat4 transform, const glm::vec3& color);
+
 
 	void CreateBuffers(int w, int h);
 	void CreateOpenglBuffer();

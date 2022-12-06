@@ -267,6 +267,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		MeshModel& curr = scene.GetActiveModel();
 
 		static bool worldFlag = false, localFlag = false;
+
 		if(model_controllers)
 		{
 			ImGui::Begin("Keyboard controls");
@@ -397,6 +398,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				const int cameraCount = scene.GetCameraCount();
 				static char* items[] = { "0","1","2","3","4","5","6","7" };
 				static int selectedItemModel = modelCount;
+
 				//Model controls
 				if (modelCount > 0)
 				{
@@ -417,6 +419,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							glm::vec3 rotationWorld(myModel.GetRotationWorld());
 							glm::vec3 scaleWorld(myModel.GetScaleWorld());
 
+							 bool axisLocal = myModel.axisLocal;
+							 bool axisWorld = myModel.axisWorld;
+							 bool bBoxLocal = myModel.bounding_box_local;
+							 bool bBoxWorld = myModel.bounding_box_world;
 
 							ImGui::Text("Local Transformation");
 							ImGui::SliderFloat3("Translate-Local", &translationObject.x, -1000.0f, 1000.0f);
@@ -448,6 +454,28 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 								myModel.SetTranslationWorld(glm::vec3(0.0f));
 								myModel.SetRotationWorld(glm::vec3(0.0f));
 							}
+
+							if (ImGui::Checkbox("Axis Local", &axisLocal))
+							{ 
+								myModel.axisLocal = !myModel.axisLocal; 
+							}
+
+							if (ImGui::Checkbox("Axis World", &axisWorld))
+							{
+								myModel.axisWorld = !myModel.axisWorld;
+							}
+
+							if (ImGui::Checkbox("B_Box Local", &bBoxLocal))
+							{
+								myModel.bounding_box_local = !myModel.bounding_box_local;
+							}
+
+							if (ImGui::Checkbox("B_Box World", &bBoxWorld))
+							{
+								myModel.bounding_box_world = !myModel.bounding_box_world;
+							}
+
+
 							ImGui::End();
 						}
 

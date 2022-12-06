@@ -258,28 +258,13 @@ void Renderer::drawSomeFlowers()
 
 	return;
 }
-void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene)
-{
-
-}
-
-void Renderer::drawModel( MeshModel& myModel,Scene &scene)
+void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene,glm::mat4 transform, const glm::vec3& color)
 {
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
 	Camera& cam = scene.GetActiveCamera();
-	glm::mat4 Transformation = myModel.GetTransform();
-	glm::mat4 modelTransform = myModel.GetObjectTransform();	
-	glm::mat4 worldTransform = myModel.GetWorldTransform();
 	glm::mat4 view = cam.GetViewTransformation();				//view
 	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
-	glm::mat4 modelViewMatrix = view * Transformation;
-	const glm::vec3 color = glm::vec3(1, 0, 0);
-
-	const glm::vec3 colorX = glm::vec3(0, 0, 1);
-	const glm::vec3 colorY = glm::vec3(1, 1, 1);
-	const glm::vec3 colorZ = glm::vec3(0, 1, 1);
-
 	float x_Min = myModel.GetFace(0).GetVertexIndex(0);
 	float y_Min = myModel.GetFace(0).GetVertexIndex(1);
 	float z_Min = myModel.GetFace(0).GetVertexIndex(2);
@@ -287,34 +272,6 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 	float x_Max = myModel.GetFace(0).GetVertexIndex(0);
 	float y_Max = myModel.GetFace(0).GetVertexIndex(1);
 	float z_Max = myModel.GetFace(0).GetVertexIndex(2);
-
-	
-
-	glm::vec4 vCenter = glm::vec4(0.0f);
-
-	for (int i = 0;i < myModel.GetFacesCount();i++)
-	{
-		glm::vec3 v0 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0) - 1];
-		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
-		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
-
-		glm::vec4 verticeModel0 = projection * view * Transformation * glm::vec4(v0,1);
-		glm::vec4 verticeModel1 = projection * view * Transformation * glm::vec4(v1,1);
-		glm::vec4 verticeModel2 = projection * view * Transformation * glm::vec4(v2,1);
-
-		verticeModel0.x += half_width;
-		verticeModel0.y += half_height;
-		verticeModel1.x += half_width;
-		verticeModel1.y += half_height;
-		verticeModel2.x += half_width;
-		verticeModel2.y += half_height;
-
-		//vCenter += (verticeModel0 + verticeModel1 + verticeModel2) / 3.0f;
-
-		DrawLine(verticeModel0, verticeModel1, color);
-		DrawLine(verticeModel0, verticeModel2, color);
-		DrawLine(verticeModel2, verticeModel1, color);
-	}
 
 	// find min and max for vertices
 	for (int i = 0;i < myModel.GetVertices().size();i++)
@@ -326,15 +283,16 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max = std::max(myModel.GetVertices()[i][1], y_Max);
 		z_Max = std::max(myModel.GetVertices()[i][2], z_Max);
 	}
+
 	// bounding box vectors
-	glm::vec4 b_Box1Local = projection * view * modelTransform * glm::vec4(x_Min, y_Min, z_Min,1.0f);
-	glm::vec4 b_Box2Local = projection * view * modelTransform * glm::vec4(x_Min, y_Min, z_Max,1.0f);
-	glm::vec4 b_Box3Local = projection * view * modelTransform * glm::vec4(x_Min, y_Max, z_Min,1.0f);
-	glm::vec4 b_Box4Local = projection * view * modelTransform * glm::vec4(x_Min, y_Max, z_Max,1.0f);
-	glm::vec4 b_Box5Local = projection * view * modelTransform * glm::vec4(x_Max, y_Min, z_Min,1.0f);
-	glm::vec4 b_Box6Local = projection * view * modelTransform * glm::vec4(x_Max, y_Min, z_Max,1.0f);
-	glm::vec4 b_Box7Local = projection * view * modelTransform * glm::vec4(x_Max, y_Max, z_Min,1.0f);
-	glm::vec4 b_Box8Local = projection * view * modelTransform * glm::vec4(x_Max, y_Max, z_Max,1.0f);
+	glm::vec4 b_Box1Local = projection * view * transform * glm::vec4(x_Min, y_Min, z_Min, 1.0f);
+	glm::vec4 b_Box2Local = projection * view * transform * glm::vec4(x_Min, y_Min, z_Max, 1.0f);
+	glm::vec4 b_Box3Local = projection * view * transform * glm::vec4(x_Min, y_Max, z_Min, 1.0f);
+	glm::vec4 b_Box4Local = projection * view * transform * glm::vec4(x_Min, y_Max, z_Max, 1.0f);
+	glm::vec4 b_Box5Local = projection * view * transform * glm::vec4(x_Max, y_Min, z_Min, 1.0f);
+	glm::vec4 b_Box6Local = projection * view * transform * glm::vec4(x_Max, y_Min, z_Max, 1.0f);
+	glm::vec4 b_Box7Local = projection * view * transform * glm::vec4(x_Max, y_Max, z_Min, 1.0f);
+	glm::vec4 b_Box8Local = projection * view * transform * glm::vec4(x_Max, y_Max, z_Max, 1.0f);
 
 	//center the bounding box
 
@@ -355,33 +313,107 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 	b_Box8Local.x += half_width;
 	b_Box8Local.y += half_height;
 
-	//vCenter /= myModel.GetFacesCount();
-	vCenter.x = ((x_Min + x_Max) / 2.0f)+half_width;
-	vCenter.y = ((y_Min + y_Max) / 2.0f)+half_height;
+	//draw Bounding Box
+	DrawLine(b_Box1Local, b_Box2Local, color);
+	DrawLine(b_Box1Local, b_Box3Local, color);
+	DrawLine(b_Box1Local, b_Box5Local, color);
+	DrawLine(b_Box2Local, b_Box4Local, color);
+	DrawLine(b_Box2Local, b_Box6Local, color);
+	DrawLine(b_Box3Local, b_Box4Local, color);
+	DrawLine(b_Box3Local, b_Box7Local, color);
+	DrawLine(b_Box4Local, b_Box8Local, color);
+	DrawLine(b_Box5Local, b_Box6Local, color);
+	DrawLine(b_Box5Local, b_Box7Local, color);
+	DrawLine(b_Box6Local, b_Box8Local, color);
+	DrawLine(b_Box7Local, b_Box8Local, color);
+}
+
+void Renderer::drawAxis(MeshModel& myModel, Scene& scene, glm::mat4 transform, const glm::vec3& color)
+{
+	int half_width = viewport_width / 2;
+	int half_height = viewport_height / 2;
+	Camera& cam = scene.GetActiveCamera();
+	glm::mat4 view = cam.GetViewTransformation();				//view
+	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
+	glm::vec4 vCenter = glm::vec4(0.0f);
+
+	float x_Min = myModel.GetFace(0).GetVertexIndex(0);
+	float y_Min = myModel.GetFace(0).GetVertexIndex(1);
+	float z_Min = myModel.GetFace(0).GetVertexIndex(2);
+
+	float x_Max = myModel.GetFace(0).GetVertexIndex(0);
+	float y_Max = myModel.GetFace(0).GetVertexIndex(1);
+	float z_Max = myModel.GetFace(0).GetVertexIndex(2);
+
+	for (int i = 0;i < myModel.GetVertices().size();i++)
+	{
+		x_Min = std::min(myModel.GetVertices()[i][0], x_Min);
+		y_Min = std::min(myModel.GetVertices()[i][1], y_Min);
+		z_Min = std::min(myModel.GetVertices()[i][2], z_Min);
+		x_Max = std::max(myModel.GetVertices()[i][0], x_Max);
+		y_Max = std::max(myModel.GetVertices()[i][1], y_Max);
+		z_Max = std::max(myModel.GetVertices()[i][2], z_Max);
+	}
+
+
+	vCenter.x = ((x_Min + x_Max) / 2.0f) + half_width;
+	vCenter.y = ((y_Min + y_Max) / 2.0f) + half_height;
 	vCenter.z = (z_Min + z_Max) / 2.0f;
 
 	//draw Axis
-	DrawLine(vCenter + projection * view * worldTransform * glm::vec4(-100.0f, 0.0f, 0.0f, 1.0f), vCenter + projection * view * worldTransform * glm::vec4(100.0f, 0.0f, 0.0f, 1.0f), colorX);
-	DrawLine(vCenter + projection * view * worldTransform * glm::vec4(0.0f, -100.0f, 0.0f, 1.0f), vCenter + projection * view * worldTransform * glm::vec4(0.0f, 100.0f, 0.0f, 1.0f), colorX);
-	DrawLine(vCenter + projection * view * worldTransform * glm::vec4(0.0f, 0.0f, -100.0f, 1.0f), vCenter + projection * view * worldTransform * glm::vec4(0.0f, 0.0f, 100.0f, 1.0f), colorX);
+	DrawLine(vCenter + projection * view * transform * glm::vec4(-100.0f, 0.0f, 0.0f, 1.0f), vCenter + projection * view * transform * glm::vec4(100.0f, 0.0f, 0.0f, 1.0f), color);
+	DrawLine(vCenter + projection * view * transform * glm::vec4(0.0f, -100.0f, 0.0f, 1.0f), vCenter + projection * view * transform * glm::vec4(0.0f, 100.0f, 0.0f, 1.0f), color);
+	DrawLine(vCenter + projection * view * transform * glm::vec4(0.0f, 0.0f, -100.0f, 1.0f), vCenter + projection * view * transform * glm::vec4(0.0f, 0.0f, 100.0f, 1.0f), color);
+}
 
-	DrawLine(vCenter + projection * view * modelTransform * glm::vec4(-1.0f, 0.0f, 0.0f, 1.0f), vCenter + projection * view * modelTransform * glm::vec4(1.0f, 0.0f, 0.0f, 1.0f), colorY);
-	DrawLine(vCenter + projection * view * modelTransform * glm::vec4(0.0f, -1.0f, 0.0f, 1.0f), vCenter + projection * view * modelTransform * glm::vec4(0.0f, 1.0f, 0.0f, 1.0f), colorY);
-	DrawLine(vCenter + projection * view * modelTransform * glm::vec4(0.0f, 0.0f, -1.0f, 1.0f), vCenter + projection * view * modelTransform * glm::vec4(0.0f, 0.0f, 1.0f, 1.0f), colorY);
 
-	//draw Bounding Box
-	DrawLine(b_Box1Local, b_Box2Local, colorZ);
-	DrawLine(b_Box1Local, b_Box3Local, colorZ);
-	DrawLine(b_Box1Local, b_Box5Local, colorZ);
-	DrawLine(b_Box2Local, b_Box4Local, colorZ);
-	DrawLine(b_Box2Local, b_Box6Local, colorZ);
-	DrawLine(b_Box3Local, b_Box4Local, colorZ);
-	DrawLine(b_Box3Local, b_Box7Local, colorZ);
-	DrawLine(b_Box4Local, b_Box8Local, colorZ);
-	DrawLine(b_Box5Local, b_Box6Local, colorZ);
-	DrawLine(b_Box5Local, b_Box7Local, colorZ);
-	DrawLine(b_Box6Local, b_Box8Local, colorZ);
-	DrawLine(b_Box7Local, b_Box8Local, colorZ);
+
+void Renderer::drawModel( MeshModel& myModel,Scene &scene)
+{
+	int half_width = viewport_width / 2;
+	int half_height = viewport_height / 2;
+	Camera& cam = scene.GetActiveCamera();
+	glm::mat4 Transformation = myModel.GetTransform();
+	glm::mat4 modelTransform = myModel.GetObjectTransform();	
+	glm::mat4 worldTransform = myModel.GetWorldTransform();
+	glm::mat4 view = cam.GetViewTransformation();				//view
+	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
+	const glm::vec3 color = glm::vec3(1, 0, 0);
+	const glm::vec3 colorAxisLocal = glm::vec3(0.5, 0.7, 0.2);
+	const glm::vec3 colorAxisWorld = glm::vec3(1, 0.2, 0.3);
+	const glm::vec3 colorBBoxLocal = glm::vec3(0.5, 0.3, 0);
+	const glm::vec3 colorBBoxWorld = glm::vec3(0.3, 0, 1);
+
+
+	glm::vec4 vCenter = glm::vec4(0.0f);
+
+	for (int i = 0;i < myModel.GetFacesCount();i++)
+	{
+		glm::vec3 v0 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0) - 1];
+		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
+		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
+
+		glm::vec4 verticeModel0 = projection * view * Transformation * glm::vec4(v0,1);
+		glm::vec4 verticeModel1 = projection * view * Transformation * glm::vec4(v1,1);
+		glm::vec4 verticeModel2 = projection * view * Transformation * glm::vec4(v2,1);
+
+		verticeModel0.x += half_width;
+		verticeModel0.y += half_height;
+		verticeModel1.x += half_width;
+		verticeModel1.y += half_height;
+		verticeModel2.x += half_width;
+		verticeModel2.y += half_height;
+
+		DrawLine(verticeModel0, verticeModel1, color);
+		DrawLine(verticeModel0, verticeModel2, color);
+		DrawLine(verticeModel2, verticeModel1, color);
+	}
+
+
+	if (myModel.getAxisLocal()) { drawAxis(myModel,scene,modelTransform,colorAxisLocal); }
+	if (myModel.getAxisWorld()) { drawAxis(myModel, scene, worldTransform,colorAxisWorld); }
+	if (myModel.getbBoxLocal()) { drawBoundingBox(myModel, scene, modelTransform,colorBBoxLocal); }
+	if (myModel.getbBoxWorld()) { drawBoundingBox(myModel, scene, worldTransform,colorBBoxWorld); }
 
 }
 

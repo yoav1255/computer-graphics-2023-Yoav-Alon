@@ -13,7 +13,11 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	translationWorld(glm::vec3(0, 0, 0)),
 	scaleWorld(glm::vec3(1, 1, 1)),
 	rotationWorld(glm::vec3(0, 0, 0)),
-	vCenter(glm::vec3(0,0,0))
+	vCenter(glm::vec3(0, 0, 0)),
+	axisLocal(false),
+	axisWorld(false),
+	bounding_box_local(false),
+	bounding_box_world(false)
 {
 
 }
