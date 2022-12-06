@@ -423,7 +423,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							 bool axisWorld = myModel.axisWorld;
 							 bool bBoxLocal = myModel.bounding_box_local;
 							 bool bBoxWorld = myModel.bounding_box_world;
-							 bool verticeNormals = myModel.drawNormals;
+							 bool verticeNormals = myModel.drawVerticeNormals;
+							 bool faceNormals = myModel.drawFaceNormals;
 
 							ImGui::Text("Local Transformation");
 							ImGui::SliderFloat3("Translate-Local", &translationObject.x, -1000.0f, 1000.0f);
@@ -477,7 +478,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							}
 							if (ImGui::Checkbox("vertice normals", &verticeNormals))
 							{
-								myModel.drawNormals = !myModel.drawNormals;
+								myModel.drawVerticeNormals = !myModel.drawVerticeNormals;
+							}
+							if (ImGui::Checkbox("face normals", &faceNormals))
+							{
+								myModel.drawFaceNormals = !myModel.drawFaceNormals;
 							}
 
 

@@ -419,6 +419,44 @@ void Renderer::drawVerticeNormals(MeshModel& myModel, Scene& scene, const glm::v
 	}
 }
 
+void Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color)
+{
+	int half_width = viewport_width / 2;
+	int half_height = viewport_height / 2;
+
+	Camera& cam = scene.GetActiveCamera();
+	glm::mat4 Transformation = myModel.GetTransform();
+	glm::mat4 modelTransform = myModel.GetObjectTransform();
+	glm::mat4 worldTransform = myModel.GetWorldTransform();
+	glm::mat4 view = cam.GetViewTransformation();				//view
+	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
+
+	for (int i = 0;i < myModel.GetFacesCount();i++)
+	{
+		glm::vec3 v0 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0) - 1];
+		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
+		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
+
+		glm::vec3 c0 = glm::cross((v0 - v1), (v0, v2));
+		glm::vec3 c1 = glm::cross((v1 - v0), (v1, v2));
+		glm::vec3 c2 = glm::cross((v2 - v0), (v2, v1));
+
+		glm::vec3 vCenter = (v0 + v1 + v2) / 3.0f;
+		glm::vec3 normCenter = ((c0 + c1 + c2) / 3.0f) +vCenter ;
+
+		glm::vec4 face_norm_projected = projection * view * Transformation * glm::vec4(normCenter, 1);
+		glm::vec4 vCenter_projected = projection * view * Transformation * glm::vec4(vCenter, 1);
+
+		vCenter_projected.x += half_width;
+		vCenter_projected.y += half_height;
+
+		face_norm_projected.x += half_width;
+		face_norm_projected.y += half_height;
+		
+		DrawLine(face_norm_projected, vCenter_projected, color);
+	}
+}
+
 
 void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
@@ -466,11 +504,8 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		if (myModel.getAxisWorld()) { drawAxis(myModel, scene, colorAxisWorld, true); }
 		if (myModel.getbBoxLocal()) { drawBoundingBox(myModel, scene, colorBBoxLocal, false); }
 		if (myModel.getbBoxWorld()) { drawBoundingBox(myModel, scene, colorBBoxWorld, true); }
-		if (myModel.drawNormals) { drawVerticeNormals(myModel, scene, colorAxisLocal); }
-
-		//face Normals
-	
-
+		if (myModel.drawVerticeNormals) { drawVerticeNormals(myModel, scene, colorAxisLocal); }
+		if (myModel.drawFaceNormals) { drawFacesNormals(myModel, scene, colorAxisLocal); };
 }
 
 

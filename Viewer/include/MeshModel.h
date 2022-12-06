@@ -67,5 +67,6 @@ public:
 	bool axisWorld;
 	bool bounding_box_local;
 	bool bounding_box_world;
-	bool drawNormals;
+	bool drawVerticeNormals;
+	bool drawFaceNormals;
 };

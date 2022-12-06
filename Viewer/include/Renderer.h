@@ -25,6 +25,7 @@ private:
 	void drawBoundingBox(MeshModel& myModel, Scene& scene, const glm::vec3& color,bool isWorld);
 	void drawAxis(MeshModel& myModel, Scene& scene, const glm::vec3& color, bool isWorld);
 	void drawVerticeNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
+	void drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
 
 
 	void CreateBuffers(int w, int h);
