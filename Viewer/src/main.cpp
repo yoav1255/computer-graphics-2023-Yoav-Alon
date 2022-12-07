@@ -495,46 +495,78 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					if (cameraCount > 0)
 					{
 						Camera& cam = scene.GetActiveCamera();
+
 						static float up = 1.0f;
 						static float down = -1.0f;
 						static float left = -1.0f;
 						static float right = 1.0f;
+
 						static float zNear = 1.0f;
 						static float zFar = -1.0f;
-						cam.Ortho(left, right, down, up, zNear, zFar);
+
+						static float fovy = 1.0f;
+						static float aspect = 2.0f;
+
 						static glm::vec3 eye = glm::vec3(0.0f, 0.0f, 0.1f);
 						static glm::vec3 at = glm::vec3(0.0f);
 						static float upper = 1.0f;
+
+						static bool ortho_or_perspective = false; //true=ortho, false=perspective
 						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f, upper, 0.0f));
+
+						if (ortho_or_perspective)
+							cam.Ortho(left, right, down, up, zNear, zFar);
+						else
+							cam.Perspective(fovy, aspect, zNear, zFar);
 						if (camera_controllers)
 						{
 							ImGui::Begin("Camera Controller");
 							ImGui::Text("View Volume");
-							ImGui::SliderFloat("Up", &up, -10.0f, 10.0f);
-							ImGui::SliderFloat("Down", &down, -10.0f, 10.0f);
-							ImGui::SliderFloat("Left", &left, -10.0f, 10.0f);
-							ImGui::SliderFloat("right", &right, -10.0f, 10.0f);
-							ImGui::SliderFloat("Near", &zNear, -10.0f, 10.0f);
-							ImGui::SliderFloat("Far", &zFar, -10.0f, 10.0f);
-
-							if (ImGui::Button("auto"))
+							if(ImGui::RadioButton("Ortho", ortho_or_perspective)){ortho_or_perspective=true;}ImGui::SameLine();
+							if (ImGui::RadioButton("Perspective", !ortho_or_perspective)) { ortho_or_perspective = false; }
+							if (ortho_or_perspective)
 							{
-								up = 1;
-								down = -1;
-								left = -1;
-								right = 1;
-								zNear = 1;
-								zFar = -1;
+								ImGui::SliderFloat("Up", &up, -10.0f, 10.0f);
+								ImGui::SliderFloat("Down", &down, -10.0f, 10.0f);
+								ImGui::SliderFloat("Left", &left, -10.0f, 10.0f);
+								ImGui::SliderFloat("right", &right, -10.0f, 10.0f);
+								ImGui::SliderFloat("Near", &zNear, -10.0f, 10.0f);
+								ImGui::SliderFloat("Far", &zFar, -10.0f, 10.0f);
+
+								if (ImGui::Button("auto"))
+								{
+									up = 1;
+									down = -1;
+									left = -1;
+									right = 1;
+									zNear = 1;
+									zFar = -1;
+								}
+							}
+							else
+							{
+								ImGui::SliderFloat("Fovy", &fovy, -10.0f, 10.0f);
+								ImGui::SliderFloat("Aspect", &aspect, 0.0f, 6.0f);
+								ImGui::SliderFloat("Near", &zNear, -10.0f, 10.0f);
+								ImGui::SliderFloat("Far", &zFar, -10.0f, 10.0f);
+
+								if (ImGui::Button("auto"))
+								{
+									fovy = 1.0f;
+									aspect = 2.0f;
+									zNear = 1;
+									zFar = -1;
+								}
 							}
 
 							ImGui::Text("Camera controls");
-							ImGui::SliderFloat("eye X", &eye.x, 0.0f, 10.0f);
-							ImGui::SliderFloat("eye Y", &eye.y, 0.0f, 10.0f);
-							ImGui::SliderFloat("eye Z", &eye.z, 0.0f, 10.0f);
+							ImGui::SliderFloat("eye X", &eye.x, -50.0f, 50.0f);
+							ImGui::SliderFloat("eye Y", &eye.y, -50.0f, 50.0f);
+							ImGui::SliderFloat("eye Z", &eye.z, -50.0f, 50.0f);
 
-							ImGui::SliderFloat("at X", &at.x, 0.0f, 10.0f);
-							ImGui::SliderFloat("at Y", &at.y, 0.0f, 10.0f);
-							ImGui::SliderFloat("at Z", &at.z, 0.0f, 10.0f);
+							ImGui::SliderFloat("at X", &at.x, -50.0f, 50.0f);
+							ImGui::SliderFloat("at Y", &at.y, -50.0f, 50.0f);
+							ImGui::SliderFloat("at Z", &at.z, -50.0f, 50.0f);
 
 
 							//std::vector<const char*> camera_names;
