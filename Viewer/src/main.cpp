@@ -213,7 +213,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					scene.AddModel(myFile);
 					scene.SetActiveModelIndex(scene.GetModelCount() - 1);
 					free(outPath);
-					//std::cout << myFile;
 				}
 				else if (result == NFD_CANCEL)
 				{
@@ -484,11 +483,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							{
 								myModel.drawFaceNormals = !myModel.drawFaceNormals;
 							}
-
-
 							ImGui::End();
 						}
-
 					}
 					//Camera controls
 
@@ -501,37 +497,39 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						static float left = -1.0f;
 						static float right = 1.0f;
 
-						static float zNear = 1.0f;
-						static float zFar = -1.0f;
+						static float zNearOrtho = 1.0f;
+						static float zFarOrtho = -1.0f;
 
 						static float fovy = 1.0f;
 						static float aspect = 2.0f;
+						static float zNearPerspective = 1.0f;
+						static float zFarPerspective = 3.0f;
 
-						static glm::vec3 eye = glm::vec3(0.0f, 0.0f, 0.1f);
-						static glm::vec3 at = glm::vec3(0.0f);
+						static glm::vec3 eye = glm::vec3(0.1f);
+						static glm::vec3 at = glm::vec3(1.0f);
 						static float upper = 1.0f;
 
 						static bool ortho_or_perspective = false; //true=ortho, false=perspective
 						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f, upper, 0.0f));
 
 						if (ortho_or_perspective)
-							cam.Ortho(left, right, down, up, zNear, zFar);
+							cam.Ortho(left, right, down, up, zNearOrtho, zFarOrtho);
 						else
-							cam.Perspective(fovy, aspect, zNear, zFar);
+							cam.Perspective(fovy, aspect, zNearPerspective, zFarPerspective);
 						if (camera_controllers)
 						{
 							ImGui::Begin("Camera Controller");
 							ImGui::Text("View Volume");
 							if(ImGui::RadioButton("Ortho", ortho_or_perspective)){ortho_or_perspective=true;}ImGui::SameLine();
 							if (ImGui::RadioButton("Perspective", !ortho_or_perspective)) { ortho_or_perspective = false; }
-							if (ortho_or_perspective)
+							if (ortho_or_perspective) // Ortho
 							{
 								ImGui::SliderFloat("Up", &up, -10.0f, 10.0f);
 								ImGui::SliderFloat("Down", &down, -10.0f, 10.0f);
 								ImGui::SliderFloat("Left", &left, -10.0f, 10.0f);
 								ImGui::SliderFloat("right", &right, -10.0f, 10.0f);
-								ImGui::SliderFloat("Near", &zNear, -10.0f, 10.0f);
-								ImGui::SliderFloat("Far", &zFar, -10.0f, 10.0f);
+								ImGui::SliderFloat("Near", &zNearOrtho, -10.0f, 10.0f);
+								ImGui::SliderFloat("Far", &zFarOrtho, -10.0f, 10.0f);
 
 								if (ImGui::Button("auto"))
 								{
@@ -539,36 +537,39 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 									down = -1;
 									left = -1;
 									right = 1;
-									zNear = 1;
-									zFar = -1;
+									zNearOrtho = 1;
+									zFarOrtho = -1;
 								}
 							}
-							else
+							else // Perspective
 							{
-								ImGui::SliderFloat("Fovy", &fovy, -10.0f, 10.0f);
+								ImGui::SliderFloat("Fovy", &fovy, 0.0f, 360.0f);
 								ImGui::SliderFloat("Aspect", &aspect, 0.0f, 6.0f);
-								ImGui::SliderFloat("Near", &zNear, -10.0f, 10.0f);
-								ImGui::SliderFloat("Far", &zFar, -10.0f, 10.0f);
+								ImGui::SliderFloat("Near", &zNearPerspective, -10.0f, 10.0f);
+								ImGui::SliderFloat("Far", &zFarPerspective, -100.0f, 100.0f);
 
-								if (ImGui::Button("auto"))
+								if (ImGui::Button("reset"))
 								{
 									fovy = 1.0f;
 									aspect = 2.0f;
-									zNear = 1;
-									zFar = -1;
+									zNearPerspective = 1;
+									zFarPerspective = -1;
 								}
 							}
-
+							//Look at
 							ImGui::Text("Camera controls");
-							ImGui::SliderFloat("eye X", &eye.x, -50.0f, 50.0f);
-							ImGui::SliderFloat("eye Y", &eye.y, -50.0f, 50.0f);
-							ImGui::SliderFloat("eye Z", &eye.z, -50.0f, 50.0f);
+							ImGui::SliderFloat("eye X", &eye.x, -100.0f, 100.0f);
+							ImGui::SliderFloat("eye Y", &eye.y, -100.0f, 100.0f);
+							ImGui::SliderFloat("eye Z", &eye.z, -100.0f, 100.0f);
 
-							ImGui::SliderFloat("at X", &at.x, -50.0f, 50.0f);
-							ImGui::SliderFloat("at Y", &at.y, -50.0f, 50.0f);
-							ImGui::SliderFloat("at Z", &at.z, -50.0f, 50.0f);
-
-
+							ImGui::SliderFloat("at X", &at.x, -10.0f, 10.0f);
+							ImGui::SliderFloat("at Y", &at.y, -10.0f, 10.0f);
+							ImGui::SliderFloat("at Z", &at.z, -10.0f, 10.0f);
+							if (ImGui::Button("auto"))
+							{
+								eye = { 0.1f,0.1f,0.1f };
+								at = { 1.0f,1.0f,1.0f };
+							}
 							//std::vector<const char*> camera_names;
 							//for (int i = 0; i < scene.GetCameraCount(); i++)
 							//{
@@ -577,6 +578,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							//}
 							ImGui::End();
 						}
+
+						//Camera transformations
 
 						if (camera_transformation)
 						{
@@ -601,7 +604,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							ImGui::Text("Local Transformation");
 							ImGui::SliderFloat3("Translate-Local", &camtranslationObject.x, -1000.0f, 1000.0f);
 							ImGui::SliderFloat3("Rotate-Local", &camrotationObject.x, 0.0f, 360.0f);
-							ImGui::SliderFloat("Scale-Local", &camscaleObject.x, 0.0f, 2000.0f);
+							ImGui::SliderFloat("Scale-Local", &camscaleObject.x, -5.0f, 5.0f);
 							camscaleObject.y = camscaleObject.x;
 							camscaleObject.z = camscaleObject.x;
 							cam.SetTranslationObject(camtranslationObject);
@@ -631,15 +634,5 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						}
 					}
 				}
-			}
-
-			// 3. Show another simple window.
-			if (show_another_window)
-			{
-				ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-				ImGui::Text("Hello from another window!");
-				if (ImGui::Button("Close Me"))
-					show_another_window = false;
-				ImGui::End();
 			}
 		}

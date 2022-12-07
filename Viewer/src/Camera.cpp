@@ -6,10 +6,10 @@ Camera::Camera():
 	projection_transformation(glm::mat4x4()),
 	objectTransform(glm::mat4(1.0)),
 	worldTransform(glm::mat4(1.0)),
-	translationObject(glm::vec3(0, 0, 0)),
+	translationObject(glm::vec3(1.0f)),
 	scaleObject(glm::vec3(1, 1, 1)),
 	rotationObject(glm::vec3(0, 0, 0)),
-	translationWorld(glm::vec3(0, 0, 0)),
+	translationWorld(glm::vec3(1.0f)),
 	scaleWorld(glm::vec3(1, 1, 1)),
 	rotationWorld(glm::vec3(0, 0, 0))
 {
