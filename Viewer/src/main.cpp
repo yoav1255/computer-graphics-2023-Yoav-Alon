@@ -543,7 +543,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							}
 							else // Perspective
 							{
-								ImGui::SliderFloat("Fovy", &fovy, 0.0f, 360.0f);
+								ImGui::SliderFloat("Fovy", &fovy, -2.0f, 2.0f);
 								ImGui::SliderFloat("Aspect", &aspect, 0.0f, 6.0f);
 								ImGui::SliderFloat("Near", &zNearPerspective, -10.0f, 10.0f);
 								ImGui::SliderFloat("Far", &zFarPerspective, -100.0f, 100.0f);
