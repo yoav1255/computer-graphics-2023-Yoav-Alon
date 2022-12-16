@@ -14,7 +14,11 @@ public:
 	void SetProjection(const glm::mat4x4& projection);
 	void Ortho(float left, float right, float bottom, float top, float znear, float zfar) { projection_transformation = glm::ortho(left, right, bottom, top, znear, zfar); }
 	void Frustum();
-	void Perspective(float fovy, float aspect, float znear, float zfar) { projection_transformation = glm::perspective(fovy,aspect,znear,zfar); } 
+	void Perspective(float fovy, float aspect, float znear, float zfar) {
+		//projection_transformation = glm::frustum(left, right, bottom, top, 1.0f, 100.0f);
+		projection_transformation = glm::perspective(fovy, aspect, znear, zfar);
+	}
+		//glm::perspective(fovy,aspect,znear,zfar); } 
 	
 	const glm::mat4x4& GetProjectionTransformation() const;
 	const glm::mat4x4& GetViewTransformation() const;

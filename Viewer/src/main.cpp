@@ -43,10 +43,9 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 	// TODO: Handle mouse scroll here
 }
-
+static int windowWidth = 1920, windowHeight = 1080;
 int main(int argc, char **argv)
 {
-	int windowWidth = 1920, windowHeight = 1080;
 	GLFWwindow* window = SetupGlfwWindow(windowWidth, windowHeight, "Mesh Viewer");
 	if (!window)
 		return 1;
@@ -426,9 +425,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							 bool faceNormals = myModel.drawFaceNormals;
 
 							ImGui::Text("Local Transformation");
-							ImGui::SliderFloat3("Translate-Local", &translationObject.x, -1000.0f, 1000.0f);
+							ImGui::SliderFloat3("Translate-Local", &translationObject.x, -10.0f, 10.0f);
 							ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
-							ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 2000.0f);
+							ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 10.0f);
 							scaleObject.y = scaleObject.x;
 							scaleObject.z = scaleObject.x;
 							myModel.SetTranslationObject(translationObject);
@@ -438,7 +437,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 							ImGui::Text("World Transformation");
 
-							ImGui::SliderFloat3("Translate-World", &translationWorld.x, -1000.0f, 1000.0f);
+							ImGui::SliderFloat3("Translate-World", &translationWorld.x, -10.0f, 10.0f);
 							ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
 							ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
 							scaleWorld.y = scaleWorld.x;
@@ -500,22 +499,20 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						static float zNearOrtho = 1.0f;
 						static float zFarOrtho = -1.0f;
 
-						static float fovy = 1.0f;
-						static float aspect = 2.0f;
-						static float zNearPerspective = 1.0f;
-						static float zFarPerspective = 3.0f;
+						static float fovy = 45.0f;
+						static float aspect = float(windowWidth)/float(windowHeight);
+						static float zNearPerspective = 1.f;
+						static float zFarPerspective = 100.0f;
 
-						static glm::vec3 eye = glm::vec3(0.1f);
+						static glm::vec3 eye = glm::vec3(0.0f,0.0f,3.0f);
 						static glm::vec3 at = glm::vec3(1.0f);
 						static float upper = 1.0f;
 
 						static bool ortho_or_perspective = false; //true=ortho, false=perspective
 						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f, upper, 0.0f));
 
-						if (ortho_or_perspective)
-							cam.Ortho(left, right, down, up, zNearOrtho, zFarOrtho);
-						else
-							cam.Perspective(fovy, aspect, zNearPerspective, zFarPerspective);
+						cam.Perspective(glm::radians(fovy), aspect, zNearPerspective, zFarPerspective); // set to frustrum s
+							//cam.Frustum();
 						if (camera_controllers)
 						{
 							ImGui::Begin("Camera Controller");
@@ -540,35 +537,40 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 									zNearOrtho = 1;
 									zFarOrtho = -1;
 								}
+								
+								cam.Ortho(left, right, down, up, zNearOrtho, zFarOrtho);
 							}
 							else // Perspective
 							{
-								ImGui::SliderFloat("Fovy", &fovy, 0.0f, 360.0f);
-								ImGui::SliderFloat("Aspect", &aspect, 0.0f, 6.0f);
+								
+								ImGui::SliderFloat("Fovy in degrees", &fovy, 1.0f, 360.0f);
+								//ImGui::SliderFloat("Aspect", &aspect, 0.0f, 6.0f);
 								ImGui::SliderFloat("Near", &zNearPerspective, -10.0f, 10.0f);
 								ImGui::SliderFloat("Far", &zFarPerspective, -100.0f, 100.0f);
 
 								if (ImGui::Button("reset"))
 								{
-									fovy = 1.0f;
-									aspect = 2.0f;
+									
+									fovy = 45.0f;
+									//aspect = 2.0f;
 									zNearPerspective = 1;
-									zFarPerspective = -1;
+									zFarPerspective = 100;
 								}
+								cam.Perspective(glm::radians(fovy), aspect, zNearPerspective, zFarPerspective);
 							}
 							//Look at
 							ImGui::Text("Camera controls");
-							ImGui::SliderFloat("eye X", &eye.x, -100.0f, 100.0f);
-							ImGui::SliderFloat("eye Y", &eye.y, -100.0f, 100.0f);
-							ImGui::SliderFloat("eye Z", &eye.z, -100.0f, 100.0f);
+							ImGui::SliderFloat("eye X", &eye.x, -10.0f, 10.0f);
+							ImGui::SliderFloat("eye Y", &eye.y, -10.0f, 10.0f);
+							ImGui::SliderFloat("eye Z", &eye.z, -10.0f, 10.0f);
 
 							ImGui::SliderFloat("at X", &at.x, -10.0f, 10.0f);
 							ImGui::SliderFloat("at Y", &at.y, -10.0f, 10.0f);
 							ImGui::SliderFloat("at Z", &at.z, -10.0f, 10.0f);
 							if (ImGui::Button("auto"))
 							{
-								eye = { 0.1f,0.1f,0.1f };
-								at = { 1.0f,1.0f,1.0f };
+								eye = { 0.0f,0.0f,3.0f };
+								at = { 1,1,1 };
 							}
 							//std::vector<const char*> camera_names;
 							//for (int i = 0; i < scene.GetCameraCount(); i++)
@@ -602,7 +604,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							glm::vec3 camscaleWorld(cam.GetScaleWorld());
 
 							ImGui::Text("Local Transformation");
-							ImGui::SliderFloat3("Translate-Local", &camtranslationObject.x, -1000.0f, 1000.0f);
+							ImGui::SliderFloat3("Translate-Local", &camtranslationObject.x, -10.0f, 10.0f);
 							ImGui::SliderFloat3("Rotate-Local", &camrotationObject.x, 0.0f, 360.0f);
 							ImGui::SliderFloat("Scale-Local", &camscaleObject.x, -5.0f, 5.0f);
 							camscaleObject.y = camscaleObject.x;
@@ -614,7 +616,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 							ImGui::Text("World Transformation");
 
-							ImGui::SliderFloat3("Translate-World", &camtranslationWorld.x, -1000.0f, 1000.0f);
+							ImGui::SliderFloat3("Translate-World", &camtranslationWorld.x, -10.0f, 10.0f);
 							ImGui::SliderFloat3("Rotate-World", &camrotationWorld.x, 0.0f, 360.0f);
 							ImGui::SliderFloat("Scale-World", &camscaleWorld.x, 0.0f, 2.0f);
 							camscaleWorld.y = camscaleWorld.x;

@@ -22,7 +22,7 @@ Camera::~Camera()
 
 void Camera::SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up)
 {
-	view_transformation=GetTransform()* glm::lookAt(eye, at, up);
+	view_transformation= glm::lookAt(eye, at, up)  * GetTransform();
 }
 
 
@@ -47,8 +47,8 @@ void Camera::SetProjection(const glm::mat4x4& projection)
 
 
 glm::mat4x4 Camera::GetTransform()
-{
-	return worldTransform * objectTransform;
+{// (AB)^-1 = B^-1 * A^-1
+	return   worldTransform*objectTransform  ; 
 }
 
 glm::mat4x4 Camera::GetObjectTransform()
@@ -71,7 +71,8 @@ void Camera::SetObjectTransform()
 	glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translationObject);
 	glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scaleObject);
 
-	objectTransform = glm::inverse(matTranslation * matRotation * matScale);
+	//objectTransform = glm::inverse(matTranslation * matRotation * matScale);
+	objectTransform = (matTranslation * matRotation * matScale);
 }
 
 void Camera::SetWorldTransform()
@@ -84,5 +85,8 @@ void Camera::SetWorldTransform()
 	glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translationWorld);
 	glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scaleWorld);
 
-	worldTransform = glm::inverse(matTranslation * matRotation * matScale);
+	//worldTransform = glm::inverse(matTranslation * matRotation * matScale);
+	worldTransform = (matTranslation * matRotation * matScale);
+
+
 }

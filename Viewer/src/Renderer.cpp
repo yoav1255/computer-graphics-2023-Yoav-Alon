@@ -465,8 +465,8 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 
 	Camera& cam = scene.GetActiveCamera();
 	glm::mat4 Transformation = myModel.GetTransform();
-	glm::mat4 modelTransform = myModel.GetObjectTransform();	
-	glm::mat4 worldTransform = myModel.GetWorldTransform();
+	//glm::mat4 modelTransform = myModel.GetObjectTransform();	
+	//glm::mat4 worldTransform = myModel.GetWorldTransform();
 	glm::mat4 view = cam.GetViewTransformation();				//view
 	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
 
@@ -483,17 +483,22 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		glm::vec3 v0 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0) - 1];
 		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
 		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
-
-		glm::vec4 verticeModel0 = projection * view * Transformation * glm::vec4(v0, 1);
-		glm::vec4 verticeModel1 = projection * view * Transformation * glm::vec4(v1, 1);
-		glm::vec4 verticeModel2 = projection * view * Transformation * glm::vec4(v2, 1);
-
+		
+		glm::vec3 verticeModel0=glm::project(v0, view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
+		glm::vec3 verticeModel1 =glm::project(v1, view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
+		glm::vec3 verticeModel2 = glm::project(v2, view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
+		//glm::vec4 verticeModel0 = projection * view * Transformation * glm::vec4(v0, 1);
+		//glm::vec4 verticeModel1 = projection * view * Transformation * glm::vec4(v1, 1);
+		//glm::vec4 verticeModel2 = projection * view * Transformation * glm::vec4(v2, 1);
 		verticeModel0.x += half_width;
 		verticeModel0.y += half_height;
 		verticeModel1.x += half_width;
 		verticeModel1.y += half_height;
 		verticeModel2.x += half_width;
 		verticeModel2.y += half_height;
+		
+		
+		
 
 		DrawLine(verticeModel0, verticeModel1, color);
 		DrawLine(verticeModel0, verticeModel2, color);
