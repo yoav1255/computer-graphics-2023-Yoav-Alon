@@ -590,6 +590,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 								addedCam->Ortho(0.0f, 400.0f, 0.0f, 400.0f, -1.0f, 1.0f);
 								addedCam->SetCameraLookAt(glm::vec3(tempEye.x, tempEye.y, tempEye.z), glm::vec3(tempAt.x, tempAt.x, tempAt.x), glm::vec3(0, tempUp, 0));
 								addedCam->Perspective(glm::radians(45.0f), float(windowWidth) / float(windowHeight), 1.0f, 100.0f);
+								addedCam->my_eye = tempEye;
+								addedCam->my_at = tempAt;
+								addedCam->my_upper = tempUp;
 								scene.AddCamera(addedCam);
 								//scene.SetActiveCameraIndex(scene.GetCameraCount()-1);
 								selectedItemCamera = scene.GetCameraCount() - 1;
