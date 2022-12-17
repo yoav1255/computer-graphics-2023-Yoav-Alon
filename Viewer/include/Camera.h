@@ -62,6 +62,8 @@ public:
 	void SetScaleWorld(const glm::vec3 scaleVec) { scaleWorld = scaleVec; }
 	void SetRotationWorld(const glm::vec3 rotationVec) { rotationWorld = rotationVec; }
 
+	bool lookAt;
+
 private:
 	glm::mat4x4 view_transformation;
 	glm::mat4x4 projection_transformation;

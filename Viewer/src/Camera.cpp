@@ -12,6 +12,7 @@ Camera::Camera():
 	translationWorld(glm::vec3(1.0f)),
 	scaleWorld(glm::vec3(1, 1, 1)),
 	rotationWorld(glm::vec3(0, 0, 0)),
+	lookAt(true),
 	dolly(0.0f)
 {
 	 my_up = 1.0f;
@@ -40,7 +41,8 @@ Camera::~Camera()
 
 void Camera::SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up)
 {
-	view_transformation= glm::lookAt(eye, at, up)  * GetTransform();
+	view_transformation= glm::lookAt(eye, at, up)  ;
+	//* GetTransform()
 }
 
 
