@@ -17,6 +17,11 @@ video for demostration :
 
 ## Paragraph 3:
 
+allowing the user to resize the window's size and we will resize the viewport accordingly:
+
+<img src='./3a.png'>
+<img src='./3b.png'>
+<img src='./3c.png'>
 
 
 ## Paragraph 4:

@@ -143,7 +143,7 @@ void RenderFrame(GLFWwindow* window, Scene& scene, Renderer& renderer, ImGuiIO& 
 
 		if (frameBufferWidth != renderer.GetViewportWidth() || frameBufferHeight != renderer.GetViewportHeight())
 		{
-			// TODO: Set new aspect ratio
+			renderer.SetNewViewport(frameBufferWidth, frameBufferHeight);
 		}
 
 		if (!io.WantCaptureKeyboard)
@@ -426,9 +426,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							 bool faceNormals = myModel.drawFaceNormals;
 
 							ImGui::Text("Local Transformation");
-							ImGui::SliderFloat3("Translate-Local", &translationObject.x, -10.0f, 10.0f);
+							ImGui::SliderFloat3("Translate-Local", &translationObject.x, -3.0f, 3.0f);
 							ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
-							ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 10.0f);
+							ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 4.0f);
 							scaleObject.y = scaleObject.x;
 							scaleObject.z = scaleObject.x;
 							myModel.SetTranslationObject(translationObject);
@@ -438,9 +438,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 							ImGui::Text("World Transformation");
 
-							ImGui::SliderFloat3("Translate-World", &translationWorld.x, -10.0f, 10.0f);
+							ImGui::SliderFloat3("Translate-World", &translationWorld.x, -3.0f, 3.0f);
 							ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
-							ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
+							ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 4.0f);
 							scaleWorld.y = scaleWorld.x;
 							scaleWorld.z = scaleWorld.x;
 							myModel.SetTranslationWorld(translationWorld);
@@ -538,7 +538,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 									zNearOrtho = 1;
 									zFarOrtho = -1;
 								}
-								
 								cam.Ortho(left, right, down, up, zNearOrtho, zFarOrtho);
 							}
 							else // Perspective

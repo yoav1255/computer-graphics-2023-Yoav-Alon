@@ -227,6 +227,13 @@ void Renderer::ClearColorBuffer(const glm::vec3& color)
 		}
 	}
 }
+
+void Renderer::SetNewViewport(float frameBufferWidth, float frameBufferHeight)
+{
+	viewport_width = frameBufferWidth;
+	viewport_height = frameBufferHeight;
+}
+
 void Renderer::putFlower(int radius,int x ,const glm::vec3& color, int stemLen)
 {
 	int ground = 50;
@@ -434,12 +441,12 @@ void Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec
 		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
 		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
 
-		glm::vec3 c0 = glm::cross((v0 - v1), (v0, v2));
-		glm::vec3 c1 = glm::cross((v1 - v0), (v1, v2));
-		glm::vec3 c2 = glm::cross((v2 - v0), (v2, v1));
+		glm::vec3 c0 = glm::cross((v1-v0), (v2-v0));
+		glm::vec3 c0_normalized = glm::normalize(c0);
+
 
 		glm::vec3 vCenter = (v0 + v1 + v2) / 3.0f;
-		glm::vec3 normCenter = ((c0 + c1 + c2) / 3.0f) +vCenter ;
+		glm::vec3 normCenter = c0_normalized +vCenter ;
 
 		glm::vec3 face_norm_projected = glm::project(glm::vec3(normCenter),view* Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 vCenter_projected = glm::project(glm::vec3(vCenter), view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
