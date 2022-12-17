@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+
 class Renderer
 {
 public:
@@ -22,8 +23,9 @@ private:
 	void drawSomeFlowers();
 	void putFlower(int radius, int x, const glm::vec3& color , int stemLen);
 	void drawModel( MeshModel& myModel,Scene& scene);
-	void drawBoundingBox(MeshModel& myModel, Scene& scene, const glm::vec3& color,bool isWorld);
-	void drawAxis(MeshModel& myModel, Scene& scene, const glm::vec3& color, bool isWorld);
+	void drawBoundingBox(MeshModel& myModel, Scene& scene, const glm::vec3& color,bool isWorld,float x_Min,float y_Min,float z_Min,float x_Max, float y_Max,float z_Max);
+	void drawAxisLocal(MeshModel& myModel, Scene& scene, const glm::vec3& color, float x_Min, float y_Min, float z_Min, float x_Max, float y_Max, float z_Max);
+	void drawAxisWorld(const glm::vec3& color);
 	void drawVerticeNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
 	void drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
 

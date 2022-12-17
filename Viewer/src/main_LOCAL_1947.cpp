@@ -505,8 +505,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						static float zNearPerspective = 1.0f;
 						static float zFarPerspective = 3.0f;
 
-						static glm::vec3 eye = glm::vec3(1.0f,1.0f,2.0f);
-						static glm::vec3 at = glm::vec3(1.1f);
+						static glm::vec3 eye = glm::vec3(0.1f);
+						static glm::vec3 at = glm::vec3(1.0f);
 						static float upper = 1.0f;
 
 						static bool ortho_or_perspective = false; //true=ortho, false=perspective
@@ -560,15 +560,15 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							ImGui::Text("Camera controls");
 							ImGui::SliderFloat("eye X", &eye.x, -100.0f, 100.0f);
 							ImGui::SliderFloat("eye Y", &eye.y, -100.0f, 100.0f);
-							ImGui::SliderFloat("eye Z", &eye.z, -3.0f, 3.0f);
+							ImGui::SliderFloat("eye Z", &eye.z, -100.0f, 100.0f);
 
 							ImGui::SliderFloat("at X", &at.x, -10.0f, 10.0f);
 							ImGui::SliderFloat("at Y", &at.y, -10.0f, 10.0f);
 							ImGui::SliderFloat("at Z", &at.z, -10.0f, 10.0f);
 							if (ImGui::Button("auto"))
 							{
-								eye = { 1.0f,1.0f,2.0f };
-								at = { 1.1f,1.1f,1.1f };
+								eye = { 0.1f,0.1f,0.1f };
+								at = { 1.0f,1.0f,1.0f };
 							}
 							//std::vector<const char*> camera_names;
 							//for (int i = 0; i < scene.GetCameraCount(); i++)

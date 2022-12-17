@@ -86,6 +86,41 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<MeshModel>& myM
 	return os;
 }
 
+const glm::mat4 MeshModel::GetRotationObjectMat() const
+{
+	glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), glm::radians(rotationObject.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(rotationObject.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotationObject.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	return rotateX * rotateY * rotateZ;
+}
+const glm::mat4 MeshModel::GetTranslationObjectMat() const
+{
+	return glm::translate(glm::mat4(1.0f), translationObject);
+
+}
+const glm::mat4 MeshModel::GetScaleObjectMat() const
+{
+	return glm::scale(glm::mat4(1.0f), scaleObject);
+}
+const glm::mat4 MeshModel::GetRotationWorldMat() const
+{
+	glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), glm::radians(rotationWorld.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(rotationWorld.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotationWorld.z), glm::vec3(0.0f, 0.0f, 1.0f));
+
+	return rotateX * rotateY * rotateZ;
+}
+const glm::mat4 MeshModel::GetTranslationWorldMat() const
+{
+	return glm::translate(glm::mat4(1.0f), translationWorld);
+}
+const glm::mat4 MeshModel::GetScaleWorldMat() const
+{
+	return glm::scale(glm::mat4(1.0f), scaleWorld);
+}
+
+
   glm::mat4x4 MeshModel::GetTransform()
 {
 	return worldTransform * objectTransform;
@@ -103,26 +138,11 @@ std::ostream& operator<<(std::ostream &os, const std::shared_ptr<MeshModel>& myM
 
  void MeshModel::SetObjectTransform()
 {
-	 glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), glm::radians(rotationObject.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	 glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(rotationObject.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	 glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotationObject.z), glm::vec3(0.0f, 0.0f, 1.0f));
-
-	 glm::mat4 matRotation = rotateX * rotateY * rotateZ;
-	 glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translationObject);
-	 glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scaleObject);
-
-	 objectTransform = matTranslation * matRotation * matScale;
+	 objectTransform = GetTranslationObjectMat() * GetRotationObjectMat() * GetScaleObjectMat();
 }
 
  void MeshModel::SetWorldTransform()
 {
-	 glm::mat4 rotateX = glm::rotate(glm::mat4(1.0f), glm::radians(rotationWorld.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	 glm::mat4 rotateY = glm::rotate(glm::mat4(1.0f), glm::radians(rotationWorld.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	 glm::mat4 rotateZ = glm::rotate(glm::mat4(1.0f), glm::radians(rotationWorld.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	 worldTransform = GetTranslationWorldMat() * GetRotationWorldMat() * GetScaleWorldMat();
 
-	 glm::mat4 matRotation = rotateX * rotateY * rotateZ;
-	 glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translationWorld);
-	 glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scaleWorld);
-
-	 worldTransform = matTranslation * matRotation * matScale;
  }
