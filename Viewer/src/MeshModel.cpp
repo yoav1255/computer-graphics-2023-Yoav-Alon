@@ -55,7 +55,32 @@ void MeshModel::setVertices(const glm::mat4 mat)
 		vertices[i] = mat * glm::vec4(vertices[i],1);
 	}
 }
+glm::vec3 MeshModel::GetVCenter(int half_width,int half_height)
+{
+	float x_Min = vertices[0].x;
+	float y_Min = vertices[0].y;
+	float z_Min = vertices[0].z;
 
+	float x_Max = vertices[0].x;
+	float y_Max = vertices[0].y;
+	float z_Max = vertices[0].z;
+	for (int i = 0; i < GetVertices().size(); i++)
+	{
+		x_Min = std::min(GetVertices()[i][0], x_Min);
+		y_Min = std::min(GetVertices()[i][1], y_Min);
+		z_Min = std::min(GetVertices()[i][2], z_Min);
+		x_Max = std::max(GetVertices()[i][0], x_Max);
+		y_Max = std::max(GetVertices()[i][1], y_Max);
+		z_Max = std::max(GetVertices()[i][2], z_Max);
+	}
+
+
+	vCenter.x = ((x_Min + x_Max) / 2.0f) ;
+	vCenter.y = ((y_Min + y_Max) / 2.0f) ;
+	vCenter.z = (z_Min + z_Max) / 2.0f;
+	return vCenter;
+
+}
 std::ostream& operator<<(std::ostream &os, const std::shared_ptr<MeshModel>& myModel)
 {
 	os << "Vertices : " << std::endl;

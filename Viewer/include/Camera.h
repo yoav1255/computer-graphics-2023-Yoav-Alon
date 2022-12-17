@@ -12,13 +12,9 @@ public:
 	void SetTransformation(const glm::mat4x4& transform);
 	void SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up);
 	void SetProjection(const glm::mat4x4& projection);
-	void Ortho(float left, float right, float bottom, float top, float znear, float zfar) { projection_transformation = glm::ortho(left, right, bottom, top, znear, zfar); }
-	void Frustum();
-	void Perspective(float fovy, float aspect, float znear, float zfar) {
-		//projection_transformation = glm::frustum(left, right, bottom, top, 1.0f, 100.0f);
-		projection_transformation = glm::perspective(fovy, aspect, znear, zfar);
-	}
-		//glm::perspective(fovy,aspect,znear,zfar); } 
+	void Ortho(float left, float right, float bottom, float top, float znear, float zfar);
+	void Perspective(float aspect);
+
 	
 	const glm::mat4x4& GetProjectionTransformation() const;
 	const glm::mat4x4& GetViewTransformation() const;
@@ -40,10 +36,17 @@ public:
 	const glm::vec3& GetTranslationWorld() const { return translationWorld; }
 	const glm::vec3& GetScaleWorld() const { return scaleWorld; }
 	const glm::vec3& GetRotationWorld() const { return rotationWorld; }
-
+	void setDolly(float distance);
 	void SetTranslationWorld(const glm::vec3 translationVec) { translationWorld = translationVec; }
 	void SetScaleWorld(const glm::vec3 scaleVec) { scaleWorld = scaleVec; }
 	void SetRotationWorld(const glm::vec3 rotationVec) { rotationWorld = rotationVec; }
+	float dolly;
+	float fov;
+	float zNearPerspective;
+	float zFarPerspective;
+	glm::vec3 translationWorld;	
+	glm::vec3 translationObject;
+
 
 private:
 	glm::mat4x4 view_transformation;
@@ -51,10 +54,9 @@ private:
 
 	glm::mat4 objectTransform;
 	glm::mat4 worldTransform;
-	glm::vec3 translationObject;
 	glm::vec3 scaleObject;
 	glm::vec3 rotationObject;
-	glm::vec3 translationWorld;
+	
 	glm::vec3 scaleWorld;
 	glm::vec3 rotationWorld;
 };

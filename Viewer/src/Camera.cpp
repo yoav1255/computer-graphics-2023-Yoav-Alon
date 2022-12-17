@@ -4,14 +4,18 @@ Camera::Camera():
 
 	view_transformation(glm::mat4x4()),
 	projection_transformation(glm::mat4x4()),
-	objectTransform(glm::mat4(1.0)),
-	worldTransform(glm::mat4(1.0)),
+	objectTransform(glm::mat4(1.0f)),
+	worldTransform(glm::mat4(1.0f)),
 	translationObject(glm::vec3(1.0f)),
 	scaleObject(glm::vec3(1, 1, 1)),
 	rotationObject(glm::vec3(0, 0, 0)),
 	translationWorld(glm::vec3(1.0f)),
 	scaleWorld(glm::vec3(1, 1, 1)),
-	rotationWorld(glm::vec3(0, 0, 0))
+	rotationWorld(glm::vec3(0, 0, 0)),
+	dolly(0.0f),
+	fov(45.0f),
+	zNearPerspective(1.0f),
+	zFarPerspective(100.0f)
 {
 }
 
@@ -19,12 +23,27 @@ Camera::~Camera()
 {
 	
 }
+void Camera::setDolly(float distance)
+{
+	view_transformation = glm::translate(view_transformation, glm::vec3(0.0f, 0.0f, distance));
+
+}
 
 void Camera::SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const glm::vec3& up)
 {
 	view_transformation= glm::lookAt(eye, at, up)  * GetTransform();
 }
 
+void Camera::Perspective(float aspect)
+{
+	//fov = fov + (fov * dolly * 0.5);
+	projection_transformation = glm::perspective(glm::radians(fov), aspect, zNearPerspective, zFarPerspective);
+}
+void Camera::Ortho(float left, float right, float bottom, float top, float znear, float zfar)
+{
+	projection_transformation = glm::ortho(left, right, bottom, top, znear, zfar);
+
+}
 
 const glm::mat4x4& Camera::GetProjectionTransformation() const
 {
@@ -48,6 +67,7 @@ void Camera::SetProjection(const glm::mat4x4& projection)
 
 glm::mat4x4 Camera::GetTransform()
 {// (AB)^-1 = B^-1 * A^-1
+	
 	return   worldTransform*objectTransform  ; 
 }
 

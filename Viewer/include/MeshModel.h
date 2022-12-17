@@ -22,7 +22,9 @@ public:
 	 glm::mat4x4 GetObjectTransform();
 	 glm::mat4x4 GetWorldTransform();
 	void SetObjectTransform();
-	void SetWorldTransform();
+	void SetWorldTransform();	
+	glm::vec3 GetVCenter(int half_width, int half_height);
+
 
 	const glm::vec3& GetTranslationObject() const { return translationObject; }
 	const glm::vec3& GetScaleObject() const { return scaleObject; }
@@ -37,7 +39,6 @@ public:
 	const glm::vec3& GetTranslationWorld() const { return translationWorld; }
 	const glm::vec3& GetScaleWorld() const { return scaleWorld; }
 	const glm::vec3& GetRotationWorld() const { return rotationWorld; }
-	const glm::vec3& GetVCenter() const { return vCenter; }
 
 	bool getAxisLocal() { return axisLocal; }
 	bool getAxisWorld() { return axisWorld; }
