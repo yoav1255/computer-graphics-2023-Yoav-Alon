@@ -43,8 +43,7 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 	// TODO: Handle mouse scroll here
 }
-int windowWidth = 1920, windowHeight = 1080;
-
+static int windowWidth = 1920, windowHeight = 1080;
 int main(int argc, char **argv)
 {
 	GLFWwindow* window = SetupGlfwWindow(windowWidth, windowHeight, "Mesh Viewer");
@@ -499,7 +498,12 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 						static float zNearOrtho = 1.0f;
 						static float zFarOrtho = -1.0f;
+
+						static float fovy = 45.0f;
 						static float aspect = float(windowWidth)/float(windowHeight);
+						static float zNearPerspective = 1.f;
+						static float zFarPerspective = 100.0f;
+
 						static glm::vec3 eye = glm::vec3(0.0f,0.0f,3.0f);
 						static glm::vec3 at = glm::vec3(1.0f);
 						static float upper = 1.0f;
@@ -507,7 +511,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						static bool ortho_or_perspective = false; //true=ortho, false=perspective
 						cam.SetCameraLookAt(eye, at, glm::vec3(0.0f, upper, 0.0f));
 
-						cam.Perspective( aspect); // set to frustrum s
+						cam.Perspective(glm::radians(fovy), aspect, zNearPerspective, zFarPerspective); // set to frustrum s
 							//cam.Frustum();
 						if (camera_controllers)
 						{
@@ -538,59 +542,36 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							}
 							else // Perspective
 							{
-								static bool isDolly = false;
-								static float dolly_prev = 0.0f;
-								ImGui::SliderFloat("Fovy in degrees", &cam.fov, 1.0f, 360.0f);
+<<<<<<< HEAD
+								ImGui::SliderFloat("Fovy", &fovy, -2.0f, 2.0f);
+								ImGui::SliderFloat("Aspect", &aspect, 0.0f, 6.0f);
+=======
+								
+								ImGui::SliderFloat("Fovy in degrees", &fovy, 1.0f, 360.0f);
 								//ImGui::SliderFloat("Aspect", &aspect, 0.0f, 6.0f);
-								ImGui::SliderFloat("Near", &cam.zNearPerspective, -10.0f, 10.0f);
-								ImGui::SliderFloat("Far", &cam.zFarPerspective, -100.0f, 100.0f);
-
-								ImGui::SliderFloat("Dolly Zoom", &cam.dolly, -0.04f, 0.04f);
-								ImGui::Checkbox("Do you want to Dolly?", &isDolly);
-								if (isDolly)
-								{
-									cam.fov += cam.dolly*2.5f;
-									cam.translationWorld.z += cam.dolly / 4;
-									//at.x = model_center.x;
-									//at.y = model_center.y;
-									//at.z = model_center.z;
-									//distance -= cam.dolly;
-									//cam.fov = glm::degrees(2.0f * atan(0.5f / distance));
-									/*if (cam.dolly > dolly_prev)
-									{
-										cam.fov += 0.1;
-										cam.translationObject.z += 0.01;
-									}
-									else if (cam.dolly < dolly_prev)
-									{
-										cam.fov -= 0.1;
-										cam.translationObject.z -=0.01;
-
-									}
-									dolly_prev = cam.dolly;*/
-
-								}
+>>>>>>> db5b66d6d2130317bb975641d0323d0ab6c5ed19
+								ImGui::SliderFloat("Near", &zNearPerspective, -10.0f, 10.0f);
+								ImGui::SliderFloat("Far", &zFarPerspective, -100.0f, 100.0f);
 
 								if (ImGui::Button("reset"))
 								{
-
-									cam.fov = 45.0f;
+									
+									fovy = 45.0f;
 									//aspect = 2.0f;
-									cam.zNearPerspective = 1;
-									cam.zFarPerspective = 100;
-									cam.dolly = 0.0f;
+									zNearPerspective = 1;
+									zFarPerspective = 100;
 								}
-								cam.Perspective(aspect);
+								cam.Perspective(glm::radians(fovy), aspect, zNearPerspective, zFarPerspective);
 							}
 							//Look at
 							ImGui::Text("Camera controls");
 							ImGui::SliderFloat("eye X", &eye.x, -10.0f, 10.0f);
 							ImGui::SliderFloat("eye Y", &eye.y, -10.0f, 10.0f);
 							ImGui::SliderFloat("eye Z", &eye.z, -10.0f, 10.0f);
+
 							ImGui::SliderFloat("at X", &at.x, -10.0f, 10.0f);
 							ImGui::SliderFloat("at Y", &at.y, -10.0f, 10.0f);
 							ImGui::SliderFloat("at Z", &at.z, -10.0f, 10.0f);
-							
 							if (ImGui::Button("auto"))
 							{
 								eye = { 0.0f,0.0f,3.0f };
@@ -609,7 +590,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 						if (camera_transformation)
 						{
-							static bool first = true;
+
 							static int selectedItemCamera = cameraCount;
 
 							ImGui::Begin("Change Camera Position");
@@ -618,14 +599,6 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							//
 							//int index = scene.GetActiveCameraIndex();
 							Camera& cam = scene.GetActiveCamera();
-							if (first) 
-							{
-								cam.SetTranslationObject(glm::vec3(0.0f));
-								cam.SetRotationObject(glm::vec3(0.0f));
-								cam.SetTranslationWorld(glm::vec3(0.0f));
-								cam.SetRotationWorld(glm::vec3(0.0f));
-								first = false;
-							}
 
 							glm::vec3 camtranslationObject(cam.GetTranslationObject());
 							glm::vec3 camrotationObject(cam.GetRotationObject());
