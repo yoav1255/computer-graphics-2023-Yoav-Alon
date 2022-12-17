@@ -426,9 +426,9 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							 bool faceNormals = myModel.drawFaceNormals;
 
 							ImGui::Text("Local Transformation");
-							ImGui::SliderFloat3("Translate-Local", &translationObject.x, -10.0f, 10.0f);
+							ImGui::SliderFloat3("Translate-Local", &translationObject.x, -1000.0f, 1000.0f);
 							ImGui::SliderFloat3("Rotate-Local", &rotationObject.x, 0.0f, 360.0f);
-							ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 10.0f);
+							ImGui::SliderFloat("Scale-Local", &scaleObject.x, 0.0f, 100.0f);
 							scaleObject.y = scaleObject.x;
 							scaleObject.z = scaleObject.x;
 							myModel.SetTranslationObject(translationObject);
@@ -438,7 +438,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 							ImGui::Text("World Transformation");
 
-							ImGui::SliderFloat3("Translate-World", &translationWorld.x, -10.0f, 10.0f);
+							ImGui::SliderFloat3("Translate-World", &translationWorld.x, -1000.0f, 1000.0f);
 							ImGui::SliderFloat3("Rotate-World", &rotationWorld.x, 0.0f, 360.0f);
 							ImGui::SliderFloat("Scale-World", &scaleWorld.x, 0.0f, 2.0f);
 							scaleWorld.y = scaleWorld.x;
@@ -505,8 +505,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 						static float zNearPerspective = 1.f;
 						static float zFarPerspective = 100.0f;
 
-						static glm::vec3 eye = glm::vec3(0.0f,0.0f,3.0f);
-						static glm::vec3 at = glm::vec3(1.0f);
+						static glm::vec3 eye = glm::vec3(1.0f,1.0f,2.0f);
+						static glm::vec3 at = glm::vec3(1.1f);
 						static float upper = 1.0f;
 
 						static bool ortho_or_perspective = false; //true=ortho, false=perspective
@@ -570,8 +570,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							ImGui::SliderFloat("at Z", &at.z, -10.0f, 10.0f);
 							if (ImGui::Button("auto"))
 							{
-								eye = { 0.0f,0.0f,3.0f };
-								at = { 1,1,1 };
+								eye = { 1.0f,1.0f,2.0f };
+								at = { 1.1,1.1,1.1 };
 							}
 							//std::vector<const char*> camera_names;
 							//for (int i = 0; i < scene.GetCameraCount(); i++)
