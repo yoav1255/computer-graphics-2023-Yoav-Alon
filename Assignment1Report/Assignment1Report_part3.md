@@ -22,11 +22,12 @@ video for demostration :
 
 https://user-images.githubusercontent.com/101698622/208249833-c38ab71f-3ae5-444a-93d7-601f88741c8b.mp4
 
-
+In order to reposition the camera in the camera frame and in the world frame we multiplied the following:
+camera projection X inverse(camera local frame X camera world frame) X matrix transformation
 
 ## Paragraph 3:
 
-allowing the user to resize the window's size and we will resize the viewport accordingly:
+allowing the user to resize the window's size and we will resize the viewport accordingly with a new aspect ratio:
 
 <img src='./3a.png'>
 <img src='./3b.png'>
@@ -65,6 +66,8 @@ while the bounding box in the world frame is always parallel to the World Axis.
 
 ## Paragraph 7:
 
+We can see that translating and rotating doesn't affect the vertices.
+with a cube it is clear to see that the normals are perpendicular to the faces.
 Vertex Normals
 <img src='./7a.png'>
 <img src='./7b.png'>
@@ -76,11 +79,12 @@ Face Normals
 
 ## Paragraph 8:
 
-Orthographic projection compared to perspective projection:
+Orthographic projection compared to perspective projection.
+As a sanity check we moved on the camera's Z axis, and it is clear to see that on perspective projection the object looks farther campared to the orthographic projection.
 Orthographic:
 
 <img src='./8a.png'>
-perspective:
+Perspective:
 
 <img src='./8b.png'>
 
