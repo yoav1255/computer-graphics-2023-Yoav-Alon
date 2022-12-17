@@ -71,8 +71,8 @@ void Camera::SetObjectTransform()
 	glm::mat4 matTranslation = glm::translate(glm::mat4(1.0f), translationObject);
 	glm::mat4 matScale = glm::scale(glm::mat4(1.0f), scaleObject);
 
-	//objectTransform = glm::inverse(matTranslation * matRotation * matScale);
-	objectTransform = (matTranslation * matRotation * matScale);
+	objectTransform = glm::inverse(matTranslation * matRotation * matScale);
+	//objectTransform = (matTranslation * matRotation * matScale);
 }
 
 void Camera::SetWorldTransform()
