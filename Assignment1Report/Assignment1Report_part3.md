@@ -53,7 +53,7 @@ T1 on model frame then T2 on world frame:
 T1 on world frame then T2 on model frame:
 ![Screenshot (17)](https://user-images.githubusercontent.com/108798956/208262488-81c9f035-6294-4458-8b94-abe2c5b0d713.png)
 
-
+We can see that the diffrence is that the order of multiplycation as well as the matrices applied to each of the frames makes a diffrence as T1,T2 are non commuting transformation.
 
 
 ## Paragraph 6:
