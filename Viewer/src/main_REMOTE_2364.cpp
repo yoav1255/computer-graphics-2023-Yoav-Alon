@@ -43,8 +43,7 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 	// TODO: Handle mouse scroll here
 }
-int windowWidth = 1920, windowHeight = 1080;
-
+static int windowWidth = 1920, windowHeight = 1080;
 int main(int argc, char **argv)
 {
 	GLFWwindow* window = SetupGlfwWindow(windowWidth, windowHeight, "Mesh Viewer");

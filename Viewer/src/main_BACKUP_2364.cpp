@@ -43,8 +43,7 @@ void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 	ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 	// TODO: Handle mouse scroll here
 }
-int windowWidth = 1920, windowHeight = 1080;
-
+static int windowWidth = 1920, windowHeight = 1080;
 int main(int argc, char **argv)
 {
 	GLFWwindow* window = SetupGlfwWindow(windowWidth, windowHeight, "Mesh Viewer");
@@ -543,9 +542,14 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 							}
 							else // Perspective
 							{
+<<<<<<< HEAD
+								ImGui::SliderFloat("Fovy", &fovy, -2.0f, 2.0f);
+								ImGui::SliderFloat("Aspect", &aspect, 0.0f, 6.0f);
+=======
 								
 								ImGui::SliderFloat("Fovy in degrees", &fovy, 1.0f, 360.0f);
 								//ImGui::SliderFloat("Aspect", &aspect, 0.0f, 6.0f);
+>>>>>>> db5b66d6d2130317bb975641d0323d0ab6c5ed19
 								ImGui::SliderFloat("Near", &zNearPerspective, -10.0f, 10.0f);
 								ImGui::SliderFloat("Far", &zFarPerspective, -100.0f, 100.0f);
 
