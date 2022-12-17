@@ -11,8 +11,26 @@ Camera::Camera():
 	rotationObject(glm::vec3(0, 0, 0)),
 	translationWorld(glm::vec3(1.0f)),
 	scaleWorld(glm::vec3(1, 1, 1)),
-	rotationWorld(glm::vec3(0, 0, 0))
+	rotationWorld(glm::vec3(0, 0, 0)),
+	dolly(0.0f)
 {
+	 my_up = 1.0f;
+	 my_down = -1.0f;
+	 my_left = -1.0f;
+	 my_right = 1.0f;
+
+	 my_zNearOrtho = 1.0f;
+	 my_zFarOrtho = -1.0f;
+
+	 my_fovy = 45.0f;
+	 my_zNearPerspective = 1.f;
+	 my_zFarPerspective = 100.0f;
+
+	 my_eye = glm::vec3(0.0f, 0.0f, 3.0f);
+	 my_at = glm::vec3(1.0f);
+	 my_upper = 1.0f;
+	 my_isDolly = false;
+	 my_ortho_or_perspective = false; //true=ortho, false=perspective
 }
 
 Camera::~Camera()

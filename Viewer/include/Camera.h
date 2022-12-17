@@ -19,10 +19,27 @@ public:
 		projection_transformation = glm::perspective(fovy, aspect, znear, zfar);
 	}
 		//glm::perspective(fovy,aspect,znear,zfar); } 
-	
+	float dolly;
 	const glm::mat4x4& GetProjectionTransformation() const;
 	const glm::mat4x4& GetViewTransformation() const;
+	glm::vec3 translationWorld;
+	 float my_up = 1.0f;
+	 float my_down = -1.0f;
+	 float my_left = -1.0f;
+	 float my_right = 1.0f;
 
+	 float my_zNearOrtho = 1.0f;
+	 float my_zFarOrtho = -1.0f;
+
+	 float my_fovy = 45.0f;
+	 float my_zNearPerspective = 1.f;
+	 float my_zFarPerspective = 100.0f;
+
+	 glm::vec3 my_eye = glm::vec3(0.0f, 0.0f, 3.0f);
+	 glm::vec3 my_at = glm::vec3(1.0f);
+	 float my_upper = 1.0f;
+	 bool my_isDolly = false;
+	 bool my_ortho_or_perspective = false; //true=ortho, false=perspective
 	glm::mat4x4 GetTransform();
 	glm::mat4x4 GetObjectTransform();
 	glm::mat4x4 GetWorldTransform();
@@ -54,7 +71,6 @@ private:
 	glm::vec3 translationObject;
 	glm::vec3 scaleObject;
 	glm::vec3 rotationObject;
-	glm::vec3 translationWorld;
 	glm::vec3 scaleWorld;
 	glm::vec3 rotationWorld;
 };
