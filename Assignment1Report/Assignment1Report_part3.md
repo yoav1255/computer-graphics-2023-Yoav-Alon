@@ -45,6 +45,14 @@ Translating and rotating on local frame:
 <img src='./4c.png'>
 
 ## Paragraph 5:
+Applying T1 as a translate matrix with x = 0.889 and T2 as a rotation matrix with 209 degrees rotation relative to the Z axis.
+
+T1 on model frame then T2 on world frame:
+![Screenshot (16)](https://user-images.githubusercontent.com/108798956/208262472-f660eafc-83bb-492c-bdac-b3cc6ab86ee1.png)
+
+T1 on world frame then T2 on model frame:
+![Screenshot (17)](https://user-images.githubusercontent.com/108798956/208262488-81c9f035-6294-4458-8b94-abe2c5b0d713.png)
+
 
 
 
@@ -80,7 +88,6 @@ perspective:
 ## Paragraph 9 video:
 
 
-
 https://user-images.githubusercontent.com/108798956/208097507-5016801e-be26-46bf-a712-faf5f0cd8fc2.mp4
 
 ## Paragraph 10 screenshot:
@@ -96,7 +103,6 @@ https://user-images.githubusercontent.com/108798956/208257643-d1310f0e-23d8-4b6f
 
 
 ## Paragraph 12 - video of adding another camera to an existing one and 2 screenshots:
-
 
 
 https://user-images.githubusercontent.com/108798956/208258205-0bab2172-133b-4102-9e6f-9413bb209ded.mp4
