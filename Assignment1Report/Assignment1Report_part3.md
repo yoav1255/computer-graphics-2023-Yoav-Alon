@@ -6,6 +6,10 @@ We implemented an Orthographic projection that enables the user to control the v
 
 Video for demonstration :
 
+
+https://user-images.githubusercontent.com/101698622/208249500-6205efa4-c490-4b42-a488-8a7b03e60807.mp4
+
+
 ## Paragraph 2:
 
 Reposition the camera in camera frame and in world frame :
@@ -13,6 +17,11 @@ Reposition the camera in camera frame and in world frame :
 <img src='./2a.png'>
 
 video for demostration :
+
+
+
+https://user-images.githubusercontent.com/101698622/208249833-c38ab71f-3ae5-444a-93d7-601f88741c8b.mp4
+
 
 
 ## Paragraph 3:
