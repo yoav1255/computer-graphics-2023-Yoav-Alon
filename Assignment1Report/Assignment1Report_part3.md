@@ -89,7 +89,7 @@ https://user-images.githubusercontent.com/108798956/208097507-5016801e-be26-46bf
 ![Screenshot (10)](https://user-images.githubusercontent.com/108798956/208098804-1105a309-3426-4ea2-b250-67a48d914290.png)
 
 ## Paragraph 11 video - Dolly zoom:
-### Manipulating the camera's FOV with it's movement on the Z asix caueses this "vertigo" effect.
+### Manipulating the camera's FOV with it's movement on the Z asix causes  this "vertigo" effect.
 
 
 https://user-images.githubusercontent.com/108798956/208257643-d1310f0e-23d8-4b6f-8c66-ad421ca21898.mp4
