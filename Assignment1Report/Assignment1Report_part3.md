@@ -87,3 +87,25 @@ https://user-images.githubusercontent.com/108798956/208097507-5016801e-be26-46bf
 
 
 ![Screenshot (10)](https://user-images.githubusercontent.com/108798956/208098804-1105a309-3426-4ea2-b250-67a48d914290.png)
+
+## Paragraph 11 video - Dolly zoom:
+### Manipulating the camera's FOV with it's movement on the Z asix caueses this "vertigo" effect.
+
+
+https://user-images.githubusercontent.com/108798956/208257643-d1310f0e-23d8-4b6f-8c66-ad421ca21898.mp4
+
+
+## Paragraph 12 - video of adding another camera to an existing one and 2 screenshots:
+
+
+
+https://user-images.githubusercontent.com/108798956/208258205-0bab2172-133b-4102-9e6f-9413bb209ded.mp4
+
+![Screenshot (11)](https://user-images.githubusercontent.com/108798956/208258290-b68c6eff-240f-45b8-b3c6-6c36d866bc50.png)
+
+![Screenshot (12)](https://user-images.githubusercontent.com/108798956/208258310-231d2b86-f4e6-4387-900a-fb8d995f0b81.png)
+
+
+
+
+
