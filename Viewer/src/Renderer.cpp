@@ -552,6 +552,8 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
 
+
+
 		DrawLine(verticeModel0, verticeModel1, color);
 		DrawLine(verticeModel0, verticeModel2, color);
 		DrawLine(verticeModel2, verticeModel1, color);
