@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/random.hpp>
 
 
 class Renderer
@@ -29,6 +30,7 @@ private:
 	void drawAxisWorld(const glm::vec3& color);
 	void drawVerticeNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
 	void drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
+	void drawRectangle(glm::vec3 verticeModel0, glm::vec3 verticeModel1, glm::vec3 verticeModel2);
 
 
 	void CreateBuffers(int w, int h);

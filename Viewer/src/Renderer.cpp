@@ -460,13 +460,51 @@ void Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec
 		DrawLine(face_norm_projected, vCenter_projected, color);
 	}
 }
+void Renderer::drawRectangle(glm::vec3 verticeModel0, glm::vec3 verticeModel1, glm::vec3 verticeModel2)
+{
+	float x_Min_Local = viewport_width;
+	float y_Min_Local = viewport_height;
+	float z_Min_Local = viewport_width;
+	float x_Max_Local = 0;
+	float y_Max_Local = 0;
+	float z_Max_Local = 0;
+	vector<glm::vec2> points_to_rectangle;
+
+	x_Min_Local = std::min(verticeModel0.x, verticeModel1.x);
+	x_Min_Local = std::min(x_Min_Local, verticeModel2.x);
+	y_Min_Local = std::min(verticeModel0.y, verticeModel1.y);
+	y_Min_Local = std::min(y_Min_Local, verticeModel2.y);
+	z_Min_Local = std::min(verticeModel0.z, verticeModel1.z);
+	z_Min_Local = std::min(z_Min_Local, verticeModel2.z);
+	x_Max_Local = std::max(verticeModel0.x, verticeModel1.x);
+	x_Max_Local = std::max(x_Max_Local, verticeModel2.x);
+	y_Max_Local = std::max(verticeModel0.y, verticeModel1.y);
+	y_Max_Local = std::max(y_Max_Local, verticeModel2.y);
+	z_Max_Local = std::max(verticeModel0.z, verticeModel1.z);
+	z_Max_Local = std::max(z_Max_Local, verticeModel2.z);
+
+	points_to_rectangle.push_back(glm::vec2(x_Min_Local, y_Min_Local));
+	points_to_rectangle.push_back(glm::vec2(x_Min_Local, y_Max_Local));
+	points_to_rectangle.push_back(glm::vec2(x_Max_Local, y_Min_Local));
+	points_to_rectangle.push_back(glm::vec2(x_Max_Local, y_Max_Local));
+
+	DrawLine(points_to_rectangle[0], points_to_rectangle[1], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[0], points_to_rectangle[2], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[1], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[2], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+
+	points_to_rectangle.pop_back();
+	points_to_rectangle.pop_back();
+	points_to_rectangle.pop_back();
+	points_to_rectangle.pop_back();
+}
 
 
 void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-
+	glm::vec3 color;
 	Camera& cam = scene.GetActiveCamera();
 	glm::mat4 Transformation = myModel.GetTransform();
 	glm::mat4 modelTransform = myModel.GetObjectTransform();	
@@ -476,7 +514,6 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 
 	glm::mat4 translate_Local = glm::translate(glm::mat4(1.0f), myModel.GetTranslationObject());
 
-	const glm::vec3 color = glm::vec3(1, 0, 0);
 	const glm::vec3 colorAxisLocal = glm::vec3(0.5, 0.9, 0.2);
 	const glm::vec3 colorAxisWorld = glm::vec3(0.7, 0.2, 0.3);
 	const glm::vec3 colorBBoxLocal = glm::vec3(0.5, 0.3, 0);
@@ -496,15 +533,13 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 	float y_Max_World = 0;
 	float z_Max_World = 0;
 
-	float x_Min_Local = viewport_width;
-	float y_Min_Local = viewport_height;
-	float z_Min_Local = viewport_width;
-	float x_Max_Local = 0;
-	float y_Max_Local = 0;
-	float z_Max_Local = 0;
+
 
 	for (int i = 0;i < myModel.GetFacesCount();i++)
 	{
+		float rand = glm::linearRand(0.0f,1.0f);
+		color = glm::vec3(rand,rand, rand);
+
 		glm::vec3 v0 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0) - 1];
 		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
 		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
@@ -552,11 +587,11 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
 
-
-
 		DrawLine(verticeModel0, verticeModel1, color);
 		DrawLine(verticeModel0, verticeModel2, color);
 		DrawLine(verticeModel2, verticeModel1, color);
+		myModel.drawRectangle = true; // change in GUI!
+		if (myModel.drawRectangle) { drawRectangle(verticeModel0, verticeModel1, verticeModel2); }
 
 	}
 		if (myModel.getAxisLocal()) { drawAxisLocal(myModel, scene, colorAxisLocal, x_Min, y_Min, z_Min, x_Max, y_Max, z_Max); }
