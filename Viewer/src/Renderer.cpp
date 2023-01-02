@@ -460,7 +460,7 @@ void Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec
 		DrawLine(face_norm_projected, vCenter_projected, color);
 	}
 }
-void Renderer::drawRectangle(glm::vec3 verticeModel0, glm::vec3 verticeModel1, glm::vec3 verticeModel2)
+void Renderer::drawRectangle(glm::vec3 &verticeModel0, glm::vec3 &verticeModel1, glm::vec3 &verticeModel2)
 {
 	float x_Min_Local = viewport_width;
 	float y_Min_Local = viewport_height;
@@ -498,13 +498,57 @@ void Renderer::drawRectangle(glm::vec3 verticeModel0, glm::vec3 verticeModel1, g
 	points_to_rectangle.pop_back();
 	points_to_rectangle.pop_back();
 }
+glm::vec3 min_points(glm::vec3 v1, glm::vec3 v2)
+{
+	return v1.x < v2.x?v1:v2;
+}
+glm::vec3 max_points(glm::vec3 v1, glm::vec3 v2)
+{
+	return v1.x < v2.x ? v2 : v1;
+}
+glm::vec3 mid_point(glm::vec3 v1, glm::vec3 v2,glm::vec3 v3)
+{
+	if (v1.x < v2.x && v2.x < v3.x) return v2;
+	if (v1.x > v2.x && v1.x < v3.x) return v1;
+	if (v1.x < v2.x && v1.x > v3.x) return v3;
+}
+void Renderer::edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const glm::vec3& color)
+{
+	glm::vec3 v_min = min_points(min_points(v0, v1), v2);
+	glm::vec3 v_max = max_points(max_points(v0, v1), v2);
+	glm::vec3 v_mid = mid_point(v0,v1,v2);
+
+	float slope1 = (v_max.y - v_min.y) / float(v_max.x - v_min.x);
+	float slope2 = (v_mid.y - v_min.y) / float(v_mid.x - v_min.x);
+	float slope3 = (v_max.y - v_mid.y) / float(v_max.x - v_mid.x);
+
+	glm::vec3 p1 = v_min;
+	glm::vec3 p2 = v_min;
+	while (p2.x <= v_mid.x)
+	{
+		DrawLine(p1, p2, color);
+		p1.x ++; p2.x ++;
+		p1.y += slope1; p2.y += slope2;
+	}
+	//p2 at mid vec
+	p2 = v_mid;
+	while (p2.x <= v_max.x)
+	{
+		DrawLine(p1, p2, color);
+		p1.x ++; p2.x ++;
+		p1.y += slope1; p2.y += slope3;
+	}
+
+}
 
 
 void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-	glm::vec3 color;
+	//glm::vec3 color;
+	//float rand = glm::linearRand(0.0f, 1.0f);
+	//color = glm::vec3(rand, rand, rand);
 	Camera& cam = scene.GetActiveCamera();
 	glm::mat4 Transformation = myModel.GetTransform();
 	glm::mat4 modelTransform = myModel.GetObjectTransform();	
@@ -534,12 +578,8 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 	float z_Max_World = 0;
 
 
-
 	for (int i = 0;i < myModel.GetFacesCount();i++)
 	{
-		float rand = glm::linearRand(0.0f,1.0f);
-		color = glm::vec3(rand,rand, rand);
-
 		glm::vec3 v0 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0) - 1];
 		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
 		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
@@ -587,9 +627,12 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
 
-		DrawLine(verticeModel0, verticeModel1, color);
-		DrawLine(verticeModel0, verticeModel2, color);
-		DrawLine(verticeModel2, verticeModel1, color);
+		DrawLine(verticeModel0, verticeModel1, colorBBoxWorld);
+		DrawLine(verticeModel0, verticeModel2, colorBBoxWorld);
+		DrawLine(verticeModel2, verticeModel1, colorBBoxWorld);
+
+		edgeWalking(verticeModel0, verticeModel1, verticeModel2, colorBBoxLocal);
+
 		myModel.drawRectangle = true; // change in GUI!
 		if (myModel.drawRectangle) { drawRectangle(verticeModel0, verticeModel1, verticeModel2); }
 
