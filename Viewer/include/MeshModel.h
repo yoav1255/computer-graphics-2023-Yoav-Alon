@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/random.hpp>
 #include <iostream>
 
 class MeshModel
@@ -61,6 +62,7 @@ public:
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
+	std::vector<glm::vec3> colors;
 	glm::mat4 objectTransform;
 	glm::mat4 worldTransform;
 	glm::vec3 vCenter;

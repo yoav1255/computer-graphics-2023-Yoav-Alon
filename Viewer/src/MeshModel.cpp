@@ -22,7 +22,15 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	drawFaceNormals(false),
 	drawRectangle(false)
 {
+	for (int i = 0;i < faces.size();i++)
+	{
+		float rand1 = glm::linearRand(0.0f, 1.0f);
+		float rand2 = glm::linearRand(0.0f, 1.0f);
+		float rand3 = glm::linearRand(0.0f, 1.0f);
 
+		glm::vec3 color = glm::vec3(rand1, rand2, rand3);
+		colors.push_back(color);
+	}
 }
 
 MeshModel::~MeshModel()

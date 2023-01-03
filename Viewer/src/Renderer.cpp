@@ -508,12 +508,43 @@ glm::vec3 max_points(glm::vec3 v1, glm::vec3 v2)
 }
 glm::vec3 mid_point(glm::vec3 v1, glm::vec3 v2,glm::vec3 v3)
 {
-	if (v1.x < v2.x && v2.x < v3.x) return v2;
-	if (v1.x > v2.x && v1.x < v3.x) return v1;
-	if (v1.x < v2.x && v1.x > v3.x) return v3;
+	if ((v1.x <= v2.x && v2.x <= v3.x)||(v1.x >=v2.x && v2.x>=v3.x))return v2;
+	if ((v1.x >= v2.x && v1.x <= v3.x)||(v1.x <= v2.x && v1.x >= v3.x)) return v1;
+	if ((v3.x <= v2.x && v1.x <= v3.x)||(v3.x >= v2.x && v1.x >= v3.x)) return v3;
+}
+void Renderer::fill_left_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max,glm::vec3 color)
+{
+	float slope1 = (v_max.y - v_min.y) / float(v_max.x - v_min.x);
+	float slope2 = (v_mid.y - v_min.y) / float(v_mid.x - v_min.x);
+	glm::vec3 p1 = v_min;
+	glm::vec3 p2 = v_min;
+	for (int x = v_min.x;x <= v_mid.x;x++)
+	{
+		p1.x = x;
+		p2.x = x;
+		p1.y = v_min.y + (x-v_min.x) * slope1;
+		p2.y = v_min.y + (x-v_min.x) * slope2;
+		DrawLine(p1, p2, color);
+	}
+}
+void Renderer::fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max, glm::vec3 color)
+{
+	float slope1 = (v_min.y -v_max.y ) / float(v_min.x - v_max.x);
+	float slope2 = (v_mid.y - v_max.y) / float(v_mid.x - v_max.x);
+	glm::vec3 p1 = v_max;
+	glm::vec3 p2 = v_max;
+	for (int x = v_max.x;x > v_mid.x;x--)
+	{
+		p1.x = x;
+		p2.x = x;
+		p1.y = v_max.y + (x-v_max.x) * slope1;
+		p2.y = v_max.y + (x-v_max.x) * slope2;
+		DrawLine(p1, p2, color);
+	}
 }
 void Renderer::edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const glm::vec3& color)
 {
+	glm::vec3 color_test = glm::vec3(0.7f, 0.2f, 0.2f);
 	glm::vec3 v_min = min_points(min_points(v0, v1), v2);
 	glm::vec3 v_max = max_points(max_points(v0, v1), v2);
 	glm::vec3 v_mid = mid_point(v0,v1,v2);
@@ -522,22 +553,33 @@ void Renderer::edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const gl
 	float slope2 = (v_mid.y - v_min.y) / float(v_mid.x - v_min.x);
 	float slope3 = (v_max.y - v_mid.y) / float(v_max.x - v_mid.x);
 
-	glm::vec3 p1 = v_min;
-	glm::vec3 p2 = v_min;
-	while (p2.x <= v_mid.x)
+	if (v_mid.x == v_max.x) fill_left_Triangle(v_min, v_mid, v_max,color);
+	else if (v_mid.x == v_min.x) fill_right_Triangle(v_min, v_mid, v_max, color);
+	else
 	{
-		DrawLine(p1, p2, color);
-		p1.x ++; p2.x ++;
-		p1.y += slope1; p2.y += slope2;
+		fill_left_Triangle(v_min, v_mid, v_max, color_test);
+		fill_right_Triangle(v_min, v_mid, v_max, color_test);
 	}
-	//p2 at mid vec
-	p2 = v_mid;
-	while (p2.x <= v_max.x)
-	{
-		DrawLine(p1, p2, color);
-		p1.x ++; p2.x ++;
-		p1.y += slope1; p2.y += slope3;
-	}
+
+
+
+
+	//glm::vec3 p1 = v_min;
+	//glm::vec3 p2 = v_min;
+	//while (p2.x < v_mid.x)
+	//{
+	//	DrawLine(p1, p2, color);
+	//	p1.x ++; p2.x ++;
+	//	p1.y += slope1; p2.y += slope2;
+	//}
+	////p2 at mid vec
+
+	//while (p2.x < v_max.x)
+	//{
+	//	DrawLine(p1, p2, color);
+	//	p1.x ++; p2.x ++;
+	//	p1.y += slope1; p2.y += slope3;
+	//}
 
 }
 
@@ -546,9 +588,6 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
-	//glm::vec3 color;
-	//float rand = glm::linearRand(0.0f, 1.0f);
-	//color = glm::vec3(rand, rand, rand);
 	Camera& cam = scene.GetActiveCamera();
 	glm::mat4 Transformation = myModel.GetTransform();
 	glm::mat4 modelTransform = myModel.GetObjectTransform();	
@@ -631,7 +670,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		DrawLine(verticeModel0, verticeModel2, colorBBoxWorld);
 		DrawLine(verticeModel2, verticeModel1, colorBBoxWorld);
 
-		edgeWalking(verticeModel0, verticeModel1, verticeModel2, colorBBoxLocal);
+		edgeWalking(verticeModel0, verticeModel1, verticeModel2, myModel.colors[i]);
 
 		myModel.drawRectangle = true; // change in GUI!
 		if (myModel.drawRectangle) { drawRectangle(verticeModel0, verticeModel1, verticeModel2); }
