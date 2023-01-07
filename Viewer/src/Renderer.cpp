@@ -55,6 +55,44 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 		e += 2 * dx * reflect;
 	}
 }
+void Renderer::drawRectangle(glm::vec3& verticeModel0, glm::vec3& verticeModel1, glm::vec3& verticeModel2)
+{
+	float x_Min_Local = viewport_width;
+	float y_Min_Local = viewport_height;
+	float z_Min_Local = viewport_width;
+	float x_Max_Local = 0;
+	float y_Max_Local = 0;
+	float z_Max_Local = 0;
+	vector<glm::vec3> points_to_rectangle;
+
+	x_Min_Local = std::min(verticeModel0.x, verticeModel1.x);
+	x_Min_Local = std::min(x_Min_Local, verticeModel2.x);
+	y_Min_Local = std::min(verticeModel0.y, verticeModel1.y);
+	y_Min_Local = std::min(y_Min_Local, verticeModel2.y);
+	z_Min_Local = std::min(verticeModel0.z, verticeModel1.z);
+	z_Min_Local = std::min(z_Min_Local, verticeModel2.z);
+	x_Max_Local = std::max(verticeModel0.x, verticeModel1.x);
+	x_Max_Local = std::max(x_Max_Local, verticeModel2.x);
+	y_Max_Local = std::max(verticeModel0.y, verticeModel1.y);
+	y_Max_Local = std::max(y_Max_Local, verticeModel2.y);
+	z_Max_Local = std::max(verticeModel0.z, verticeModel1.z);
+	z_Max_Local = std::max(z_Max_Local, verticeModel2.z);
+
+	points_to_rectangle.push_back(glm::vec3(x_Min_Local, y_Min_Local, 0));
+	points_to_rectangle.push_back(glm::vec3(x_Min_Local, y_Max_Local, 0));
+	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Min_Local, 0));
+	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Max_Local, 0));
+
+	DrawLine(points_to_rectangle[0], points_to_rectangle[1], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[0], points_to_rectangle[2], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[1], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[2], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+
+	points_to_rectangle.pop_back();
+	points_to_rectangle.pop_back();
+	points_to_rectangle.pop_back();
+	points_to_rectangle.pop_back();
+}
 
 void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color,bool fillTriangle, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
 {

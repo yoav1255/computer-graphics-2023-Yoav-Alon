@@ -78,5 +78,6 @@ public:
 	bool bounding_box_world;
 	bool drawVerticeNormals;
 	bool drawFaceNormals;
+	bool drawRectangle;
 
 };
