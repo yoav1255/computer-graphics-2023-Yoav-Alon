@@ -21,6 +21,7 @@ Renderer::Renderer(int viewport_width, int viewport_height) :
 Renderer::~Renderer()
 {
 	delete[] color_buffer;
+	delete[] z_buffer;
 }
 
 void Renderer::PutPixel(int i, int j, const glm::vec3& color)
@@ -54,7 +55,7 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 	}
 }
 
-void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color)
+void Renderer::DrawLine(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color)
 {
 	int x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
 	if (p1.x < p2.x)  // init on base of is p1.x < p2.x
@@ -97,12 +98,139 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 	}
 }
 
+void Renderer::DrawLineReversedAxis_CalcZ(int x1, int y1, int x2, int y2, const glm::vec3& color, glm::vec3 t1, glm::vec3 t2, glm::vec3 t3)
+{
+	int e, dx, dy, reflect = 1;
+
+	dx = x2 - x1;
+	dy = y2 - y1;
+	if (x1 > x2) // if the slope is negative
+		reflect = -1;
+	e = -dy;
+	while (y1 <= y2) // Bresenham algorithm
+	{
+		if (e > 0)
+		{
+			x1 += 1 * reflect;
+			e -= 2 * dy;
+		}
+		if ((x1 > 0 && x1 < viewport_width) && (y1 > 0 && y1 < viewport_height))
+		{
+			float curr_z = At(x1, y1);
+			float point_z = Find_Current_Point(glm::vec2(x1, y1), t1, t2, t3);
+			if (point_z < curr_z)
+			{
+				PutPixel(x1, y1, color);
+				z_buffer[x1 + viewport_width * y1] = point_z;
+			}
+		}
+		y1 += 1;
+		e += 2 * dx * reflect;
+	}
+}
+
+void Renderer::DrawLine_CalcZ(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color, glm::vec3 t1, glm::vec3 t2, glm::vec3 t3)
+{
+	int x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
+	if (p1.x < p2.x)  // init on base of is p1.x < p2.x
+	{
+		x1 = p1.x;
+		y1 = p1.y;
+		x2 = p2.x;
+		y2 = p2.y;
+	}
+	else
+	{
+		x1 = p2.x;
+		y1 = p2.y;
+		x2 = p1.x;
+		y2 = p1.y;
+	}
+	dx = x2 - x1; // init delta for x and y
+	dy = y2 - y1;
+	if (abs(dy) > abs(dx)) // deceiding if need to run the algo. with reversed axis for slopes that are bigger than abs(1)
+	{
+		if (y1 < y2) // same as we did for p1.x and p2.x above
+			DrawLineReversedAxis(x1, y1, x2, y2, color);
+		else
+			DrawLineReversedAxis(x2, y2, x1, y1, color);
+		return;
+	}
+	if (y1 > y2) // if the slope is negative
+		reflect = -1;
+	e = -dx;
+	while (x1 <= x2) // Bresenham algorithm
+	{
+		if (e > 0)
+		{
+			y1 += 1 * reflect;
+			e -= 2 * dx;
+		}
+		if ((x1 > 0 && x1 < viewport_width) && (y1 > 0 && y1 < viewport_height))
+		{
+			float curr_z = At(x1, y1);
+			float point_z = Find_Current_Point(glm::vec2(x1, y1), t1, t2, t3);
+			if (point_z < curr_z)
+			{
+				PutPixel(x1, y1, color);
+				z_buffer[x1 + viewport_width * y1] = point_z;
+			}
+		}
+		x1 += 1;
+		e += 2 * dy * reflect;
+	}
+}
+
 void Renderer::CreateBuffers(int w, int h)
 {
 	CreateOpenglBuffer(); //Do not remove this line.
 	color_buffer = new float[3 * w * h];
+	z_buffer = new float[w*h];
 	ClearColorBuffer(glm::vec3(0.0f, 0.0f, 0.0f));
 }
+float Renderer::At(int x, int y)
+{
+	return z_buffer[x + viewport_width * y];
+}
+
+float Renderer::Find_Current_Point(glm::vec2 &P, glm::vec3 &A, glm::vec3 &B, glm::vec3 &C)
+{
+
+	glm::vec3 p = glm::vec3(P.x, P.y, 0);
+	//float area = (A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)) / 2.0f;
+	//area = area > 0.0 ? area : -area;
+
+	//float areaA = (p.x * (B.y - C.y) + B.x * (C.y - p.y) + C.x * (p.y - B.y)) / 2.0f;
+	//areaA = areaA > 0.0 ? areaA : -areaA;
+
+	//float areaB = (A.x * (p.y - C.y) + p.x * (C.y - A.y) + C.x * (A.y - p.y)) / 2.0f;
+	//areaB = areaB > 0.0 ? areaB : -areaB;
+
+	//float areaC = (A.x * (B.y - p.y) + B.x * (p.y - A.y) + p.x * (A.y - B.y)) / 2.0f;
+	//areaC = areaC > 0.0 ? areaC : -areaC;
+
+	float area = 0.5f * glm::length(glm::cross(B - A, C - A));
+	area = area > 0.0 ? area : -area;
+
+	float areaA = 0.5f * glm::length(glm::cross(B - p, C - p));
+	areaA = areaA > 0.0 ? areaA : -areaA;
+
+	float areaB = 0.5f * glm::length(glm::cross(p - A, C - A));
+	areaB = areaB > 0.0 ? areaB : -areaB;
+
+	float areaC = 0.5f * glm::length(glm::cross(B - A, p - A));
+	areaC = areaC > 0.0 ? areaC : -areaC;
+
+
+	float alpha = areaA / area;
+	float beta = areaB / area;
+	float gama = 1-alpha-beta;
+
+	float z = alpha * A.z + beta * B.z + gama * C.z;
+	return z;
+}
+
+
 
 //##############################
 //##OpenGL stuff. Don't touch.##
@@ -227,6 +355,16 @@ void Renderer::ClearColorBuffer(const glm::vec3& color)
 		}
 	}
 }
+void Renderer::ClearZBuffer()
+{
+	for (int i = 0; i < viewport_height; i++)
+	{
+		for (int j = 0; j < viewport_width; j++)
+		{
+			z_buffer[i * viewport_width + j] = std::numeric_limits<float>::infinity();
+		}
+	}
+}
 
 void Renderer::SetNewViewport(float frameBufferWidth, float frameBufferHeight)
 {
@@ -234,37 +372,37 @@ void Renderer::SetNewViewport(float frameBufferWidth, float frameBufferHeight)
 	viewport_height = frameBufferHeight;
 }
 
-void Renderer::putFlower(int radius,int x ,const glm::vec3& color, int stemLen)
-{
-	int ground = 50;
-	glm::ivec2 center(x, 50 + stemLen + radius );
-	for (int i = 0, step = 180; i < step; i++)
-	{
-		glm::ivec2 b(center.x + radius * sin((2 * M_PI * i) / step), center.y + radius * cos((2 * M_PI * i) / step));
-		DrawLine(center, b, color);
-	}
-	DrawLine({ center.x,center.y - radius }, { center.x,ground }, { 0,1,0 });
-	DrawLine({ center.x,center.y - radius }, { center.x-1,ground }, { 0,1,0 });
-	DrawLine({ center.x,center.y - radius }, { center.x+1,ground }, { 0,1,0 });
-}
-void Renderer::drawSomeFlowers()
-{
-	glm::ivec2 a(0, 700);
-	glm::ivec3 color(200, 0, 0);
-	for (int i = 90, r = 200, step = 360; i <=180; i++) // draws the sun
-	{
-		glm::ivec2 b(a.x+r * sin((2 * M_PI * i) / step), a.y+r * cos((2 * M_PI * i) / step));
-		DrawLine( a, b, color);
-	}
-	// drawing the flowers
-	putFlower(100, 400, { 70,70,70 }, 200);
-	putFlower(80, 200, { 70,70,70 }, 200);
-	putFlower(60, 600, { 70,70,70 }, 100);
-	putFlower(70, 800, { 70,70,70 }, 80);
-	putFlower(130, 1000, { 70,70,70 }, 250);
-
-	return;
-}
+//void Renderer::putFlower(int radius,int x ,const glm::vec3& color, int stemLen)
+//{
+//	int ground = 50;
+//	glm::ivec2 center(x, 50 + stemLen + radius );
+//	for (int i = 0, step = 180; i < step; i++)
+//	{
+//		glm::ivec2 b(center.x + radius * sin((2 * M_PI * i) / step), center.y + radius * cos((2 * M_PI * i) / step));
+//		DrawLine(center, b, color);
+//	}
+//	DrawLine({ center.x,center.y - radius }, { center.x,ground }, { 0,1,0 });
+//	DrawLine({ center.x,center.y - radius }, { center.x-1,ground }, { 0,1,0 });
+//	DrawLine({ center.x,center.y - radius }, { center.x+1,ground }, { 0,1,0 });
+//}
+//void Renderer::drawSomeFlowers()
+//{
+//	glm::ivec2 a(0, 700);
+//	glm::ivec3 color(200, 0, 0);
+//	for (int i = 90, r = 200, step = 360; i <=180; i++) // draws the sun
+//	{
+//		glm::ivec2 b(a.x+r * sin((2 * M_PI * i) / step), a.y+r * cos((2 * M_PI * i) / step));
+//		DrawLine( a, b, color);
+//	}
+//	// drawing the flowers
+//	putFlower(100, 400, { 70,70,70 }, 200);
+//	putFlower(80, 200, { 70,70,70 }, 200);
+//	putFlower(60, 600, { 70,70,70 }, 100);
+//	putFlower(70, 800, { 70,70,70 }, 80);
+//	putFlower(130, 1000, { 70,70,70 }, 250);
+//
+//	return;
+//}
 
 void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene,const glm::vec3& color, bool isWorld, float x_Min, float y_Min, float z_Min, float x_Max, float y_Max, float z_Max)
 {
@@ -468,7 +606,7 @@ void Renderer::drawRectangle(glm::vec3 &verticeModel0, glm::vec3 &verticeModel1,
 	float x_Max_Local = 0;
 	float y_Max_Local = 0;
 	float z_Max_Local = 0;
-	vector<glm::vec2> points_to_rectangle;
+	vector<glm::vec3> points_to_rectangle;
 
 	x_Min_Local = std::min(verticeModel0.x, verticeModel1.x);
 	x_Min_Local = std::min(x_Min_Local, verticeModel2.x);
@@ -483,10 +621,10 @@ void Renderer::drawRectangle(glm::vec3 &verticeModel0, glm::vec3 &verticeModel1,
 	z_Max_Local = std::max(verticeModel0.z, verticeModel1.z);
 	z_Max_Local = std::max(z_Max_Local, verticeModel2.z);
 
-	points_to_rectangle.push_back(glm::vec2(x_Min_Local, y_Min_Local));
-	points_to_rectangle.push_back(glm::vec2(x_Min_Local, y_Max_Local));
-	points_to_rectangle.push_back(glm::vec2(x_Max_Local, y_Min_Local));
-	points_to_rectangle.push_back(glm::vec2(x_Max_Local, y_Max_Local));
+	points_to_rectangle.push_back(glm::vec3(x_Min_Local, y_Min_Local,0));
+	points_to_rectangle.push_back(glm::vec3(x_Min_Local, y_Max_Local,0));
+	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Min_Local,0));
+	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Max_Local,0));
 
 	DrawLine(points_to_rectangle[0], points_to_rectangle[1], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
 	DrawLine(points_to_rectangle[0], points_to_rectangle[2], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
@@ -498,33 +636,38 @@ void Renderer::drawRectangle(glm::vec3 &verticeModel0, glm::vec3 &verticeModel1,
 	points_to_rectangle.pop_back();
 	points_to_rectangle.pop_back();
 }
-glm::vec3 min_points(glm::vec3 v1, glm::vec3 v2)
+
+bool comparePoints(glm::vec3 v1, glm::vec3 v2)
 {
-	return v1.x < v2.x?v1:v2;
+	return v1.x < v2.x;
 }
-glm::vec3 max_points(glm::vec3 v1, glm::vec3 v2)
-{
-	return v1.x < v2.x ? v2 : v1;
-}
-glm::vec3 mid_point(glm::vec3 v1, glm::vec3 v2,glm::vec3 v3)
-{
-	if ((v1.x <= v2.x && v2.x <= v3.x)||(v1.x >=v2.x && v2.x>=v3.x))return v2;
-	if ((v1.x >= v2.x && v1.x <= v3.x)||(v1.x <= v2.x && v1.x >= v3.x)) return v1;
-	if ((v3.x <= v2.x && v1.x <= v3.x)||(v3.x >= v2.x && v1.x >= v3.x)) return v3;
-}
+//glm::vec3 min_points(glm::vec3 v1, glm::vec3 v2)
+//{
+//	return v1.x < v2.x?v1:v2;
+//}
+//glm::vec3 max_points(glm::vec3 v1, glm::vec3 v2)
+//{
+//	return v1.x < v2.x ? v2 : v1;
+//}
+//glm::vec3 mid_point(glm::vec3 v1, glm::vec3 v2,glm::vec3 v3)
+//{
+//	if ((v1.x <= v2.x && v2.x <= v3.x)||(v1.x >= v2.x && v2.x >= v3.x)) return v2;
+//	if ((v1.x >= v2.x && v1.x <= v3.x)||(v1.x <= v2.x && v1.x >= v3.x)) return v1;
+//	if ((v3.x <= v2.x && v1.x <= v3.x)||(v3.x >= v2.x && v1.x >= v3.x)) return v3;
+//}
 void Renderer::fill_left_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max,glm::vec3 color)
 {
 	float slope1 = (v_max.y - v_min.y) / float(v_max.x - v_min.x);
 	float slope2 = (v_mid.y - v_min.y) / float(v_mid.x - v_min.x);
 	glm::vec3 p1 = v_min;
 	glm::vec3 p2 = v_min;
-	for (int x = v_min.x;x <= v_mid.x;x++)
+	for (float x = v_min.x;x <= v_mid.x;x++)
 	{
 		p1.x = x;
 		p2.x = x;
 		p1.y = v_min.y + (x-v_min.x) * slope1;
 		p2.y = v_min.y + (x-v_min.x) * slope2;
-		DrawLine(p1, p2, color);
+		DrawLine_CalcZ(p1, p2, color,v_min,v_mid,v_max);
 	}
 }
 void Renderer::fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max, glm::vec3 color)
@@ -533,56 +676,47 @@ void Renderer::fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v
 	float slope2 = (v_mid.y - v_max.y) / float(v_mid.x - v_max.x);
 	glm::vec3 p1 = v_max;
 	glm::vec3 p2 = v_max;
-	for (int x = v_max.x;x > v_mid.x;x--)
+	for (float x = v_max.x;x >= v_mid.x;x--)
 	{
 		p1.x = x;
 		p2.x = x;
 		p1.y = v_max.y + (x-v_max.x) * slope1;
 		p2.y = v_max.y + (x-v_max.x) * slope2;
-		DrawLine(p1, p2, color);
+		DrawLine_CalcZ(p1, p2, color, v_min, v_mid, v_max);
 	}
 }
 void Renderer::edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const glm::vec3& color)
 {
 	glm::vec3 color_test = glm::vec3(0.7f, 0.2f, 0.2f);
-	glm::vec3 v_min = min_points(min_points(v0, v1), v2);
-	glm::vec3 v_max = max_points(max_points(v0, v1), v2);
-	glm::vec3 v_mid = mid_point(v0,v1,v2);
+	glm::vec3 color_white = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 color_black = glm::vec3(0.0f, 0.0f, 0.0f);
 
-	float slope1 = (v_max.y - v_min.y) / float(v_max.x - v_min.x);
-	float slope2 = (v_mid.y - v_min.y) / float(v_mid.x - v_min.x);
-	float slope3 = (v_max.y - v_mid.y) / float(v_max.x - v_mid.x);
+	vector<glm::vec3> points;
+	points.push_back(v1);
+	points.push_back(v2);
+	points.push_back(v0);
+	std::sort(points.begin(), points.end(), comparePoints);
 
-	if (v_mid.x == v_max.x) fill_left_Triangle(v_min, v_mid, v_max,color);
+	//glm::vec3 v_min = min_points(min_points(v0, v1), v2);
+	//glm::vec3 v_max = max_points(max_points(v0, v1), v2);
+	//glm::vec3 v_mid = mid_point(v0,v1,v2);
+
+	glm::vec3 v_min = points[0];
+	glm::vec3 v_mid = points[1];
+	glm::vec3 v_max = points[2];
+
+	if (v_mid.x == v_max.x) fill_left_Triangle(v_min, v_mid, v_max, color);
 	else if (v_mid.x == v_min.x) fill_right_Triangle(v_min, v_mid, v_max, color);
 	else
 	{
-		fill_left_Triangle(v_min, v_mid, v_max, color_test);
-		fill_right_Triangle(v_min, v_mid, v_max, color_test);
+		fill_left_Triangle(v_min, v_mid, v_max, color);
+		fill_right_Triangle(v_min, v_mid, v_max, color);
 	}
-
-
-
-
-	//glm::vec3 p1 = v_min;
-	//glm::vec3 p2 = v_min;
-	//while (p2.x < v_mid.x)
-	//{
-	//	DrawLine(p1, p2, color);
-	//	p1.x ++; p2.x ++;
-	//	p1.y += slope1; p2.y += slope2;
-	//}
-	////p2 at mid vec
-
-	//while (p2.x < v_max.x)
-	//{
-	//	DrawLine(p1, p2, color);
-	//	p1.x ++; p2.x ++;
-	//	p1.y += slope1; p2.y += slope3;
-	//}
+}
+void Renderer::drawZBuffer(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+{
 
 }
-
 
 void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
@@ -666,13 +800,13 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
 
-		DrawLine(verticeModel0, verticeModel1, colorBBoxWorld);
-		DrawLine(verticeModel0, verticeModel2, colorBBoxWorld);
-		DrawLine(verticeModel2, verticeModel1, colorBBoxWorld);
+		//DrawLine(verticeModel0, verticeModel1, colorBBoxWorld);
+		//DrawLine(verticeModel0, verticeModel2, colorBBoxWorld);
+		//DrawLine(verticeModel2, verticeModel1, colorBBoxWorld);
 
 		edgeWalking(verticeModel0, verticeModel1, verticeModel2, myModel.colors[i]);
 
-		myModel.drawRectangle = true; // change in GUI!
+		myModel.drawRectangle = false; // change in GUI!
 		if (myModel.drawRectangle) { drawRectangle(verticeModel0, verticeModel1, verticeModel2); }
 
 	}
@@ -687,10 +821,9 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 
 void Renderer::Render( Scene& scene)
 {
-
-
 	if (scene.GetModelCount() > 0)
 	{
+		ClearZBuffer();
 		for (int i = 0;i < scene.GetModelCount();i++)
 		{
 			MeshModel myModel = scene.GetModel(i);

@@ -4,7 +4,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/random.hpp>
-
+#include <glm/gtx/norm.hpp>
+#include <glm/geometric.hpp>
 
 class Renderer
 {
@@ -14,14 +15,17 @@ public:
 	void Render( Scene& scene);
 	void SwapBuffers();
 	void ClearColorBuffer(const glm::vec3& color);
+	void ClearZBuffer();
 	int GetViewportWidth() const;
 	int GetViewportHeight() const;
 	void SetNewViewport(float frameBufferWidth, float frameBufferHeight);
 	
 private:
 	void PutPixel(const int i, const int j, const glm::vec3& color);
-	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color);
+	void DrawLine(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color);
 	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color);
+	void DrawLine_CalcZ(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color,glm::vec3 t1, glm::vec3 t2, glm::vec3 t3);
+	void DrawLineReversedAxis_CalcZ(int x1, int y1, int x2, int y2, const glm::vec3& color,glm::vec3 t1, glm::vec3 t2, glm::vec3 t3);
 	void drawSomeFlowers();
 	void putFlower(int radius, int x, const glm::vec3& color , int stemLen);
 	void drawModel( MeshModel& myModel,Scene& scene);
@@ -34,13 +38,16 @@ private:
 	void fill_left_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max, glm::vec3 color);
 	void fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max, glm::vec3 color);
 	void edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const glm::vec3& color);
+	float Find_Current_Point(glm::vec2 &p,glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3);
+	void drawZBuffer(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
 
-
+	float At(int x, int y);
 	void CreateBuffers(int w, int h);
 	void CreateOpenglBuffer();
 	void InitOpenglRendering();
 
 	float* color_buffer;
+	float* z_buffer;
 	int viewport_width;
 	int viewport_height;
 	GLuint gl_screen_tex;
