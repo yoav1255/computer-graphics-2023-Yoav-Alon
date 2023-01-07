@@ -432,6 +432,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					bool bBoxWorld = myModel.bounding_box_world;
 					bool verticeNormals = myModel.drawVerticeNormals;
 					bool faceNormals = myModel.drawFaceNormals;
+					bool rectangles = myModel.drawRectangle;
 
 					ImGui::Text("Local Transformation");
 					ImGui::SliderFloat3("Translate-Local", &translationObject.x, -3.0f, 3.0f);
@@ -490,6 +491,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					if (ImGui::Checkbox("face normals", &faceNormals))
 					{
 						myModel.drawFaceNormals = !myModel.drawFaceNormals;
+					}
+					if (ImGui::Checkbox("ractangles", &rectangles))
+					{
+						myModel.drawRectangle = !myModel.drawRectangle;
 					}
 					ImGui::End();
 				}

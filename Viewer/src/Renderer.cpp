@@ -49,7 +49,7 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 			x1 += 1 * reflect;
 			e -= 2 * dy;
 		}
-		if (fillTriangle && testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1)))
+		if ((!fillTriangle) || (fillTriangle && testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1))))
 			PutPixel(x1, y1, color);
 		y1 += 1;
 		e += 2 * dx * reflect;
@@ -83,10 +83,10 @@ void Renderer::drawRectangle(glm::vec3& verticeModel0, glm::vec3& verticeModel1,
 	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Min_Local, 0));
 	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Max_Local, 0));
 
-	DrawLine(points_to_rectangle[0], points_to_rectangle[1], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
-	DrawLine(points_to_rectangle[0], points_to_rectangle[2], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
-	DrawLine(points_to_rectangle[1], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
-	DrawLine(points_to_rectangle[2], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[0], points_to_rectangle[1], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
+	DrawLine(points_to_rectangle[0], points_to_rectangle[2], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
+	DrawLine(points_to_rectangle[1], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
+	DrawLine(points_to_rectangle[2], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
 
 	points_to_rectangle.pop_back();
 	points_to_rectangle.pop_back();
@@ -131,7 +131,7 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 			y1 += 1 * reflect;
 			e -= 2 * dx;
 		}
-		if (fillTriangle && testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1))) 
+		if ((!fillTriangle)||(fillTriangle && testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1)))) 
 			PutPixel(x1, y1, color);
 		x1 += 1;
 		e += 2 * dy * reflect;
@@ -531,7 +531,7 @@ void Renderer::colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, 
 	float currx1 = v1.x;
 	float currx2 = v1.x;
 	glm::ivec2 iv1, iv2;
-	for (int y_line = round(v1.y); y_line <= v2.y; y_line++)
+	for (int y_line = round(v1.y); y_line < v2.y; y_line++)
 	{
 		iv1.x = currx1;
 		iv1.y = y_line;
@@ -551,7 +551,7 @@ void Renderer::colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm
 	float currx1 = v3.x;
 	float currx2 = v3.x;
 	glm::ivec2 iv1, iv2;
-	for (int y_line= round(v3.y); y_line >= v1.y; y_line--)
+	for (int y_line= round(v3.y); y_line > v1.y; y_line--)
 	{
 
 		iv1.x = currx1;
@@ -591,13 +591,13 @@ void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::v
 	my_v3 = temp[2];
 	if (my_v2.y == my_v3.y) // flat bottom triangle
 	{
-		colorBottomTriangle(my_v1, my_v2, my_v3, color);
-
+		colorBottomTriangle(my_v1, my_v2, my_v3, glm::vec3(0.5f,0.0f,0.0f));
+		DrawLine(my_v3, my_v2, glm::vec3(0.5f, 0.0f, 0.0f));
 	}
 	else if (my_v1.y == my_v2.y) // flat top triangle
 	{
-		colorTopTriangle(my_v1, my_v2, my_v3, color);
-
+		colorTopTriangle(my_v1, my_v2, my_v3, glm::vec3(0.5f, 0.0f, 0.0f));
+		DrawLine(my_v1, my_v2, glm::vec3(0.5f, 0.0f, 0.0f));
 	}
 	else // need to add another vertex as we break the triangle into 2 seprate triangles
 	{
@@ -613,8 +613,9 @@ void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::v
 		}
 		//use barycentric coordinates to find depth (z) of my_v4:
 		my_v4.z = calculateZ(my_v1, my_v2, my_v3, my_v4.x, my_v4.y);
-		colorBottomTriangle(my_v1, my_v2, my_v4,color);
-		colorTopTriangle(my_v2, my_v4, my_v3,color);
+		colorBottomTriangle(my_v1, my_v2, my_v4, glm::vec3(0.5f, 0.0f, 0.0f));
+		colorTopTriangle(my_v2, my_v4, my_v3, glm::vec3(0.5f, 0.0f, 0.0f));
+		DrawLine(my_v2, my_v4, glm::vec3(0.5f, 0.0f, 0.0f));
 	}
 
 }
@@ -692,6 +693,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		//DrawLine(verticeModel0, verticeModel1, color);
 		//DrawLine(verticeModel0, verticeModel2, color);
 		//DrawLine(verticeModel2, verticeModel1, color);
+		if (myModel.drawRectangle) drawRectangle(verticeModel0, verticeModel1, verticeModel2);
 
 	}
 		if (myModel.getAxisLocal()) { drawAxisLocal(myModel, scene, colorAxisLocal, x_Min, y_Min, z_Min, x_Max, y_Max, z_Max); }
@@ -707,7 +709,6 @@ void Renderer::Render( Scene& scene)
 {
 	if (scene.GetModelCount() > 0)
 	{
-		ClearZBuffer();
 		for (int i = 0;i < scene.GetModelCount();i++)
 		{
 			MeshModel myModel = scene.GetModel(i);
