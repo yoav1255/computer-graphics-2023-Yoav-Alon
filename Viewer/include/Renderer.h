@@ -36,6 +36,7 @@ private:
 	void colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& color);
 	void colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& color);
 	float calculateZ(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, float x, float y);
+	void drawRectangle(glm::vec3& verticeModel0, glm::vec3& verticeModel1, glm::vec3& verticeModel2);
 	
 	bool testAndSetZBuffer(int x, int y,float z);
 	void CreateBuffers(int w, int h);
