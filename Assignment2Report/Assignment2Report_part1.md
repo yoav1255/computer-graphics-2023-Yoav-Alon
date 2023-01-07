@@ -3,6 +3,9 @@ we calculated the maximum value of z on each triangle and we drew the triangles 
 ![1a](https://user-images.githubusercontent.com/101698622/211166733-4c618519-fbd8-4281-bc45-0e6ad288b7bb.png)
 
 ### 3. Implementing the Edge Walking algorithm. we can clearly see the ovelapping of the triangles, since Z buffer is not yet implemented:
+![Screenshot (27)](https://user-images.githubusercontent.com/108798956/211167051-da09d43a-73ba-497c-bf7b-d594528a7a21.png)
+
+
 ![3b](https://user-images.githubusercontent.com/101698622/211166830-026a3e05-582e-4e72-bbbf-f22f5cecf438.png)
 
 
