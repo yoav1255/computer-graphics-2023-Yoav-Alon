@@ -100,6 +100,7 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 void Renderer::CreateBuffers(int w, int h)
 {
 	CreateOpenglBuffer(); //Do not remove this line.
+	this->z_buffer = std::vector<std::vector<float>>(w , std::vector<float>(h,std::numeric_limits<float>::infinity()));
 	color_buffer = new float[3 * w * h];
 	ClearColorBuffer(glm::vec3(0.0f, 0.0f, 0.0f));
 }
@@ -460,7 +461,91 @@ void Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec
 		DrawLine(face_norm_projected, vCenter_projected, color);
 	}
 }
+void Renderer::colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& color)
+{
+	float invslope1 = (v2.x - v1.x) / (v2.y - v1.y);
+	float invslope2 = (v3.x - v1.x) / (v3.y - v1.y);
+	float currx1 = v1.x;
+	float currx2 = v1.x;
+	glm::ivec2 iv1, iv2;
+	for (int y_line = round(v1.y); y_line <= v2.y; y_line++)
+	{
+		iv1.x = currx1;
+		iv1.y = y_line;
+		iv2.x = currx2;
+		iv2.y = y_line;
+		DrawLine(iv1,iv2,color);
+		currx1 += invslope1;
+		currx2 += invslope2;
 
+	}
+
+}
+void Renderer::colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& color)
+{
+	float invslope1 = (v3.x - v1.x) / (v3.y - v1.y);
+	float invslope2 = (v3.x - v2.x) / (v3.y - v2.y);
+	float currx1 = v3.x;
+	float currx2 = v3.x;
+	glm::ivec2 iv1, iv2;
+	for (int y_line= round(v3.y); y_line >= v1.y; y_line--)
+	{
+		iv1.x = currx1;
+		iv1.y = y_line;
+		iv2.x = currx2;
+		iv2.y = y_line;
+		DrawLine(iv1, iv2, color);
+		currx1 -= invslope1;
+		currx2 -= invslope2;
+	}
+
+}
+void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::vec3& color)
+{ 
+	std::vector<glm::vec3> temp(3);
+	std::random_device rd;  // Will be used to obtain a seed for the random number engine
+	std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
+	std::uniform_real_distribution<float> dis(0.0, 1.0);
+	glm::vec3 my_color(dis(gen), dis(gen), dis(gen));
+	glm::vec3 my_v1, my_v2, my_v3;
+	temp[0] = v1;
+	temp[1] = v2;
+	temp[2] = v3;
+	std::sort(temp.begin(), temp.end(), [](const glm::vec3& a, const glm::vec3& b) // sort vertices by y coordinate
+		{
+			return a.y < b.y;
+		});
+	my_v1 = temp[0];
+	my_v2 = temp[1];
+	my_v3 = temp[2];
+	if (my_v2.y == my_v3.y) // flat bottom triangle
+	{
+		colorBottomTriangle(my_v1, my_v2, my_v3, my_color);
+
+	}
+	else if (my_v1.y == my_v2.y) // flat top triangle
+	{
+		colorTopTriangle(my_v1, my_v2, my_v3, my_color);
+
+	}
+	else // need to add another vertex as we break the triangle into 2 seprate triangles
+	{
+		glm::vec3 my_v4;
+		my_v4.y = my_v2.y;
+		if (my_v1.x == my_v3.x)
+			my_v4.x = my_v1.x;
+		else
+		{
+			float m = (my_v1.y - my_v3.y) / (my_v1.x - my_v3.x);
+			my_v4.x = (my_v4.y - my_v1.y + m * my_v1.x) / m; // m can not be equal to 0 because of the sorting of the vertices
+		}
+		// todo: might need to update my_v4 z coordinate 
+		colorBottomTriangle(my_v1, my_v2, my_v4,my_color);
+		colorTopTriangle(my_v2, my_v4, my_v3,my_color);
+	}
+
+}
+	
 
 void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
@@ -513,10 +598,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		glm::vec3 verticeModel1 = glm::project(v1, view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 verticeModel2 = glm::project(v2, view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 
-		glm::vec3 verticeLocal0 = glm::project(v0, view * myModel.GetTranslationWorldMat() * myModel.GetScaleWorldMat() * modelTransform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-		glm::vec3 verticeLocal1 = glm::project(v1, view * myModel.GetTranslationWorldMat() * myModel.GetScaleWorldMat() * modelTransform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-		glm::vec3 verticeLocal2 = glm::project(v2, view * myModel.GetTranslationWorldMat() * myModel.GetScaleWorldMat() * modelTransform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-
+		
 		verticeModel0.x += half_width;
 		verticeModel0.y += half_height;
 		verticeModel1.x += half_width;
@@ -524,12 +606,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		verticeModel2.x += half_width;
 		verticeModel2.y += half_height;
 
-		verticeLocal0.x += half_width;
-		verticeLocal0.y += half_height;
-		verticeLocal1.x += half_width;
-		verticeLocal1.y += half_height;
-		verticeLocal2.x += half_width;
-		verticeLocal2.y += half_height;
+		
 
 		x_Min_World = std::min(verticeModel0.x, x_Min_World);
 		y_Min_World = std::min(verticeModel0.y, y_Min_World);
@@ -538,23 +615,18 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max_World = std::max(verticeModel0.y, y_Max_World);
 		z_Max_World = std::max(verticeModel0.z, z_Max_World);
 
-		//x_Min_Local = std::min(verticeLocal0.x, x_Min_Local);
-		//y_Min_Local = std::min(verticeLocal0.y, y_Min_Local);
-		//z_Min_Local = std::min(verticeLocal0.z, z_Min_Local);
-		//x_Max_Local = std::max(verticeLocal0.x, x_Max_Local);
-		//y_Max_Local = std::max(verticeLocal0.y, y_Max_Local);
-		//z_Max_Local = std::max(verticeLocal0.z, z_Max_Local);
-
+		
 		x_Min = std::min(v0.x, x_Min);
 		y_Min = std::min(v0.y, y_Min);
 		z_Min = std::min(v0.z, z_Min);
 		x_Max = std::max(v0.x, x_Max);
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
-
-		DrawLine(verticeModel0, verticeModel1, color);
-		DrawLine(verticeModel0, verticeModel2, color);
-		DrawLine(verticeModel2, verticeModel1, color);
+		
+		drawTriangles(verticeModel0, verticeModel1, verticeModel2, glm::vec3(1, 0, 0));
+		//DrawLine(verticeModel0, verticeModel1, color);
+		//DrawLine(verticeModel0, verticeModel2, color);
+		//DrawLine(verticeModel2, verticeModel1, color);
 
 	}
 		if (myModel.getAxisLocal()) { drawAxisLocal(myModel, scene, colorAxisLocal, x_Min, y_Min, z_Min, x_Max, y_Max, z_Max); }

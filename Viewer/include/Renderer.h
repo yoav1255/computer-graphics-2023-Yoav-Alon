@@ -1,5 +1,6 @@
 #pragma once
 #include "Scene.h"
+#include <random>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -29,12 +30,14 @@ private:
 	void drawAxisWorld(const glm::vec3& color);
 	void drawVerticeNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
 	void drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
-
+	void drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3,glm::vec3 &color);
+	void colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& color);
+	void colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& color);
 
 	void CreateBuffers(int w, int h);
 	void CreateOpenglBuffer();
 	void InitOpenglRendering();
-
+	std::vector<std::vector<float>> z_buffer;
 	float* color_buffer;
 	int viewport_width;
 	int viewport_height;
