@@ -1,3 +1,9 @@
+### 1. Drawing the bounding rectangle based on the depth of the triangle:
+we calculated the maximum value of z on each triangle and we drew the triangles according to the value of z as shown below:
+![1a](https://user-images.githubusercontent.com/101698622/211166733-4c618519-fbd8-4281-bc45-0e6ad288b7bb.png)
+
+### 3. Implementing the Edge Walking algorithm. we can clearly see the ovelapping of the triangles, since Z buffer is not yet implemented:
+![3b](https://user-images.githubusercontent.com/101698622/211166830-026a3e05-582e-4e72-bbbf-f22f5cecf438.png)
 
 
 ### 4. Implementation of the Z buffer and side-by-side pictures of Z buffer and color buffer:
