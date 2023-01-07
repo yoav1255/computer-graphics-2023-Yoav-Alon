@@ -35,8 +35,8 @@ private:
 	void drawVerticeNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
 	void drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color);
 	void drawRectangle(glm::vec3& verticeModel0, glm::vec3 &verticeModel1, glm::vec3 &verticeModel2);
-	void fill_left_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max, glm::vec3 color);
-	void fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max, glm::vec3 color);
+	void fill_left_Triangle(glm::vec3 &v_min, glm::vec3 v_mid, glm::vec3 v_max, glm::vec3 color);
+	void fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 &v_max, glm::vec3 color);
 	void edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const glm::vec3& color);
 	float Find_Current_Point(glm::vec2 &p,glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3);
 	void drawZBuffer(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);

@@ -626,10 +626,10 @@ void Renderer::drawRectangle(glm::vec3 &verticeModel0, glm::vec3 &verticeModel1,
 	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Min_Local,0));
 	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Max_Local,0));
 
-	DrawLine(points_to_rectangle[0], points_to_rectangle[1], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
-	DrawLine(points_to_rectangle[0], points_to_rectangle[2], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
-	DrawLine(points_to_rectangle[1], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
-	DrawLine(points_to_rectangle[2], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[0], points_to_rectangle[1], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
+	DrawLine(points_to_rectangle[0], points_to_rectangle[2], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
+	DrawLine(points_to_rectangle[1], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
+	DrawLine(points_to_rectangle[2], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
 
 	points_to_rectangle.pop_back();
 	points_to_rectangle.pop_back();
@@ -641,27 +641,14 @@ bool comparePoints(glm::vec3 v1, glm::vec3 v2)
 {
 	return v1.x < v2.x;
 }
-//glm::vec3 min_points(glm::vec3 v1, glm::vec3 v2)
-//{
-//	return v1.x < v2.x?v1:v2;
-//}
-//glm::vec3 max_points(glm::vec3 v1, glm::vec3 v2)
-//{
-//	return v1.x < v2.x ? v2 : v1;
-//}
-//glm::vec3 mid_point(glm::vec3 v1, glm::vec3 v2,glm::vec3 v3)
-//{
-//	if ((v1.x <= v2.x && v2.x <= v3.x)||(v1.x >= v2.x && v2.x >= v3.x)) return v2;
-//	if ((v1.x >= v2.x && v1.x <= v3.x)||(v1.x <= v2.x && v1.x >= v3.x)) return v1;
-//	if ((v3.x <= v2.x && v1.x <= v3.x)||(v3.x >= v2.x && v1.x >= v3.x)) return v3;
-//}
-void Renderer::fill_left_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max,glm::vec3 color)
+
+void Renderer::fill_left_Triangle(glm::vec3 &v_min, glm::vec3 v_mid, glm::vec3 v_max,glm::vec3 color)
 {
 	float slope1 = (v_max.y - v_min.y) / float(v_max.x - v_min.x);
 	float slope2 = (v_mid.y - v_min.y) / float(v_mid.x - v_min.x);
 	glm::vec3 p1 = v_min;
 	glm::vec3 p2 = v_min;
-	for (float x = v_min.x;x <= v_mid.x;x++)
+	for (float x = v_min.x;x < v_mid.x;x++)
 	{
 		p1.x = x;
 		p2.x = x;
@@ -669,14 +656,15 @@ void Renderer::fill_left_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_
 		p2.y = v_min.y + (x-v_min.x) * slope2;
 		DrawLine_CalcZ(p1, p2, color,v_min,v_mid,v_max);
 	}
+	v_min = p1;
 }
-void Renderer::fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v_max, glm::vec3 color)
+void Renderer::fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 &v_max, glm::vec3 color)
 {
 	float slope1 = (v_min.y -v_max.y ) / float(v_min.x - v_max.x);
 	float slope2 = (v_mid.y - v_max.y) / float(v_mid.x - v_max.x);
 	glm::vec3 p1 = v_max;
 	glm::vec3 p2 = v_max;
-	for (float x = v_max.x;x >= v_mid.x;x--)
+	for (float x = v_max.x;x > v_mid.x;x--)
 	{
 		p1.x = x;
 		p2.x = x;
@@ -684,6 +672,7 @@ void Renderer::fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 v
 		p2.y = v_max.y + (x-v_max.x) * slope2;
 		DrawLine_CalcZ(p1, p2, color, v_min, v_mid, v_max);
 	}
+	v_max = p2;
 }
 void Renderer::edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const glm::vec3& color)
 {
@@ -697,9 +686,6 @@ void Renderer::edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const gl
 	points.push_back(v0);
 	std::sort(points.begin(), points.end(), comparePoints);
 
-	//glm::vec3 v_min = min_points(min_points(v0, v1), v2);
-	//glm::vec3 v_max = max_points(max_points(v0, v1), v2);
-	//glm::vec3 v_mid = mid_point(v0,v1,v2);
 
 	glm::vec3 v_min = points[0];
 	glm::vec3 v_mid = points[1];
@@ -710,6 +696,7 @@ void Renderer::edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const gl
 	else
 	{
 		fill_left_Triangle(v_min, v_mid, v_max, color);
+		DrawLine(v_min, v_mid, color);
 		fill_right_Triangle(v_min, v_mid, v_max, color);
 	}
 }
@@ -800,9 +787,9 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
 
-		//DrawLine(verticeModel0, verticeModel1, colorBBoxWorld);
-		//DrawLine(verticeModel0, verticeModel2, colorBBoxWorld);
-		//DrawLine(verticeModel2, verticeModel1, colorBBoxWorld);
+		//DrawLine(verticeModel0, verticeModel1, colorAxisWorld);
+		//DrawLine(verticeModel0, verticeModel2, colorAxisWorld);
+		//DrawLine(verticeModel2, verticeModel1, colorAxisWorld);
 
 		edgeWalking(verticeModel0, verticeModel1, verticeModel2, myModel.colors[i]);
 
