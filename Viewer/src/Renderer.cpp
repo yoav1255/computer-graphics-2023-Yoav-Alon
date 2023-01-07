@@ -33,7 +33,7 @@ void Renderer::PutPixel(int i, int j, const glm::vec3& color)
 	color_buffer[INDEX(viewport_width, i, j, 1)] = color.y;
 	color_buffer[INDEX(viewport_width, i, j, 2)] = color.z;
 }
-void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color)
+void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color, bool fillTriangle, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
 {
 	int e, dx, dy, reflect = 1;
 
@@ -49,15 +49,54 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 			x1 += 1 * reflect;
 			e -= 2 * dy;
 		}
-		PutPixel(x1, y1, color);
+		if (fillTriangle && testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1)))
+			PutPixel(x1, y1, color);
 		y1 += 1;
 		e += 2 * dx * reflect;
 	}
 }
-
-void Renderer::DrawLine(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color)
+void Renderer::drawRectangle(glm::vec3& verticeModel0, glm::vec3& verticeModel1, glm::vec3& verticeModel2)
 {
-	int x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
+	float x_Min_Local = viewport_width;
+	float y_Min_Local = viewport_height;
+	float z_Min_Local = viewport_width;
+	float x_Max_Local = 0;
+	float y_Max_Local = 0;
+	float z_Max_Local = 0;
+	vector<glm::vec3> points_to_rectangle;
+
+	x_Min_Local = std::min(verticeModel0.x, verticeModel1.x);
+	x_Min_Local = std::min(x_Min_Local, verticeModel2.x);
+	y_Min_Local = std::min(verticeModel0.y, verticeModel1.y);
+	y_Min_Local = std::min(y_Min_Local, verticeModel2.y);
+	z_Min_Local = std::min(verticeModel0.z, verticeModel1.z);
+	z_Min_Local = std::min(z_Min_Local, verticeModel2.z);
+	x_Max_Local = std::max(verticeModel0.x, verticeModel1.x);
+	x_Max_Local = std::max(x_Max_Local, verticeModel2.x);
+	y_Max_Local = std::max(verticeModel0.y, verticeModel1.y);
+	y_Max_Local = std::max(y_Max_Local, verticeModel2.y);
+	z_Max_Local = std::max(verticeModel0.z, verticeModel1.z);
+	z_Max_Local = std::max(z_Max_Local, verticeModel2.z);
+
+	points_to_rectangle.push_back(glm::vec3(x_Min_Local, y_Min_Local, 0));
+	points_to_rectangle.push_back(glm::vec3(x_Min_Local, y_Max_Local, 0));
+	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Min_Local, 0));
+	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Max_Local, 0));
+
+	DrawLine(points_to_rectangle[0], points_to_rectangle[1], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[0], points_to_rectangle[2], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[1], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+	DrawLine(points_to_rectangle[2], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local / 1));
+
+	points_to_rectangle.pop_back();
+	points_to_rectangle.pop_back();
+	points_to_rectangle.pop_back();
+	points_to_rectangle.pop_back();
+}
+
+void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color,bool fillTriangle, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+{
+	float x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
 	if (p1.x < p2.x)  // init on base of is p1.x < p2.x
 	{
 		x1 = p1.x;
@@ -77,9 +116,9 @@ void Renderer::DrawLine(const glm::ivec3& p1, const glm::ivec3& p2, const glm::v
 	if (abs(dy) > abs(dx)) // deceiding if need to run the algo. with reversed axis for slopes that are bigger than abs(1)
 	{
 		if (y1 < y2) // same as we did for p1.x and p2.x above
-			DrawLineReversedAxis(x1, y1, x2, y2, color);
+			DrawLineReversedAxis(x1, y1, x2, y2, color,fillTriangle,v1,v2,v3);
 		else
-			DrawLineReversedAxis(x2, y2, x1, y1, color);
+			DrawLineReversedAxis(x2, y2, x1, y1, color, fillTriangle,v1,v2,v3);
 		return;
 	}
 	if (y1 > y2) // if the slope is negative
@@ -92,145 +131,32 @@ void Renderer::DrawLine(const glm::ivec3& p1, const glm::ivec3& p2, const glm::v
 			y1 += 1 * reflect;
 			e -= 2 * dx;
 		}
-		PutPixel(x1, y1, color);
+		if (fillTriangle && testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1))) 
+			PutPixel(x1, y1, color);
 		x1 += 1;
 		e += 2 * dy * reflect;
 	}
 }
 
-void Renderer::DrawLineReversedAxis_CalcZ(int x1, int y1, int x2, int y2, const glm::vec3& color, glm::vec3 t1, glm::vec3 t2, glm::vec3 t3)
+bool Renderer::testAndSetZBuffer(int x,int y,float z)
 {
-	int e, dx, dy, reflect = 1;
+	if (!(x >= 0 && y >= 0 && x < viewport_width && y < viewport_height))
+		return false;
+	if (this->z_buffer[ Z_INDEX(this->viewport_width,x,y)]  <= z) 
+		return false;
+	this->z_buffer[Z_INDEX(this->viewport_width, x, y)] = z;
+	return true;
 
-	dx = x2 - x1;
-	dy = y2 - y1;
-	if (x1 > x2) // if the slope is negative
-		reflect = -1;
-	e = -dy;
-	while (y1 <= y2) // Bresenham algorithm
-	{
-		if (e > 0)
-		{
-			x1 += 1 * reflect;
-			e -= 2 * dy;
-		}
-		if ((x1 > 0 && x1 < viewport_width) && (y1 > 0 && y1 < viewport_height))
-		{
-			float curr_z = At(x1, y1);
-			float point_z = Find_Current_Point(glm::vec2(x1, y1), t1, t2, t3);
-			if (point_z < curr_z)
-			{
-				PutPixel(x1, y1, color);
-				z_buffer[x1 + viewport_width * y1] = point_z;
-			}
-		}
-		y1 += 1;
-		e += 2 * dx * reflect;
-	}
-}
-
-void Renderer::DrawLine_CalcZ(const glm::ivec3& p1, const glm::ivec3& p2, const glm::vec3& color, glm::vec3 t1, glm::vec3 t2, glm::vec3 t3)
-{
-	int x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
-	if (p1.x < p2.x)  // init on base of is p1.x < p2.x
-	{
-		x1 = p1.x;
-		y1 = p1.y;
-		x2 = p2.x;
-		y2 = p2.y;
-	}
-	else
-	{
-		x1 = p2.x;
-		y1 = p2.y;
-		x2 = p1.x;
-		y2 = p1.y;
-	}
-	dx = x2 - x1; // init delta for x and y
-	dy = y2 - y1;
-	if (abs(dy) > abs(dx)) // deceiding if need to run the algo. with reversed axis for slopes that are bigger than abs(1)
-	{
-		if (y1 < y2) // same as we did for p1.x and p2.x above
-			DrawLineReversedAxis(x1, y1, x2, y2, color);
-		else
-			DrawLineReversedAxis(x2, y2, x1, y1, color);
-		return;
-	}
-	if (y1 > y2) // if the slope is negative
-		reflect = -1;
-	e = -dx;
-	while (x1 <= x2) // Bresenham algorithm
-	{
-		if (e > 0)
-		{
-			y1 += 1 * reflect;
-			e -= 2 * dx;
-		}
-		if ((x1 > 0 && x1 < viewport_width) && (y1 > 0 && y1 < viewport_height))
-		{
-			float curr_z = At(x1, y1);
-			float point_z = Find_Current_Point(glm::vec2(x1, y1), t1, t2, t3);
-			if (point_z < curr_z)
-			{
-				PutPixel(x1, y1, color);
-				z_buffer[x1 + viewport_width * y1] = point_z;
-			}
-		}
-		x1 += 1;
-		e += 2 * dy * reflect;
-	}
 }
 
 void Renderer::CreateBuffers(int w, int h)
 {
 	CreateOpenglBuffer(); //Do not remove this line.
+	this->z_buffer = new float[w * h];
 	color_buffer = new float[3 * w * h];
-	z_buffer = new float[w*h];
 	ClearColorBuffer(glm::vec3(0.0f, 0.0f, 0.0f));
+	clearZBuffer();
 }
-float Renderer::At(int x, int y)
-{
-	return z_buffer[x + viewport_width * y];
-}
-
-float Renderer::Find_Current_Point(glm::vec2 &P, glm::vec3 &A, glm::vec3 &B, glm::vec3 &C)
-{
-
-	glm::vec3 p = glm::vec3(P.x, P.y, 0);
-	//float area = (A.x * (B.y - C.y) + B.x * (C.y - A.y) + C.x * (A.y - B.y)) / 2.0f;
-	//area = area > 0.0 ? area : -area;
-
-	//float areaA = (p.x * (B.y - C.y) + B.x * (C.y - p.y) + C.x * (p.y - B.y)) / 2.0f;
-	//areaA = areaA > 0.0 ? areaA : -areaA;
-
-	//float areaB = (A.x * (p.y - C.y) + p.x * (C.y - A.y) + C.x * (A.y - p.y)) / 2.0f;
-	//areaB = areaB > 0.0 ? areaB : -areaB;
-
-	//float areaC = (A.x * (B.y - p.y) + B.x * (p.y - A.y) + p.x * (A.y - B.y)) / 2.0f;
-	//areaC = areaC > 0.0 ? areaC : -areaC;
-
-	float area = 0.5f * glm::length(glm::cross(B - A, C - A));
-	area = area > 0.0 ? area : -area;
-
-	float areaA = 0.5f * glm::length(glm::cross(B - p, C - p));
-	areaA = areaA > 0.0 ? areaA : -areaA;
-
-	float areaB = 0.5f * glm::length(glm::cross(p - A, C - A));
-	areaB = areaB > 0.0 ? areaB : -areaB;
-
-	float areaC = 0.5f * glm::length(glm::cross(B - A, p - A));
-	areaC = areaC > 0.0 ? areaC : -areaC;
-
-
-	float alpha = areaA / area;
-	float beta = areaB / area;
-	float gama = 1-alpha-beta;
-
-	float z = alpha * A.z + beta * B.z + gama * C.z;
-	return z;
-}
-
-
 
 //##############################
 //##OpenGL stuff. Don't touch.##
@@ -355,13 +281,13 @@ void Renderer::ClearColorBuffer(const glm::vec3& color)
 		}
 	}
 }
-void Renderer::ClearZBuffer()
+void Renderer::clearZBuffer()
 {
-	for (int i = 0; i < viewport_height; i++)
+	for (int i = 0; i < viewport_width; i++)
 	{
-		for (int j = 0; j < viewport_width; j++)
+		for (int j = 0; j < viewport_height; j++)
 		{
-			z_buffer[i * viewport_width + j] = std::numeric_limits<float>::infinity();
+			this->z_buffer[Z_INDEX(this->viewport_width, i, j)] = std::numeric_limits<float>::infinity();
 		}
 	}
 }
@@ -371,39 +297,39 @@ void Renderer::SetNewViewport(float frameBufferWidth, float frameBufferHeight)
 	viewport_width = frameBufferWidth;
 	viewport_height = frameBufferHeight;
 }
+/*
+void Renderer::putFlower(int radius,int x ,const glm::vec3& color, int stemLen)
+{
+	int ground = 50;
+	glm::ivec2 center(x, 50 + stemLen + radius );
+	for (int i = 0, step = 180; i < step; i++)
+	{
+		glm::ivec2 b(center.x + radius * sin((2 * M_PI * i) / step), center.y + radius * cos((2 * M_PI * i) / step));
+		DrawLine(center, b, color);
+	}
+	DrawLine({ center.x,center.y - radius }, { center.x,ground }, { 0,1,0 });
+	DrawLine({ center.x,center.y - radius }, { center.x-1,ground }, { 0,1,0 });
+	DrawLine({ center.x,center.y - radius }, { center.x+1,ground }, { 0,1,0 });
+}
+void Renderer::drawSomeFlowers()
+{
+	glm::ivec2 a(0, 700);
+	glm::ivec3 color(200, 0, 0);
+	for (int i = 90, r = 200, step = 360; i <=180; i++) // draws the sun
+	{
+		glm::ivec2 b(a.x+r * sin((2 * M_PI * i) / step), a.y+r * cos((2 * M_PI * i) / step));
+		DrawLine( a, b, color);
+	}
+	// drawing the flowers
+	putFlower(100, 400, { 70,70,70 }, 200);
+	putFlower(80, 200, { 70,70,70 }, 200);
+	putFlower(60, 600, { 70,70,70 }, 100);
+	putFlower(70, 800, { 70,70,70 }, 80);
+	putFlower(130, 1000, { 70,70,70 }, 250);
 
-//void Renderer::putFlower(int radius,int x ,const glm::vec3& color, int stemLen)
-//{
-//	int ground = 50;
-//	glm::ivec2 center(x, 50 + stemLen + radius );
-//	for (int i = 0, step = 180; i < step; i++)
-//	{
-//		glm::ivec2 b(center.x + radius * sin((2 * M_PI * i) / step), center.y + radius * cos((2 * M_PI * i) / step));
-//		DrawLine(center, b, color);
-//	}
-//	DrawLine({ center.x,center.y - radius }, { center.x,ground }, { 0,1,0 });
-//	DrawLine({ center.x,center.y - radius }, { center.x-1,ground }, { 0,1,0 });
-//	DrawLine({ center.x,center.y - radius }, { center.x+1,ground }, { 0,1,0 });
-//}
-//void Renderer::drawSomeFlowers()
-//{
-//	glm::ivec2 a(0, 700);
-//	glm::ivec3 color(200, 0, 0);
-//	for (int i = 90, r = 200, step = 360; i <=180; i++) // draws the sun
-//	{
-//		glm::ivec2 b(a.x+r * sin((2 * M_PI * i) / step), a.y+r * cos((2 * M_PI * i) / step));
-//		DrawLine( a, b, color);
-//	}
-//	// drawing the flowers
-//	putFlower(100, 400, { 70,70,70 }, 200);
-//	putFlower(80, 200, { 70,70,70 }, 200);
-//	putFlower(60, 600, { 70,70,70 }, 100);
-//	putFlower(70, 800, { 70,70,70 }, 80);
-//	putFlower(130, 1000, { 70,70,70 }, 250);
-//
-//	return;
-//}
-
+	return;
+}
+*/
 void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene,const glm::vec3& color, bool isWorld, float x_Min, float y_Min, float z_Min, float x_Max, float y_Max, float z_Max)
 {
 	float half_width = viewport_width / 2;
@@ -598,112 +524,101 @@ void Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec
 		DrawLine(face_norm_projected, vCenter_projected, color);
 	}
 }
-void Renderer::drawRectangle(glm::vec3 &verticeModel0, glm::vec3 &verticeModel1, glm::vec3 &verticeModel2)
+void Renderer::colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& color)
 {
-	float x_Min_Local = viewport_width;
-	float y_Min_Local = viewport_height;
-	float z_Min_Local = viewport_width;
-	float x_Max_Local = 0;
-	float y_Max_Local = 0;
-	float z_Max_Local = 0;
-	vector<glm::vec3> points_to_rectangle;
-
-	x_Min_Local = std::min(verticeModel0.x, verticeModel1.x);
-	x_Min_Local = std::min(x_Min_Local, verticeModel2.x);
-	y_Min_Local = std::min(verticeModel0.y, verticeModel1.y);
-	y_Min_Local = std::min(y_Min_Local, verticeModel2.y);
-	z_Min_Local = std::min(verticeModel0.z, verticeModel1.z);
-	z_Min_Local = std::min(z_Min_Local, verticeModel2.z);
-	x_Max_Local = std::max(verticeModel0.x, verticeModel1.x);
-	x_Max_Local = std::max(x_Max_Local, verticeModel2.x);
-	y_Max_Local = std::max(verticeModel0.y, verticeModel1.y);
-	y_Max_Local = std::max(y_Max_Local, verticeModel2.y);
-	z_Max_Local = std::max(verticeModel0.z, verticeModel1.z);
-	z_Max_Local = std::max(z_Max_Local, verticeModel2.z);
-
-	points_to_rectangle.push_back(glm::vec3(x_Min_Local, y_Min_Local,0));
-	points_to_rectangle.push_back(glm::vec3(x_Min_Local, y_Max_Local,0));
-	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Min_Local,0));
-	points_to_rectangle.push_back(glm::vec3(x_Max_Local, y_Max_Local,0));
-
-	DrawLine(points_to_rectangle[0], points_to_rectangle[1], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
-	DrawLine(points_to_rectangle[0], points_to_rectangle[2], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
-	DrawLine(points_to_rectangle[1], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
-	DrawLine(points_to_rectangle[2], points_to_rectangle[3], glm::vec3(1.0f, 1.0f, 1.0f) - float(z_Max_Local ));
-
-	points_to_rectangle.pop_back();
-	points_to_rectangle.pop_back();
-	points_to_rectangle.pop_back();
-	points_to_rectangle.pop_back();
-}
-
-bool comparePoints(glm::vec3 v1, glm::vec3 v2)
-{
-	return v1.x < v2.x;
-}
-
-void Renderer::fill_left_Triangle(glm::vec3 &v_min, glm::vec3 v_mid, glm::vec3 v_max,glm::vec3 color)
-{
-	float slope1 = (v_max.y - v_min.y) / float(v_max.x - v_min.x);
-	float slope2 = (v_mid.y - v_min.y) / float(v_mid.x - v_min.x);
-	glm::vec3 p1 = v_min;
-	glm::vec3 p2 = v_min;
-	for (float x = v_min.x;x < v_mid.x;x++)
+	float invslope1 = (v2.x - v1.x) / (v2.y - v1.y);
+	float invslope2 = (v3.x - v1.x) / (v3.y - v1.y);
+	float currx1 = v1.x;
+	float currx2 = v1.x;
+	glm::ivec2 iv1, iv2;
+	for (int y_line = round(v1.y); y_line <= v2.y; y_line++)
 	{
-		p1.x = x;
-		p2.x = x;
-		p1.y = v_min.y + (x-v_min.x) * slope1;
-		p2.y = v_min.y + (x-v_min.x) * slope2;
-		DrawLine_CalcZ(p1, p2, color,v_min,v_mid,v_max);
+		iv1.x = currx1;
+		iv1.y = y_line;
+		iv2.x = currx2;
+		iv2.y = y_line;
+		DrawLine(iv1, iv2, color, true, v1, v2, v3);
+		currx1 += invslope1;
+		currx2 += invslope2;
+
 	}
-	v_min = p1;
+
 }
-void Renderer::fill_right_Triangle(glm::vec3 v_min, glm::vec3 v_mid, glm::vec3 &v_max, glm::vec3 color)
+void Renderer::colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& color)
 {
-	float slope1 = (v_min.y -v_max.y ) / float(v_min.x - v_max.x);
-	float slope2 = (v_mid.y - v_max.y) / float(v_mid.x - v_max.x);
-	glm::vec3 p1 = v_max;
-	glm::vec3 p2 = v_max;
-	for (float x = v_max.x;x > v_mid.x;x--)
+	float invslope1 = (v3.x - v1.x) / (v3.y - v1.y);
+	float invslope2 = (v3.x - v2.x) / (v3.y - v2.y);
+	float currx1 = v3.x;
+	float currx2 = v3.x;
+	glm::ivec2 iv1, iv2;
+	for (int y_line= round(v3.y); y_line >= v1.y; y_line--)
 	{
-		p1.x = x;
-		p2.x = x;
-		p1.y = v_max.y + (x-v_max.x) * slope1;
-		p2.y = v_max.y + (x-v_max.x) * slope2;
-		DrawLine_CalcZ(p1, p2, color, v_min, v_mid, v_max);
+
+		iv1.x = currx1;
+		iv1.y = y_line;
+		iv2.x = currx2;
+		iv2.y = y_line;
+		DrawLine(iv1, iv2, color,true,v1,v2,v3);
+		currx1 -= invslope1;
+		currx2 -= invslope2;
 	}
-	v_max = p2;
+
 }
-void Renderer::edgeWalking(glm::vec3& v0, glm::vec3& v1, glm::vec3& v2, const glm::vec3& color)
+float Renderer::calculateZ(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, float x, float y) 
 {
-	glm::vec3 color_test = glm::vec3(0.7f, 0.2f, 0.2f);
-	glm::vec3 color_white = glm::vec3(1.0f, 1.0f, 1.0f);
-	glm::vec3 color_black = glm::vec3(0.0f, 0.0f, 0.0f);
+	float det = (v2.y - v3.y) * (v1.x - v3.x) + (v3.x - v2.x) * (v1.y - v3.y);
 
-	vector<glm::vec3> points;
-	points.push_back(v1);
-	points.push_back(v2);
-	points.push_back(v0);
-	std::sort(points.begin(), points.end(), comparePoints);
+	float l1 = ((v2.y - v3.y) * (x - v3.x) + (v3.x - v2.x) * (y - v3.y)) / det;
+	float l2 = ((v3.y - v1.y) * (x - v3.x) + (v1.x - v3.x) * (y - v3.y)) / det;
+	float l3 = 1.0f - l1 - l2;
 
-
-	glm::vec3 v_min = points[0];
-	glm::vec3 v_mid = points[1];
-	glm::vec3 v_max = points[2];
-
-	if (v_mid.x == v_max.x) fill_left_Triangle(v_min, v_mid, v_max, color);
-	else if (v_mid.x == v_min.x) fill_right_Triangle(v_min, v_mid, v_max, color);
-	else
+	return (l1 * v1.z) + (l2 * v2.z) + (l3 * v3.z);
+}
+void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::vec3& color)
+{ 
+	std::vector<glm::vec3> temp(3);
+	
+	glm::vec3 my_v1, my_v2, my_v3;
+	temp[0] = v1;
+	temp[1] = v2;
+	temp[2] = v3;
+	std::sort(temp.begin(), temp.end(), [](const glm::vec3& a, const glm::vec3& b) // sort vertices by y coordinate
+		{
+			return a.y < b.y;
+		});
+	my_v1 = temp[0];
+	my_v2 = temp[1];
+	my_v3 = temp[2];
+	if (my_v2.y == my_v3.y) // flat bottom triangle
 	{
-		fill_left_Triangle(v_min, v_mid, v_max, color);
-		DrawLine(v_min, v_mid, color);
-		fill_right_Triangle(v_min, v_mid, v_max, color);
+		colorBottomTriangle(my_v1, my_v2, my_v3, color);
+
 	}
-}
-void Renderer::drawZBuffer(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
-{
+	else if (my_v1.y == my_v2.y) // flat top triangle
+	{
+		colorTopTriangle(my_v1, my_v2, my_v3, color);
+
+	}
+	else // need to add another vertex as we break the triangle into 2 seprate triangles
+	{
+		glm::vec3 my_v4;
+
+		my_v4.y = my_v2.y;
+		if (my_v1.x == my_v3.x)
+			my_v4.x = my_v1.x;
+		else
+		{
+			float m = (my_v1.y - my_v3.y) / (my_v1.x - my_v3.x);
+			my_v4.x = (my_v4.y - my_v1.y + m * my_v1.x) / m; // m can not be equal to 0 because of the sorting of the vertices
+		}
+		//use barycentric coordinates to find depth (z) of my_v4:
+		my_v4.z = calculateZ(my_v1, my_v2, my_v3, my_v4.x, my_v4.y);
+		colorBottomTriangle(my_v1, my_v2, my_v4,color);
+		colorTopTriangle(my_v2, my_v4, my_v3,color);
+	}
 
 }
+	
 
 void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
@@ -748,10 +663,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		glm::vec3 verticeModel1 = glm::project(v1, view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 verticeModel2 = glm::project(v2, view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 
-		glm::vec3 verticeLocal0 = glm::project(v0, view * myModel.GetTranslationWorldMat() * myModel.GetScaleWorldMat() * modelTransform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-		glm::vec3 verticeLocal1 = glm::project(v1, view * myModel.GetTranslationWorldMat() * myModel.GetScaleWorldMat() * modelTransform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-		glm::vec3 verticeLocal2 = glm::project(v2, view * myModel.GetTranslationWorldMat() * myModel.GetScaleWorldMat() * modelTransform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-
+		
 		verticeModel0.x += half_width;
 		verticeModel0.y += half_height;
 		verticeModel1.x += half_width;
@@ -759,12 +671,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		verticeModel2.x += half_width;
 		verticeModel2.y += half_height;
 
-		verticeLocal0.x += half_width;
-		verticeLocal0.y += half_height;
-		verticeLocal1.x += half_width;
-		verticeLocal1.y += half_height;
-		verticeLocal2.x += half_width;
-		verticeLocal2.y += half_height;
+		
 
 		x_Min_World = std::min(verticeModel0.x, x_Min_World);
 		y_Min_World = std::min(verticeModel0.y, y_Min_World);
@@ -773,28 +680,18 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max_World = std::max(verticeModel0.y, y_Max_World);
 		z_Max_World = std::max(verticeModel0.z, z_Max_World);
 
-		//x_Min_Local = std::min(verticeLocal0.x, x_Min_Local);
-		//y_Min_Local = std::min(verticeLocal0.y, y_Min_Local);
-		//z_Min_Local = std::min(verticeLocal0.z, z_Min_Local);
-		//x_Max_Local = std::max(verticeLocal0.x, x_Max_Local);
-		//y_Max_Local = std::max(verticeLocal0.y, y_Max_Local);
-		//z_Max_Local = std::max(verticeLocal0.z, z_Max_Local);
-
+		
 		x_Min = std::min(v0.x, x_Min);
 		y_Min = std::min(v0.y, y_Min);
 		z_Min = std::min(v0.z, z_Min);
 		x_Max = std::max(v0.x, x_Max);
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
-
-		//DrawLine(verticeModel0, verticeModel1, colorAxisWorld);
-		//DrawLine(verticeModel0, verticeModel2, colorAxisWorld);
-		//DrawLine(verticeModel2, verticeModel1, colorAxisWorld);
-
-		edgeWalking(verticeModel0, verticeModel1, verticeModel2, myModel.colors[i]);
-
-		myModel.drawRectangle = false; // change in GUI!
-		if (myModel.drawRectangle) { drawRectangle(verticeModel0, verticeModel1, verticeModel2); }
+		
+		drawTriangles(verticeModel0, verticeModel1, verticeModel2, myModel.meshColors[i]);
+		//DrawLine(verticeModel0, verticeModel1, color);
+		//DrawLine(verticeModel0, verticeModel2, color);
+		//DrawLine(verticeModel2, verticeModel1, color);
 
 	}
 		if (myModel.getAxisLocal()) { drawAxisLocal(myModel, scene, colorAxisLocal, x_Min, y_Min, z_Min, x_Max, y_Max, z_Max); }

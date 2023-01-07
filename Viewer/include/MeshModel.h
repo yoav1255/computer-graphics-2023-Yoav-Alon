@@ -5,9 +5,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/random.hpp>
 #include <iostream>
-
+#include <glm/gtc/random.hpp>
 class MeshModel
 {
 public:
@@ -24,6 +23,7 @@ public:
 	 glm::mat4x4 GetWorldTransform();
 	void SetObjectTransform();
 	void SetWorldTransform();
+	std::vector<glm::vec3> meshColors;
 
 	const glm::vec3& GetTranslationObject() const { return translationObject; }
 	const glm::vec3& GetScaleObject() const { return scaleObject; }
@@ -62,7 +62,6 @@ public:
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
-	std::vector<glm::vec3> colors;
 	glm::mat4 objectTransform;
 	glm::mat4 worldTransform;
 	glm::vec3 vCenter;
@@ -80,4 +79,5 @@ public:
 	bool drawVerticeNormals;
 	bool drawFaceNormals;
 	bool drawRectangle;
+
 };
