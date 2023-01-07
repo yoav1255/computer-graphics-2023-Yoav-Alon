@@ -21,6 +21,7 @@ Renderer::Renderer(int viewport_width, int viewport_height) :
 Renderer::~Renderer()
 {
 	delete[] color_buffer;
+	delete[] z_buffer;
 }
 
 void Renderer::PutPixel(int i, int j, const glm::vec3& color)
@@ -32,7 +33,7 @@ void Renderer::PutPixel(int i, int j, const glm::vec3& color)
 	color_buffer[INDEX(viewport_width, i, j, 1)] = color.y;
 	color_buffer[INDEX(viewport_width, i, j, 2)] = color.z;
 }
-void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color)
+void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color, bool fillTriangle, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
 {
 	int e, dx, dy, reflect = 1;
 
@@ -48,15 +49,16 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 			x1 += 1 * reflect;
 			e -= 2 * dy;
 		}
-		PutPixel(x1, y1, color);
+		if (fillTriangle && testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1)))
+			PutPixel(x1, y1, color);
 		y1 += 1;
 		e += 2 * dx * reflect;
 	}
 }
 
-void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color)
+void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& color,bool fillTriangle, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
 {
-	int x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
+	float x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
 	if (p1.x < p2.x)  // init on base of is p1.x < p2.x
 	{
 		x1 = p1.x;
@@ -76,9 +78,9 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 	if (abs(dy) > abs(dx)) // deceiding if need to run the algo. with reversed axis for slopes that are bigger than abs(1)
 	{
 		if (y1 < y2) // same as we did for p1.x and p2.x above
-			DrawLineReversedAxis(x1, y1, x2, y2, color);
+			DrawLineReversedAxis(x1, y1, x2, y2, color,fillTriangle,v1,v2,v3);
 		else
-			DrawLineReversedAxis(x2, y2, x1, y1, color);
+			DrawLineReversedAxis(x2, y2, x1, y1, color, fillTriangle,v1,v2,v3);
 		return;
 	}
 	if (y1 > y2) // if the slope is negative
@@ -91,18 +93,31 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 			y1 += 1 * reflect;
 			e -= 2 * dx;
 		}
-		PutPixel(x1, y1, color);
+		if (fillTriangle && testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1))) 
+			PutPixel(x1, y1, color);
 		x1 += 1;
 		e += 2 * dy * reflect;
 	}
 }
 
+bool Renderer::testAndSetZBuffer(int x,int y,float z)
+{
+	if (!(x >= 0 && y >= 0 && x < viewport_width && y < viewport_height))
+		return false;
+	if (this->z_buffer[ Z_INDEX(this->viewport_width,x,y)]  <= z) 
+		return false;
+	this->z_buffer[Z_INDEX(this->viewport_width, x, y)] = z;
+	return true;
+
+}
+
 void Renderer::CreateBuffers(int w, int h)
 {
 	CreateOpenglBuffer(); //Do not remove this line.
-	this->z_buffer = std::vector<std::vector<float>>(w , std::vector<float>(h,std::numeric_limits<float>::infinity()));
+	this->z_buffer = new float[w * h];
 	color_buffer = new float[3 * w * h];
 	ClearColorBuffer(glm::vec3(0.0f, 0.0f, 0.0f));
+	clearZBuffer();
 }
 
 //##############################
@@ -228,13 +243,23 @@ void Renderer::ClearColorBuffer(const glm::vec3& color)
 		}
 	}
 }
+void Renderer::clearZBuffer()
+{
+	for (int i = 0; i < viewport_width; i++)
+	{
+		for (int j = 0; j < viewport_height; j++)
+		{
+			this->z_buffer[Z_INDEX(this->viewport_width, i, j)] = std::numeric_limits<float>::infinity();
+		}
+	}
+}
 
 void Renderer::SetNewViewport(float frameBufferWidth, float frameBufferHeight)
 {
 	viewport_width = frameBufferWidth;
 	viewport_height = frameBufferHeight;
 }
-
+/*
 void Renderer::putFlower(int radius,int x ,const glm::vec3& color, int stemLen)
 {
 	int ground = 50;
@@ -266,7 +291,7 @@ void Renderer::drawSomeFlowers()
 
 	return;
 }
-
+*/
 void Renderer::drawBoundingBox(MeshModel& myModel, Scene& scene,const glm::vec3& color, bool isWorld, float x_Min, float y_Min, float z_Min, float x_Max, float y_Max, float z_Max)
 {
 	float half_width = viewport_width / 2;
@@ -474,7 +499,7 @@ void Renderer::colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, 
 		iv1.y = y_line;
 		iv2.x = currx2;
 		iv2.y = y_line;
-		DrawLine(iv1,iv2,color);
+		DrawLine(iv1, iv2, color, true, v1, v2, v3);
 		currx1 += invslope1;
 		currx2 += invslope2;
 
@@ -490,23 +515,31 @@ void Renderer::colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm
 	glm::ivec2 iv1, iv2;
 	for (int y_line= round(v3.y); y_line >= v1.y; y_line--)
 	{
+
 		iv1.x = currx1;
 		iv1.y = y_line;
 		iv2.x = currx2;
 		iv2.y = y_line;
-		DrawLine(iv1, iv2, color);
+		DrawLine(iv1, iv2, color,true,v1,v2,v3);
 		currx1 -= invslope1;
 		currx2 -= invslope2;
 	}
 
 }
+float Renderer::calculateZ(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, float x, float y) 
+{
+	float det = (v2.y - v3.y) * (v1.x - v3.x) + (v3.x - v2.x) * (v1.y - v3.y);
+
+	float l1 = ((v2.y - v3.y) * (x - v3.x) + (v3.x - v2.x) * (y - v3.y)) / det;
+	float l2 = ((v3.y - v1.y) * (x - v3.x) + (v1.x - v3.x) * (y - v3.y)) / det;
+	float l3 = 1.0f - l1 - l2;
+
+	return (l1 * v1.z) + (l2 * v2.z) + (l3 * v3.z);
+}
 void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::vec3& color)
 { 
 	std::vector<glm::vec3> temp(3);
-	std::random_device rd;  // Will be used to obtain a seed for the random number engine
-	std::mt19937 gen(rd()); // Standard mersenne_twister_engine seeded with rd()
-	std::uniform_real_distribution<float> dis(0.0, 1.0);
-	glm::vec3 my_color(dis(gen), dis(gen), dis(gen));
+	
 	glm::vec3 my_v1, my_v2, my_v3;
 	temp[0] = v1;
 	temp[1] = v2;
@@ -520,17 +553,18 @@ void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::v
 	my_v3 = temp[2];
 	if (my_v2.y == my_v3.y) // flat bottom triangle
 	{
-		colorBottomTriangle(my_v1, my_v2, my_v3, my_color);
+		colorBottomTriangle(my_v1, my_v2, my_v3, color);
 
 	}
 	else if (my_v1.y == my_v2.y) // flat top triangle
 	{
-		colorTopTriangle(my_v1, my_v2, my_v3, my_color);
+		colorTopTriangle(my_v1, my_v2, my_v3, color);
 
 	}
 	else // need to add another vertex as we break the triangle into 2 seprate triangles
 	{
 		glm::vec3 my_v4;
+
 		my_v4.y = my_v2.y;
 		if (my_v1.x == my_v3.x)
 			my_v4.x = my_v1.x;
@@ -539,9 +573,10 @@ void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::v
 			float m = (my_v1.y - my_v3.y) / (my_v1.x - my_v3.x);
 			my_v4.x = (my_v4.y - my_v1.y + m * my_v1.x) / m; // m can not be equal to 0 because of the sorting of the vertices
 		}
-		// todo: might need to update my_v4 z coordinate 
-		colorBottomTriangle(my_v1, my_v2, my_v4,my_color);
-		colorTopTriangle(my_v2, my_v4, my_v3,my_color);
+		//use barycentric coordinates to find depth (z) of my_v4:
+		my_v4.z = calculateZ(my_v1, my_v2, my_v3, my_v4.x, my_v4.y);
+		colorBottomTriangle(my_v1, my_v2, my_v4,color);
+		colorTopTriangle(my_v2, my_v4, my_v3,color);
 	}
 
 }
@@ -623,7 +658,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
 		
-		drawTriangles(verticeModel0, verticeModel1, verticeModel2, glm::vec3(1, 0, 0));
+		drawTriangles(verticeModel0, verticeModel1, verticeModel2, myModel.meshColors[i]);
 		//DrawLine(verticeModel0, verticeModel1, color);
 		//DrawLine(verticeModel0, verticeModel2, color);
 		//DrawLine(verticeModel2, verticeModel1, color);

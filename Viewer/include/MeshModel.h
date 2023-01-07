@@ -6,7 +6,7 @@
 #include <glm/gtx/transform.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-
+#include <glm/gtc/random.hpp>
 class MeshModel
 {
 public:
@@ -23,6 +23,7 @@ public:
 	 glm::mat4x4 GetWorldTransform();
 	void SetObjectTransform();
 	void SetWorldTransform();
+	std::vector<glm::vec3> meshColors;
 
 	const glm::vec3& GetTranslationObject() const { return translationObject; }
 	const glm::vec3& GetScaleObject() const { return scaleObject; }
@@ -77,4 +78,5 @@ public:
 	bool bounding_box_world;
 	bool drawVerticeNormals;
 	bool drawFaceNormals;
+
 };
