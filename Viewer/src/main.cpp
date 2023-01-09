@@ -66,6 +66,16 @@ int main(int argc, char **argv)
 	scene.AddCamera(cam);
 	scene.SetActiveCameraIndex(0);
 
+	shared_ptr<light> light_test = std::make_shared<light>();
+	light_test->ambient = glm::vec3(0.3f, 0.2f, 0.4f);
+	light_test->position = glm::vec3(1, 1, 1);
+	light_test->diffuse = glm::vec3(1, 1, 1);
+	light_test->specular = glm::vec3(1, 1, 1);
+	light_test->is_on = false;
+	scene.AddLight(light_test);
+	scene.SetActiveLightIndex(0);
+
+
 	//
 	ImGuiIO& io = SetupDearImgui(window);
 	glfwSetScrollCallback(window, ScrollCallback);
@@ -196,7 +206,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 	 * MeshViewer menu
 	 */
 
-	static bool model_transformation = false, model_controllers = false, camera_transformation = false, camera_controllers = false, addCamera = false;
+	static bool model_transformation = false, model_controllers = false, camera_transformation = false, camera_controllers = false, addCamera = false, light_controllers=false;
 	ImGui::Begin("MeshViewer Menu");
 
 
@@ -248,6 +258,10 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 		if (ImGui::MenuItem("Add a camera"))
 		{
 			addCamera = true;
+		}
+		if (ImGui::MenuItem("Light"))
+		{
+			light_controllers = true;
 		}
 
 		// TODO: Add more menubar items (if you want to)
@@ -508,162 +522,174 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			if (cameraCount > 0)
 			{
 				Camera& cam = scene.GetActiveCamera();
+				static float aspect = float(windowWidth)/float(windowHeight);
+				if (camera_controllers)
+				{
+					ImGui::Begin("Camera Controller");
+					ImGui::Combo("Pick a Camera", &selectedItemCamera, items2, cameraCount);
+					scene.SetActiveCameraIndex(selectedItemCamera);
+					Camera &cam =  scene.GetActiveCamera();
+					if(ImGui::RadioButton("Ortho", cam.my_ortho_or_perspective)){cam.my_ortho_or_perspective=true;}ImGui::SameLine();
+					if (ImGui::RadioButton("Perspective", !cam.my_ortho_or_perspective)) { cam.my_ortho_or_perspective = false; }
+					if (cam.my_ortho_or_perspective) // Ortho
+					{
+						ImGui::SliderFloat("Up", &cam.my_up, -10.0f, 10.0f);
+						ImGui::SliderFloat("Down", &cam.my_down, -10.0f, 10.0f);
+						ImGui::SliderFloat("Left", &cam.my_left, -10.0f, 10.0f);
+						ImGui::SliderFloat("right", &cam.my_right, -10.0f, 10.0f);
+						ImGui::SliderFloat("Near", &cam.my_zNearOrtho, -10.0f, 10.0f);
+						ImGui::SliderFloat("Far", &cam.my_zFarOrtho, -10.0f, 10.0f);
 
-						
-						static float aspect = float(windowWidth)/float(windowHeight);
-						
-						
-						if (camera_controllers)
+						if (ImGui::Button("auto"))
 						{
-							ImGui::Begin("Camera Controller");
-							ImGui::Combo("Pick a Camera", &selectedItemCamera, items2, cameraCount);
-							scene.SetActiveCameraIndex(selectedItemCamera);
-							Camera &cam =  scene.GetActiveCamera();
-							if(ImGui::RadioButton("Ortho", cam.my_ortho_or_perspective)){cam.my_ortho_or_perspective=true;}ImGui::SameLine();
-							if (ImGui::RadioButton("Perspective", !cam.my_ortho_or_perspective)) { cam.my_ortho_or_perspective = false; }
-							if (cam.my_ortho_or_perspective) // Ortho
-							{
-								ImGui::SliderFloat("Up", &cam.my_up, -10.0f, 10.0f);
-								ImGui::SliderFloat("Down", &cam.my_down, -10.0f, 10.0f);
-								ImGui::SliderFloat("Left", &cam.my_left, -10.0f, 10.0f);
-								ImGui::SliderFloat("right", &cam.my_right, -10.0f, 10.0f);
-								ImGui::SliderFloat("Near", &cam.my_zNearOrtho, -10.0f, 10.0f);
-								ImGui::SliderFloat("Far", &cam.my_zFarOrtho, -10.0f, 10.0f);
-
-								if (ImGui::Button("auto"))
-								{
-									cam.my_up = 1;
-									cam.my_down = -1;
-									cam.my_left = -1;
-									cam.my_right = 1;
-									cam.my_zNearOrtho = 1;
-									cam.my_zFarOrtho = -1;
-								}
-								cam.Ortho(cam.my_left, cam.my_right, cam.my_down, cam.my_up, cam.my_zNearOrtho, cam.my_zFarOrtho);
-							}
-							else // Perspective
-							{
-
-								ImGui::SliderFloat("Fovy in degrees", &cam.my_fovy, 1.0f, 360.0f);
-								ImGui::SliderFloat("Near", &cam.my_zNearPerspective, -10.0f, 10.0f);
-								ImGui::SliderFloat("Far", &cam.my_zFarPerspective, -100.0f, 100.0f);
-
-								if (ImGui::Button("reset"))
-								{
-
-									cam.my_fovy = 45.0f;
-									cam.my_zNearPerspective = 1;
-									cam.my_zFarPerspective = 100;
-								}
-								ImGui::SliderFloat("Dolly Zoom", &cam.dolly, -0.04f, 0.04f);
-								ImGui::Checkbox("Do you want to Dolly?", &cam.my_isDolly);
-								if (cam.my_isDolly)
-								{
-									cam.my_fovy += cam.dolly * 2.5f;
-									cam.translationWorld.z += cam.dolly / 5;
-
-								}
-								ImGui::Text("Camera controls");//Look at
-								ImGui::SliderFloat("eye X", &cam.my_eye.x, -10.0f, 10.0f);
-								ImGui::SliderFloat("eye Y", &cam.my_eye.y, -10.0f, 10.0f);
-								ImGui::SliderFloat("eye Z", &cam.my_eye.z, -10.0f, 10.0f);
-
-								ImGui::SliderFloat("at X", &cam.my_at.x, -10.0f, 10.0f);
-								ImGui::SliderFloat("at Y", &cam.my_at.y, -10.0f, 10.0f);
-								ImGui::SliderFloat("at Z", &cam.my_at.z, -10.0f, 10.0f);
-								if (ImGui::Button("auto"))
-								{
-									cam.my_eye = { 0.0f,0.0f,3.0f };
-									cam.my_at = { 1.0,1.0,1.0 };
-								}
-								cam.Perspective(glm::radians(cam.my_fovy), aspect, cam.my_zNearPerspective, cam.my_zFarPerspective);
-
-							}
-							
-							ImGui::End();
+							cam.my_up = 1;
+							cam.my_down = -1;
+							cam.my_left = -1;
+							cam.my_right = 1;
+							cam.my_zNearOrtho = 1;
+							cam.my_zFarOrtho = -1;
 						}
-
-						//Camera transformations
-						if (addCamera)
-						{
-							ImGui::Begin("Add a Camera");
-							static glm::vec3 tempEye(0.0f,0.0f,3.0f);
-							static glm::vec3 tempAt(1.0f, 1.0f, 1.0f);
-							static float tempUp = 1.0f;
-							ImGui::SliderFloat3("Eye ?", &tempEye.x, -10.f, 10.f);
-							ImGui::SliderFloat3("At ?", &tempAt.x, -10.f, 10.f);
-							ImGui::SliderFloat("Up ?", &tempUp, -1.0f, 1.0f);
-							
-							if (ImGui::Button("Add !"))
-							{
-								shared_ptr<Camera>& addedCam = std::make_shared<Camera>();
-								addedCam->Ortho(0.0f, 400.0f, 0.0f, 400.0f, -1.0f, 1.0f);
-								addedCam->SetCameraLookAt(glm::vec3(tempEye.x, tempEye.y, tempEye.z), glm::vec3(tempAt.x, tempAt.x, tempAt.x), glm::vec3(0, tempUp, 0));
-								addedCam->Perspective(glm::radians(45.0f), float(windowWidth) / float(windowHeight), 1.0f, 100.0f);
-								addedCam->my_eye = tempEye;
-								addedCam->my_at = tempAt;
-								addedCam->my_upper = tempUp;
-								scene.AddCamera(addedCam);
-								//scene.SetActiveCameraIndex(scene.GetCameraCount()-1);
-								selectedItemCamera = scene.GetCameraCount() - 1;
-								tempEye = glm::vec3(0.0f, 0.0f, 3.0f);
-								tempAt = glm::vec3(1.0f, 1.0f, 1.0f);
-								tempUp = 1.0f;
-								addCamera = false;
-							}
-							ImGui::End();
-						}
-
-						if (camera_transformation)
-						{
-
-
-							ImGui::Begin("Change Camera Position");
-							//ImGui::Combo("Camera Picker", &selectedItemCamera, items, cameraCount);
-							//scene.SetActiveCameraIndex(selectedItemCamera);
-							//
-							//int index = scene.GetActiveCameraIndex();
-							glm::vec3 camtranslationObject(cam.GetTranslationObject());
-							glm::vec3 camrotationObject(cam.GetRotationObject());
-							glm::vec3 camscaleObject(cam.GetScaleObject());
-
-						glm::vec3 camtranslationWorld(cam.GetTranslationWorld());
-						glm::vec3 camrotationWorld(cam.GetRotationWorld());
-						glm::vec3 camscaleWorld(cam.GetScaleWorld());
-
-						ImGui::Text("Local Transformation");
-						ImGui::SliderFloat3("Translate-Local", &camtranslationObject.x, -10.0f, 10.0f);
-						ImGui::SliderFloat3("Rotate-Local", &camrotationObject.x, 0.0f, 360.0f);
-						ImGui::SliderFloat("Scale-Local", &camscaleObject.x, -5.0f, 5.0f);
-						camscaleObject.y = camscaleObject.x;
-						camscaleObject.z = camscaleObject.x;
-						cam.SetTranslationObject(camtranslationObject);
-						cam.SetRotationObject(camrotationObject);
-						cam.SetScaleObject(camscaleObject);
-						cam.SetObjectTransform();
-
-							ImGui::Text("World Transformation");
-
-							ImGui::SliderFloat3("Translate-World", &camtranslationWorld.x, -10.0f, 10.0f);
-							ImGui::SliderFloat3("Rotate-World", &camrotationWorld.x, 0.0f, 360.0f);
-							ImGui::SliderFloat("Scale-World", &camscaleWorld.x, 0.0f, 2.0f);
-							camscaleWorld.y = camscaleWorld.x;
-							camscaleWorld.z = camscaleWorld.x;
-							cam.SetTranslationWorld(camtranslationWorld);
-							cam.SetRotationWorld(camrotationWorld);
-							cam.SetScaleWorld(camscaleWorld);
-							cam.SetWorldTransform();
-							if (ImGui::Button("Center"))
-							{
-								cam.SetTranslationObject(glm::vec3(0.0f));
-								cam.SetRotationObject(glm::vec3(0.0f));
-								cam.SetTranslationWorld(glm::vec3(0.0f));
-								cam.SetRotationWorld(glm::vec3(0.0f));
-							}
-							ImGui::End();
-						}
-						cam.SetCameraLookAt(cam.my_eye, cam.my_at, glm::vec3(0, cam.my_upper, 0));
+						cam.Ortho(cam.my_left, cam.my_right, cam.my_down, cam.my_up, cam.my_zNearOrtho, cam.my_zFarOrtho);
 					}
+					else // Perspective
+					{
+
+						ImGui::SliderFloat("Fovy in degrees", &cam.my_fovy, 1.0f, 360.0f);
+						ImGui::SliderFloat("Near", &cam.my_zNearPerspective, -10.0f, 10.0f);
+						ImGui::SliderFloat("Far", &cam.my_zFarPerspective, -100.0f, 100.0f);
+
+						if (ImGui::Button("reset"))
+						{
+
+							cam.my_fovy = 45.0f;
+							cam.my_zNearPerspective = 1;
+							cam.my_zFarPerspective = 100;
+						}
+						ImGui::SliderFloat("Dolly Zoom", &cam.dolly, -0.04f, 0.04f);
+						ImGui::Checkbox("Do you want to Dolly?", &cam.my_isDolly);
+						if (cam.my_isDolly)
+						{
+							cam.my_fovy += cam.dolly * 2.5f;
+							cam.translationWorld.z += cam.dolly / 5;
+
+						}
+						ImGui::Text("Camera controls");//Look at
+						ImGui::SliderFloat("eye X", &cam.my_eye.x, -10.0f, 10.0f);
+						ImGui::SliderFloat("eye Y", &cam.my_eye.y, -10.0f, 10.0f);
+						ImGui::SliderFloat("eye Z", &cam.my_eye.z, -10.0f, 10.0f);
+
+						ImGui::SliderFloat("at X", &cam.my_at.x, -10.0f, 10.0f);
+						ImGui::SliderFloat("at Y", &cam.my_at.y, -10.0f, 10.0f);
+						ImGui::SliderFloat("at Z", &cam.my_at.z, -10.0f, 10.0f);
+						if (ImGui::Button("auto"))
+						{
+							cam.my_eye = { 0.0f,0.0f,3.0f };
+							cam.my_at = { 1.0,1.0,1.0 };
+						}
+						cam.Perspective(glm::radians(cam.my_fovy), aspect, cam.my_zNearPerspective, cam.my_zFarPerspective);
+
+					}
+							
+					ImGui::End();
 				}
+
+				//Camera transformations
+				if (addCamera)
+				{
+					ImGui::Begin("Add a Camera");
+					static glm::vec3 tempEye(0.0f,0.0f,3.0f);
+					static glm::vec3 tempAt(1.0f, 1.0f, 1.0f);
+					static float tempUp = 1.0f;
+					ImGui::SliderFloat3("Eye ?", &tempEye.x, -10.f, 10.f);
+					ImGui::SliderFloat3("At ?", &tempAt.x, -10.f, 10.f);
+					ImGui::SliderFloat("Up ?", &tempUp, -1.0f, 1.0f);
+							
+					if (ImGui::Button("Add !"))
+					{
+						shared_ptr<Camera>& addedCam = std::make_shared<Camera>();
+						addedCam->Ortho(0.0f, 400.0f, 0.0f, 400.0f, -1.0f, 1.0f);
+						addedCam->SetCameraLookAt(glm::vec3(tempEye.x, tempEye.y, tempEye.z), glm::vec3(tempAt.x, tempAt.x, tempAt.x), glm::vec3(0, tempUp, 0));
+						addedCam->Perspective(glm::radians(45.0f), float(windowWidth) / float(windowHeight), 1.0f, 100.0f);
+						addedCam->my_eye = tempEye;
+						addedCam->my_at = tempAt;
+						addedCam->my_upper = tempUp;
+						scene.AddCamera(addedCam);
+						//scene.SetActiveCameraIndex(scene.GetCameraCount()-1);
+						selectedItemCamera = scene.GetCameraCount() - 1;
+						tempEye = glm::vec3(0.0f, 0.0f, 3.0f);
+						tempAt = glm::vec3(1.0f, 1.0f, 1.0f);
+						tempUp = 1.0f;
+						addCamera = false;
+					}
+					ImGui::End();
+				}
+
+				if (camera_transformation)
+				{
+
+
+					ImGui::Begin("Change Camera Position");
+					//ImGui::Combo("Camera Picker", &selectedItemCamera, items, cameraCount);
+					//scene.SetActiveCameraIndex(selectedItemCamera);
+					//
+					//int index = scene.GetActiveCameraIndex();
+					glm::vec3 camtranslationObject(cam.GetTranslationObject());
+					glm::vec3 camrotationObject(cam.GetRotationObject());
+					glm::vec3 camscaleObject(cam.GetScaleObject());
+
+				glm::vec3 camtranslationWorld(cam.GetTranslationWorld());
+				glm::vec3 camrotationWorld(cam.GetRotationWorld());
+				glm::vec3 camscaleWorld(cam.GetScaleWorld());
+
+				ImGui::Text("Local Transformation");
+				ImGui::SliderFloat3("Translate-Local", &camtranslationObject.x, -10.0f, 10.0f);
+				ImGui::SliderFloat3("Rotate-Local", &camrotationObject.x, 0.0f, 360.0f);
+				ImGui::SliderFloat("Scale-Local", &camscaleObject.x, -5.0f, 5.0f);
+				camscaleObject.y = camscaleObject.x;
+				camscaleObject.z = camscaleObject.x;
+				cam.SetTranslationObject(camtranslationObject);
+				cam.SetRotationObject(camrotationObject);
+				cam.SetScaleObject(camscaleObject);
+				cam.SetObjectTransform();
+
+					ImGui::Text("World Transformation");
+
+					ImGui::SliderFloat3("Translate-World", &camtranslationWorld.x, -10.0f, 10.0f);
+					ImGui::SliderFloat3("Rotate-World", &camrotationWorld.x, 0.0f, 360.0f);
+					ImGui::SliderFloat("Scale-World", &camscaleWorld.x, 0.0f, 2.0f);
+					camscaleWorld.y = camscaleWorld.x;
+					camscaleWorld.z = camscaleWorld.x;
+					cam.SetTranslationWorld(camtranslationWorld);
+					cam.SetRotationWorld(camrotationWorld);
+					cam.SetScaleWorld(camscaleWorld);
+					cam.SetWorldTransform();
+					if (ImGui::Button("Center"))
+					{
+						cam.SetTranslationObject(glm::vec3(0.0f));
+						cam.SetRotationObject(glm::vec3(0.0f));
+						cam.SetTranslationWorld(glm::vec3(0.0f));
+						cam.SetRotationWorld(glm::vec3(0.0f));
+					}
+					ImGui::End();
+				}
+				cam.SetCameraLookAt(cam.my_eye, cam.my_at, glm::vec3(0, cam.my_upper, 0));
+
+
+
+	}
+			//light
+		
+			light& light_test = scene.GetActiveLight();
+			float ambient_strength = light_test.ambient_strength;
+			glm::vec3 ambient = light_test.ambient;
+			if (light_controllers)
+			{
+				ImGui::Begin("light modification");
+				ImGui::SliderFloat("ambient strength",&ambient_strength, 0.0f, 1.0f);
+				light_test.ambient_strength = ambient_strength;
+				ImGui::ColorEdit3("ambient color",(float*)&ambient);
+				light_test.ambient = ambient;
 			}
+		}
+	}
 		}

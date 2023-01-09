@@ -591,13 +591,11 @@ void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::v
 	my_v3 = temp[2];
 	if (my_v2.y == my_v3.y) // flat bottom triangle
 	{
-		colorBottomTriangle(my_v1, my_v2, my_v3, glm::vec3(0.5f,0.0f,0.0f));
-		DrawLine(my_v3, my_v2, glm::vec3(0.5f, 0.0f, 0.0f));
+		colorBottomTriangle(my_v1, my_v2, my_v3, color);
 	}
 	else if (my_v1.y == my_v2.y) // flat top triangle
 	{
-		colorTopTriangle(my_v1, my_v2, my_v3, glm::vec3(0.5f, 0.0f, 0.0f));
-		DrawLine(my_v1, my_v2, glm::vec3(0.5f, 0.0f, 0.0f));
+		colorTopTriangle(my_v1, my_v2, my_v3, color);
 	}
 	else // need to add another vertex as we break the triangle into 2 seprate triangles
 	{
@@ -613,9 +611,9 @@ void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::v
 		}
 		//use barycentric coordinates to find depth (z) of my_v4:
 		my_v4.z = calculateZ(my_v1, my_v2, my_v3, my_v4.x, my_v4.y);
-		colorBottomTriangle(my_v1, my_v2, my_v4, glm::vec3(0.5f, 0.0f, 0.0f));
-		colorTopTriangle(my_v2, my_v4, my_v3, glm::vec3(0.5f, 0.0f, 0.0f));
-		DrawLine(my_v2, my_v4, glm::vec3(0.5f, 0.0f, 0.0f));
+		colorBottomTriangle(my_v1, my_v2, my_v4, color);
+		colorTopTriangle(my_v2, my_v4, my_v3, color);
+		DrawLine(my_v2, my_v4, color);
 	}
 
 }
@@ -626,6 +624,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
 	Camera& cam = scene.GetActiveCamera();
+	light& light_test = scene.GetActiveLight();
 	glm::mat4 Transformation = myModel.GetTransform();
 	glm::mat4 modelTransform = myModel.GetObjectTransform();	
 	glm::mat4 worldTransform = myModel.GetWorldTransform();
@@ -633,11 +632,15 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 	glm::mat4 projection = cam.GetProjectionTransformation();   //projection
 
 	glm::mat4 translate_Local = glm::translate(glm::mat4(1.0f), myModel.GetTranslationObject());
-
+	glm::vec3 color = glm::vec3(0.5f, 0.8f, 0.3f);
 	const glm::vec3 colorAxisLocal = glm::vec3(0.5, 0.9, 0.2);
 	const glm::vec3 colorAxisWorld = glm::vec3(0.7, 0.2, 0.3);
 	const glm::vec3 colorBBoxLocal = glm::vec3(0.5, 0.3, 0);
 	const glm::vec3 colorBBoxWorld = glm::vec3(0.3, 0, 1);
+
+	//
+
+	//
 
 	float x_Min = viewport_width;
 	float y_Min = viewport_height;
@@ -672,15 +675,12 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		verticeModel2.x += half_width;
 		verticeModel2.y += half_height;
 
-		
-
 		x_Min_World = std::min(verticeModel0.x, x_Min_World);
 		y_Min_World = std::min(verticeModel0.y, y_Min_World);
 		z_Min_World = std::min(verticeModel0.z, z_Min_World);
 		x_Max_World = std::max(verticeModel0.x, x_Max_World);
 		y_Max_World = std::max(verticeModel0.y, y_Max_World);
 		z_Max_World = std::max(verticeModel0.z, z_Max_World);
-
 		
 		x_Min = std::min(v0.x, x_Min);
 		y_Min = std::min(v0.y, y_Min);
@@ -689,7 +689,15 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
 		
-		drawTriangles(verticeModel0, verticeModel1, verticeModel2, myModel.meshColors[i]);
+		//
+		float ambientStrength = light_test.ambient_strength;
+		glm::vec3 ambient_color = ambientStrength * light_test.ambient;
+		glm::vec3 result = ambient_color + color*(1-ambientStrength);
+
+		drawTriangles(verticeModel0, verticeModel1, verticeModel2, result);
+
+
+
 		//DrawLine(verticeModel0, verticeModel1, color);
 		//DrawLine(verticeModel0, verticeModel2, color);
 		//DrawLine(verticeModel2, verticeModel1, color);
