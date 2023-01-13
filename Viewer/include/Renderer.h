@@ -26,6 +26,7 @@ private:
 	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color, 
 		bool fillTriangle = false, glm::vec3& v1 = glm::vec3(0, 0, 0), glm::vec3& v2 = glm::vec3(0, 0, 0), glm::vec3& v3 = glm::vec3(0, 0, 0));
 	//void putFlower(int radius, int x, const glm::vec3& color, int stemLen);
+	void Renderer::DrawCircle(const glm::ivec2& center, const int& radius, const int& stepSize, const glm::vec3& color);
 	void drawModel(MeshModel& myModel, Scene& scene);
 	void drawBoundingBox(MeshModel& myModel, Scene& scene, const glm::vec3& color, bool isWorld, float x_Min, float y_Min, float z_Min, float x_Max, float y_Max, float z_Max);
 	void drawAxisLocal(MeshModel& myModel, Scene& scene, const glm::vec3& color, float x_Min, float y_Min, float z_Min, float x_Max, float y_Max, float z_Max);

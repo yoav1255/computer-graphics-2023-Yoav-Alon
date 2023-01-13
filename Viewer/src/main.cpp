@@ -68,9 +68,9 @@ int main(int argc, char **argv)
 
 	shared_ptr<light> light_test = std::make_shared<light>();
 	light_test->ambient = glm::vec3(0.3f, 0.2f, 0.4f);
-	light_test->position = glm::vec3(1, 1, 1);
-	light_test->diffuse = glm::vec3(1, 1, 1);
-	light_test->specular = glm::vec3(1, 1, 1);
+	light_test->position = glm::vec3(1.0f, 1.0f, 1.0f);
+	light_test->diffuse = glm::vec3(0.2f, 1.0f, 1.0f);
+	light_test->specular = glm::vec3(8.0f, 1.0f, 1.0f);
 	light_test->is_on = false;
 	scene.AddLight(light_test);
 	scene.SetActiveLightIndex(0);
@@ -678,17 +678,86 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 
 	}
 			//light
-		
+			MeshModel& model = scene.GetActiveModel();
 			light& light_test = scene.GetActiveLight();
+
+			//float pos_x = light_test.position.x;
+			//float pos_y = light_test.position.y;
+			//float pos_z = light_test.position.z;
+			
+
+			glm::vec3 position = light_test.position;
+			glm::vec3 translate = light_test.translation;
 			float ambient_strength = light_test.ambient_strength;
+			float specular_strength = light_test.specular_strength;
+
 			glm::vec3 ambient = light_test.ambient;
+			glm::vec3 diffuse = light_test.diffuse;
+			glm::vec3 specular = light_test.specular;
+
+			static bool emerald = true;
+			static bool gold = false;
+			static bool ruby = false;
+			//glm::vec3 mat_ambient = model.ambient;
+			//glm::vec3 mat_diffuse = model.diffuse;
+			//glm::vec3 mat_specular = model.specular;
+
 			if (light_controllers)
 			{
 				ImGui::Begin("light modification");
+
+				ImGui::SliderFloat("move light-x", &translate.x, -3.0f, 3.0f);
+				ImGui::SliderFloat("move light-y", &translate.y, -3.0f, 3.0f);
+				ImGui::SliderFloat("move light-z", &translate.z, -10.0f, 10.0f);
+				light_test.translation = translate;
+				light_test.set_transform(light_test.translation);
+
+
 				ImGui::SliderFloat("ambient strength",&ambient_strength, 0.0f, 1.0f);
 				light_test.ambient_strength = ambient_strength;
 				ImGui::ColorEdit3("ambient color",(float*)&ambient);
 				light_test.ambient = ambient;
+
+				ImGui::ColorEdit3("diffuse color", (float*)&diffuse);
+				light_test.diffuse = diffuse;
+
+				ImGui::SliderFloat("specular strength", &specular_strength, 0.0f, 1.0f);
+				light_test.specular_strength = specular_strength;
+				ImGui::ColorEdit3("specular color", (float*)&specular);
+				light_test.specular = specular;
+
+				if (ImGui::RadioButton("emerald", emerald)) { emerald = true;gold = false;ruby = false; }
+				if (ImGui::RadioButton("gold", gold)) { emerald = false;gold = true;ruby = false; }
+				if (ImGui::RadioButton("ruby", ruby)) { emerald = false;gold = false;ruby = true; }
+				if (emerald) 
+				{
+					model.ambient=glm::vec3(0.0215, 0.1745, 0.0215);
+					model.diffuse=glm::vec3(0.07568, 0.61424, 0.07568);
+					model.specular=glm::vec3(0.633, 0.727811, 0.633);
+				}
+				if (gold)
+				{
+					model.ambient = glm::vec3(0.24725, 0.1995, 0.0745);
+					model.diffuse = glm::vec3(0.75164, 0.60648, 0.22648);
+					model.specular = glm::vec3(0.628281, 0.555802, 0.366065);
+				}
+				if (ruby)
+				{
+					model.ambient = glm::vec3(0.1745, 0.01175, 0.01175);
+					model.diffuse = glm::vec3(0.61424, 0.04136, 0.04136);
+					model.specular = glm::vec3(0.727811, 0.626959, 0.626959);
+				}
+
+
+
+				//ImGui::ColorEdit3("material ambient", (float*)&mat_ambient);
+				//model.ambient = mat_ambient;
+
+				//ImGui::ColorEdit3("material diffuse", (float*)&mat_diffuse);
+				//model.diffuse = mat_diffuse;
+
+				//ImGui::ColorEdit3("material specular", (float*)&mat_specular);
+				//model.specular = mat_specular;
 			}
 		}
 	}

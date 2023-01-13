@@ -20,7 +20,10 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 	bounding_box_world(false),
 	drawVerticeNormals(false),
 	drawFaceNormals(false),
-	drawRectangle(false)
+	drawRectangle(false),
+	ambient(glm::vec3(0.0215, 0.1745, 0.0215)),
+	diffuse(glm::vec3(0.07568, 0.61424, 0.07568)),
+	specular(glm::vec3(0.633, 0.727811, 0.633))
 {
 	for (int i = 0; i < faces.size(); i++)
 	{
