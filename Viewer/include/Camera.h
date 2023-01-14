@@ -63,6 +63,7 @@ public:
 	void SetRotationWorld(const glm::vec3 rotationVec) { rotationWorld = rotationVec; }
 
 	bool lookAt;
+	glm::vec3 pos;
 
 private:
 	glm::mat4x4 view_transformation;

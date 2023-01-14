@@ -71,6 +71,9 @@ int main(int argc, char **argv)
 	light_test->position = glm::vec3(1.0f, 1.0f, 1.0f);
 	light_test->diffuse = glm::vec3(0.2f, 1.0f, 1.0f);
 	light_test->specular = glm::vec3(8.0f, 1.0f, 1.0f);
+	light_test->specular_strength = 0.5f;
+	light_test->ambient_strength = 0.1f;
+	light_test->diffuse_strength = 0.3f;
 	light_test->is_on = false;
 	scene.AddLight(light_test);
 	scene.SetActiveLightIndex(0);
@@ -689,6 +692,7 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			glm::vec3 position = light_test.position;
 			glm::vec3 translate = light_test.translation;
 			float ambient_strength = light_test.ambient_strength;
+			float diffuse_strength = light_test.diffuse_strength;
 			float specular_strength = light_test.specular_strength;
 
 			glm::vec3 ambient = light_test.ambient;
@@ -717,7 +721,8 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 				light_test.ambient_strength = ambient_strength;
 				ImGui::ColorEdit3("ambient color",(float*)&ambient);
 				light_test.ambient = ambient;
-
+				ImGui::SliderFloat("diffuse strength", &diffuse_strength, 0.0f, 1.0f);
+				light_test.diffuse_strength = diffuse_strength;
 				ImGui::ColorEdit3("diffuse color", (float*)&diffuse);
 				light_test.diffuse = diffuse;
 

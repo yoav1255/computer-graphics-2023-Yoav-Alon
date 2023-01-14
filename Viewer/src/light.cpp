@@ -6,7 +6,7 @@ ambient(amb),
 diffuse(dif),
 specular(spec)
 {
-	translation = glm::vec3(1.0f);
+	translation = glm::vec3(0.3f,0.1f,1.0f);
 	transform = glm::mat4(1.0f);
 }
 light::~light()

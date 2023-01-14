@@ -24,5 +24,6 @@ public:
 	glm::mat4 transform;
 	bool is_on;
 	float ambient_strength;
+	float diffuse_strength;
 	float specular_strength;
 };

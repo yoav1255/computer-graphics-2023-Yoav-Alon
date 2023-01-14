@@ -43,6 +43,7 @@ void Camera::SetCameraLookAt(const glm::vec3& eye, const glm::vec3& at, const gl
 {
 	SetTransformation(glm::mat4(1.0f));
 	view_transformation = glm::lookAt(eye,at,up);
+	pos = eye;
 }
 
 
