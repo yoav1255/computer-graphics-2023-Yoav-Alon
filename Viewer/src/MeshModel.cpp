@@ -58,7 +58,10 @@ const std::string& MeshModel::GetModelName() const
 {
 	return model_name;
 }
-
+std::vector<glm::vec3> MeshModel::GetVertexNormals() const
+{
+	return this->normals;
+}
 std::vector<glm::vec3> MeshModel::GetVertices() const
 {
 	return vertices;

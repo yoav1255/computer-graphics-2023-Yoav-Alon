@@ -488,17 +488,17 @@ void Renderer::drawVerticeNormals(MeshModel& myModel, Scene& scene, const glm::v
 		glm::vec3 v0_cross_projected = glm::project(glm::vec3(v0_cross), view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 v0_projected = glm::project(glm::vec3(v0), view * Transformation, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 
-		v0_projected.x += half_width;
-		v0_projected.y += half_height;
+		//v0_projected.x += half_width;
+		//v0_projected.y += half_height;
 
-		v0_cross_projected.x += half_width;
-		v0_cross_projected.y += half_height;
+		//v0_cross_projected.x += half_width;
+		//v0_cross_projected.y += half_height;
 
 		DrawLine(v0_cross_projected, v0_projected, color);
 
 	}
 }
-void Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color)
+glm::vec3 Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec3& color,bool draw)
 {
 	int half_width = viewport_width / 2;
 	int half_height = viewport_height / 2;
@@ -531,8 +531,90 @@ void Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm::vec
 
 		face_norm_projected.x += half_width;
 		face_norm_projected.y += half_height;
+		if (draw)
+			DrawLine(face_norm_projected, vCenter_projected, color);
+		return face_norm_projected;
+	}
+}
+void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+{
+	int e, dx, dy, reflect = 1;
+	glm::vec3 currI = aI;
+	dx = x2 - x1;
+	dy = y2 - y1;
+	if (x1 > x2) // if the slope is negative
+		reflect = -1;
+	e = -dy;
+	float starting_point = y1;
+	while (y1 <= y2) // Bresenham algorithm
+	{
+		if (e > 0)
+		{
+			x1 += 1 * reflect;
+			e -= 2 * dy;
+		}
+		if (testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1)))
+		{
+			float to_norm = 1;
+			to_norm = (1.0f / (y2 - starting_point));
+			currI = to_norm * (aI * glm::mat3(y2 - y1) + bI * glm::mat3(y1 - starting_point));
+			PutPixel(x1, y1, currI);
+		}
+		y1 += 1;
+		e += 2 * dx * reflect;
+	}
+}
+
+
+void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+{
+	float x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
+	glm::vec3 currI=aI;
+	if (p1.x < p2.x)  // init on base of is p1.x < p2.x
+	{
+		x1 = p1.x;
+		y1 = p1.y;
+		x2 = p2.x;
+		y2 = p2.y;
+	}
+	else
+	{
+		x1 = p2.x;
+		y1 = p2.y;
+		x2 = p1.x;
+		y2 = p1.y;
+	}
+	dx = x2 - x1; // init delta for x and y
+	dy = y2 - y1;
+	if (abs(dy) > abs(dx)) // deceiding if need to run the algo. with reversed axis for slopes that are bigger than abs(1)
+	{
+		if (y1 < y2) // same as we did for p1.x and p2.x above
+			DrawLineReversedAxis(x1, y1, x2, y2, aI, bI, v1, v2, v3);
+		else
+			DrawLineReversedAxis(x2, y2, x1, y1, aI, bI, v1, v2, v3);
+		return;
+	}
+	if (y1 > y2) // if the slope is negative
+		reflect = -1;
+	e = -dx;
+	int starting_point = x1;
+	while (x1 <= x2) // Bresenham algorithm
+	{
+		if (e > 0)
+		{
+			y1 += 1 * reflect;
+			e -= 2 * dx;
+		}
+		if (testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1)))
+		{
+			float to_norm = 1;
+			to_norm = (1.0f / (x2 - starting_point));
+			currI = to_norm * (aI * (x2 - x1) + bI * (x1 - starting_point));
+			PutPixel(x1, y1, currI);
+		}
 		
-		DrawLine(face_norm_projected, vCenter_projected, color);
+		x1 += 1;
+		e += 2 * dy * reflect;
 	}
 }
 void Renderer::colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& color)
@@ -570,6 +652,52 @@ void Renderer::colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm
 		iv2.x = currx2;
 		iv2.y = y_line;
 		DrawLine(iv1, iv2, color,true,v1,v2,v3);
+		currx1 -= invslope1;
+		currx2 -= invslope2;
+	}
+
+}
+void Renderer::colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& v1I, glm::vec3& v2I, glm::vec3& v3I)
+{
+	float invslope1 = (v2.x - v1.x) / (v2.y - v1.y);
+	float invslope2 = (v3.x - v1.x) / (v3.y - v1.y);
+	float currx1 = v1.x;
+	float currx2 = v1.x;
+	glm::vec3  aI, bI;
+	glm::ivec2 iv1, iv2;
+	for (int y_line = round(v1.y); y_line < v2.y; y_line++)
+	{
+		iv1.x = currx1;
+		iv1.y = y_line;
+		iv2.x = currx2;
+		iv2.y = y_line;
+		aI = (1.0f / (v1.y - v2.y)) * ((v1I * (y_line - v2.y) + v2I * (v1.y - y_line)));
+		bI = (1.0f / (v1.y - v3.y)) * ((v1I * (y_line - v3.y) + v3I * (v1.y - y_line)));
+		DrawLine(iv1, iv2, aI, bI, v1, v2, v3);
+		currx1 += invslope1;
+		currx2 += invslope2;
+
+	}
+
+}
+void Renderer::colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& v1I, glm::vec3& v2I, glm::vec3& v3I)
+{
+	float invslope1 = (v3.x - v1.x) / (v3.y - v1.y);
+	float invslope2 = (v3.x - v2.x) / (v3.y - v2.y);
+	float currx1 = v3.x;
+	float currx2 = v3.x;
+	glm::vec3  aI, bI;
+	glm::ivec2 iv1, iv2;
+	for (int y_line = round(v3.y); y_line > v1.y; y_line--)
+	{
+
+		iv1.x = currx1;
+		iv1.y = y_line;
+		iv2.x = currx2;
+		iv2.y = y_line;
+		aI = (1.0f / (v1.y - v3.y)) * ((v1I * (y_line - v3.y) + v3I * (v1.y - y_line)));
+		bI = (1.0f / (v2.y - v3.y)) * ((v2I * (y_line - v3.y) + v3I * (v2.y - y_line)));
+		DrawLine(iv1, iv2, aI, bI, v1, v2, v3);
 		currx1 -= invslope1;
 		currx2 -= invslope2;
 	}
@@ -624,11 +752,53 @@ void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::v
 		my_v4.z = calculateZ(my_v1, my_v2, my_v3, my_v4.x, my_v4.y);
 		colorBottomTriangle(my_v1, my_v2, my_v4, color);
 		colorTopTriangle(my_v2, my_v4, my_v3, color);
-		DrawLine(my_v2, my_v4, color);
+		//DrawLine(my_v2, my_v4, color);
 	}
 
 }
-	
+void Renderer::shadeTrianglesGouraud(std::vector<glm::vec3> intensities, std::vector<glm::vec3> vertices)
+// todo: calc value of color at vertex using vertex normal - then use drawtriangle
+{
+	std::vector<std::pair<glm::vec3, glm::vec3>> vertex_and_I(3);
+	for (int i = 0; i < 3; i++)
+	{
+		vertex_and_I[i] = std::make_pair(vertices[i], intensities[i]);
+	}
+	std::sort(vertex_and_I.begin(), vertex_and_I.end(), [](const std::pair<glm::vec3, glm::vec3>& a, const std::pair<glm::vec3, glm::vec3>& b) // sort vertices by y coordinate
+		{
+			return a.first.y < b.first.y;
+		});
+	if (vertex_and_I[1].first.y == vertex_and_I[2].first.y) // flat bottom triangle
+	{
+		colorBottomTriangle(vertex_and_I[0].first, vertex_and_I[1].first, vertex_and_I[2].first, vertex_and_I[0].second, vertex_and_I[1].second, vertex_and_I[2].second);
+	}
+	else if (vertex_and_I[0].first.y == vertex_and_I[1].first.y) // flat top triangle
+	{
+		colorTopTriangle(vertex_and_I[0].first, vertex_and_I[1].first, vertex_and_I[2].first, vertex_and_I[0].second, vertex_and_I[1].second, vertex_and_I[2].second);
+	}
+	else // need to add another vertex as we break the triangle into 2 seprate triangles
+	{
+		glm::vec3 my_v4, my_v1 = vertex_and_I[0].first, my_v2 = vertex_and_I[1].first, my_v3 = vertex_and_I[2].first;
+
+
+		my_v4.y = my_v2.y;
+		if (my_v1.x == my_v3.x)
+			my_v4.x = my_v1.x;
+		else
+		{
+			float m = (my_v1.y - my_v3.y) / (my_v1.x - my_v3.x);
+			my_v4.x = (my_v4.y - my_v1.y + m * my_v1.x) / m; // m can not be equal to 0 because of the sorting of the vertices
+		}
+		//use barycentric coordinates to find depth (z) of my_v4:
+		my_v4.z = calculateZ(my_v1, my_v2, my_v3, my_v4.x, my_v4.y);
+		glm::vec3 v4I = (1.0f / (my_v1.y - my_v3.y)) * ((vertex_and_I[0].second * (my_v4.y - my_v3.y) + vertex_and_I[2].second * (my_v1.y - my_v4.y)));
+		colorBottomTriangle(my_v1, my_v2, my_v4, vertex_and_I[0].second, vertex_and_I[1].second, v4I);
+		colorTopTriangle(my_v2, my_v4, my_v3, vertex_and_I[1].second, v4I, vertex_and_I[2].second);
+		//DrawLine(my_v2, my_v4, color);
+	}
+
+
+}
 
 void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 {
@@ -668,35 +838,64 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 
 	for (int i = 0;i < myModel.GetFacesCount();i++)
 	{
+		glm::vec3 v0I, v1I, v2I;
+		std::vector<glm::vec3> intensities(3);
+		
 		glm::vec3 v0 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(0) - 1];
 		glm::vec3 v1 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(1) - 1];
 		glm::vec3 v2 = myModel.GetVertices()[myModel.GetFace(i).GetVertexIndex(2) - 1];
 
+		glm::vec3 v0_normal = myModel.GetVertexNormals()[myModel.GetFace(i).GetVertexIndex(0) - 1];
+		glm::vec3 v1_normal = myModel.GetVertexNormals()[myModel.GetFace(i).GetVertexIndex(1) - 1];
+		glm::vec3 v2_normal = myModel.GetVertexNormals()[myModel.GetFace(i).GetVertexIndex(2) - 1];
+
+		glm::vec3 normal = glm::cross(v1-v0,v2-v0);
 		glm::mat4 view_transform = view * Transformation;
 
 		glm::vec3 verticeModel0 = glm::project(v0, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 verticeModel1 = glm::project(v1, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 verticeModel2 = glm::project(v2, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 
+		v0_normal = glm::project(v0_normal, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
+		v1_normal = glm::project(v1_normal, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
+		v2_normal = glm::project(v2_normal, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
+
+		v0_normal = glm::normalize(v0_normal);
+		v1_normal = glm::normalize(v1_normal);
+		v2_normal = glm::normalize(v2_normal);
+
+		std::vector<glm::vec3> vertexNormals(3), my_vertices(3);
+
+		vertexNormals[0] = v0_normal;
+		vertexNormals[1] = v1_normal;
+		vertexNormals[2] = v2_normal;
+		
+		my_vertices[0] = verticeModel0;
+		my_vertices[1] = verticeModel1;
+		my_vertices[2] = verticeModel2;
+
+
+
+		normal = glm::project(normal, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 v_center = (v0 + v1 + v2) / 3.0f;
-		glm::vec3 normal_test = glm::cross(v1 - v0, v2 - v0);
-		glm::vec3 norm_normal_test = glm::normalize(normal_test);
-		glm::vec3 norm_center = norm_normal_test + v_center;
+		glm::vec3 norm_projected = glm::cross(verticeModel1 - verticeModel0, verticeModel2 - verticeModel0);
+		norm_projected = glm::normalize(norm_projected);
+		/*glm::vec3 normal_test = glm::cross(v1 - v0, v2 - v0);
+	
+		
 
-		glm::vec3 norm_projected = glm::project(norm_center, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-		glm::vec3 v_center_projected = glm::project(v_center, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-
-		norm_projected.x += half_width;
+		
+		/*norm_projected.x += half_width;
 		norm_projected.y += half_height;
 		v_center_projected.x += half_width;
 		v_center_projected.y += half_height;
-
+		norm_projected = glm::normalize(norm_projected);
 		verticeModel0.x += half_width;
 		verticeModel0.y += half_height;
 		verticeModel1.x += half_width;
 		verticeModel1.y += half_height;
 		verticeModel2.x += half_width;
-		verticeModel2.y += half_height;
+		verticeModel2.y += half_height;*/
 
 		x_Min_World = std::min(verticeModel0.x, x_Min_World);
 		y_Min_World = std::min(verticeModel0.y, y_Min_World);
@@ -711,52 +910,42 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		x_Max = std::max(v0.x, x_Max);
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
-
 		glm::vec3 center = (verticeModel0 + verticeModel1 + verticeModel2) / 3.0f;
-		glm::vec3 normal = glm::cross(verticeModel1 - verticeModel0, verticeModel2 - verticeModel0);
-		normal = glm::normalize(normal);
 		
-		// Ambient 
-		float ambientStrength = light_test.ambient_strength;
-		glm::vec3 ambient_color = ambientStrength * light_test.ambient * myModel.ambient;
-		glm::vec3 result_ambient = ambient_color * color;
+		normal = glm::normalize(normal);
+		for (int j = 0; j < 3; j++)
+		{
+			// Ambient 
+			float ambientStrength = light_test.ambient_strength;
+			glm::vec3 ambient_color = ambientStrength * light_test.ambient * myModel.ambient;
+			glm::vec3 result_ambient = ambient_color * color;
 
-		//Diffuse
-		float diffuseStrength = light_test.diffuse_strength;
-		glm::vec3 light_position = light_test.position;
-		glm::mat4 light_transform = light_test.get_transform();
-		glm::vec3 light_projected = glm::project(light_position, view*light_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-		glm::vec3 light_direction = center-light_projected;
-		glm::vec3 norm_light_direction = glm::normalize(light_direction);
-		float diffuse = glm::dot(normal, light_direction);
-		diffuse = glm::max(diffuse, 0.0f);
-		glm::vec3 diffuse_color = diffuseStrength * diffuse * light_test.diffuse * myModel.diffuse;
-		//glm::vec3 result_diffuse = diffuse_color * color;
-		glm::vec3 result_defuse_and_ambient = diffuse_color + ambient_color;
-
-		//Specular
-		float specularStrength = light_test.specular_strength;
-		glm::vec3 view_direction = glm::normalize(center - cam.pos);
-		glm::vec3 reflect_direction = glm::reflect(-light_direction, normal);
-		glm::vec3 norm_reflect_direction = glm::normalize(reflect_direction);
-		float exponent = 32.0f;
-		float specular = glm::pow(glm::max(glm::dot(view_direction, norm_reflect_direction),0.0f),exponent);
-		glm::vec3 specular_color = specularStrength * specular * light_test.specular * myModel.specular;
-		glm::vec3 result_specular = specular_color * color;
-		glm::vec3 result = result_defuse_and_ambient + specular_color * color;
-		glm::vec3 scale_vec = glm::vec3(400.0f);
-			glm::mat4 scaled_mat = glm::scale(glm::mat4(1.0f), scale_vec);
-			glm::vec3 scaled_direction = scaled_mat * glm::vec4(norm_light_direction,1.0f);
-			glm::vec3 scaled_reflection = scaled_mat * glm::vec4(norm_reflect_direction, 1.0f);
-
-			DrawLine(center - scaled_direction, center, colorBBoxLocal);
-			DrawLine(center + scaled_reflection,center, colorBBoxWorld);
-
-		DrawCircle(light_projected, 100, 10, colorAxisLocal);
-		drawTriangles(verticeModel0, verticeModel1, verticeModel2, result);
-
-
-
+			//Diffuse
+			float diffuseStrength = light_test.diffuse_strength;
+			glm::vec3 light_position = light_test.position;
+			glm::mat4 light_transform = light_test.get_transform();
+			glm::vec3 light_projected = glm::project(light_position, view * light_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
+			glm::vec3 light_direction = light_projected -vertexNormals[j];
+			glm::vec3 norm_light_direction = glm::normalize(light_direction);
+			float diffuse = glm::dot(vertexNormals[j], norm_light_direction);
+			diffuse = glm::max(diffuse, 0.0f);
+			glm::vec3 diffuse_color = diffuseStrength * diffuse * light_test.diffuse * myModel.diffuse;
+			//glm::vec3 result_diffuse = diffuse_color * color;
+			glm::vec3 result_defuse_and_ambient = diffuse_color + ambient_color;
+			
+			//Specular
+			float specularStrength = light_test.specular_strength;
+			glm::vec3 view_direction = glm::normalize(cam.my_eye - center);
+			glm::vec3 reflect_direction = glm::reflect(-norm_light_direction, vertexNormals[j]);
+			glm::vec3 norm_reflect_direction = glm::normalize(reflect_direction);
+			float exponent = 32.0f;
+			float specular = glm::pow(glm::max(glm::dot(view_direction, norm_reflect_direction), 0.0f), exponent);
+			glm::vec3 specular_color = specularStrength * specular * light_test.specular * myModel.specular;
+			intensities[j] = result_defuse_and_ambient + specular_color;
+			DrawCircle(light_projected, 100, 10, colorAxisLocal);
+		}
+		
+		shadeTrianglesGouraud(intensities, my_vertices);
 		//DrawLine(verticeModel0, verticeModel1, color);
 		//DrawLine(verticeModel0, verticeModel2, color);
 		//DrawLine(verticeModel2, verticeModel1, color);
