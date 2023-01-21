@@ -52,7 +52,7 @@ public:
 	bool getAxisWorld() { return axisWorld; }
 	bool getbBoxLocal() { return bounding_box_local; }
 	bool getbBoxWorld() { return bounding_box_world; }
-
+	std::vector<glm::vec3> GetVertexNormals() const;
 
 	void SetTranslationWorld(const glm::vec3 translationVec) { translationWorld = translationVec; }
 	void SetScaleWorld(const glm::vec3 scaleVec) { scaleWorld = scaleVec; }
