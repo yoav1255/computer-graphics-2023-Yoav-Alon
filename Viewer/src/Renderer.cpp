@@ -624,7 +624,7 @@ void Renderer::drawTriangles(glm::vec3 &v1, glm::vec3 &v2, glm::vec3 &v3, glm::v
 		my_v4.z = calculateZ(my_v1, my_v2, my_v3, my_v4.x, my_v4.y);
 		colorBottomTriangle(my_v1, my_v2, my_v4, color);
 		colorTopTriangle(my_v2, my_v4, my_v3, color);
-		DrawLine(my_v2, my_v4, color);
+		//DrawLine(my_v2, my_v4, color);
 	}
 
 }
@@ -680,23 +680,21 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 
 		glm::vec3 v_center = (v0 + v1 + v2) / 3.0f;
 		glm::vec3 normal_test = glm::cross(v1 - v0, v2 - v0);
-		glm::vec3 norm_normal_test = glm::normalize(normal_test);
-		glm::vec3 norm_center = norm_normal_test + v_center;
 
-		glm::vec3 norm_projected = glm::project(norm_center, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
+		glm::vec3 norm_projected = glm::project(normal_test, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 v_center_projected = glm::project(v_center, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
+		
+		glm::vec3 norm_normal_test_projected = glm::normalize(norm_projected);
 
-		norm_projected.x += half_width;
-		norm_projected.y += half_height;
-		v_center_projected.x += half_width;
-		v_center_projected.y += half_height;
+		//v_center_projected.x += half_width;
+		//v_center_projected.y += half_height;
 
-		verticeModel0.x += half_width;
-		verticeModel0.y += half_height;
-		verticeModel1.x += half_width;
-		verticeModel1.y += half_height;
-		verticeModel2.x += half_width;
-		verticeModel2.y += half_height;
+		//verticeModel0.x += half_width;
+		//verticeModel0.y += half_height;
+		//verticeModel1.x += half_width;
+		//verticeModel1.y += half_height;
+		//verticeModel2.x += half_width;
+		//verticeModel2.y += half_height;
 
 		x_Min_World = std::min(verticeModel0.x, x_Min_World);
 		y_Min_World = std::min(verticeModel0.y, y_Min_World);
@@ -712,45 +710,44 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 		y_Max = std::max(v0.y, y_Max);
 		z_Max = std::max(v0.z, z_Max);
 
-		glm::vec3 center = (verticeModel0 + verticeModel1 + verticeModel2) / 3.0f;
-		glm::vec3 normal = glm::cross(verticeModel1 - verticeModel0, verticeModel2 - verticeModel0);
-		normal = glm::normalize(normal);
+		//glm::vec3 center = (verticeModel0 + verticeModel1 + verticeModel2) / 3.0f;
+		//glm::vec3 normal = glm::cross(verticeModel1 - verticeModel0, verticeModel2 - verticeModel0);
+		//normal = glm::normalize(normal);
 		
 		// Ambient 
 		float ambientStrength = light_test.ambient_strength;
 		glm::vec3 ambient_color = ambientStrength * light_test.ambient * myModel.ambient;
-		glm::vec3 result_ambient = ambient_color * color;
+		//glm::vec3 result_ambient = ambient_color * color;
 
 		//Diffuse
 		float diffuseStrength = light_test.diffuse_strength;
 		glm::vec3 light_position = light_test.position;
 		glm::mat4 light_transform = light_test.get_transform();
 		glm::vec3 light_projected = glm::project(light_position, view*light_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-		glm::vec3 light_direction = center-light_projected;
-		glm::vec3 norm_light_direction = glm::normalize(light_direction);
-		float diffuse = glm::dot(normal, light_direction);
+		glm::vec3 light_direction = v_center_projected-light_projected ;
+		glm::vec3 norm_light_direction = glm::normalize(-light_direction);
+		float diffuse = glm::dot(norm_normal_test_projected, norm_light_direction);
 		diffuse = glm::max(diffuse, 0.0f);
 		glm::vec3 diffuse_color = diffuseStrength * diffuse * light_test.diffuse * myModel.diffuse;
 		//glm::vec3 result_diffuse = diffuse_color * color;
 		glm::vec3 result_defuse_and_ambient = diffuse_color + ambient_color;
-
+		
 		//Specular
 		float specularStrength = light_test.specular_strength;
-		glm::vec3 view_direction = glm::normalize(center - cam.pos);
-		glm::vec3 reflect_direction = glm::reflect(-light_direction, normal);
+		glm::vec3 view_direction = glm::normalize(v_center_projected-glm::vec3(0.0f,0.0f,1.0f));
+		glm::vec3 reflect_direction = glm::reflect(-light_direction, norm_normal_test_projected);
 		glm::vec3 norm_reflect_direction = glm::normalize(reflect_direction);
-		float exponent = 32.0f;
+		float exponent = 8.0f;
 		float specular = glm::pow(glm::max(glm::dot(view_direction, norm_reflect_direction),0.0f),exponent);
 		glm::vec3 specular_color = specularStrength * specular * light_test.specular * myModel.specular;
-		glm::vec3 result_specular = specular_color * color;
-		glm::vec3 result = result_defuse_and_ambient + specular_color * color;
-		glm::vec3 scale_vec = glm::vec3(400.0f);
+		glm::vec3 result = result_defuse_and_ambient + specular_color;
+		glm::vec3 scale_vec = glm::vec3(200.0f);
 			glm::mat4 scaled_mat = glm::scale(glm::mat4(1.0f), scale_vec);
 			glm::vec3 scaled_direction = scaled_mat * glm::vec4(norm_light_direction,1.0f);
 			glm::vec3 scaled_reflection = scaled_mat * glm::vec4(norm_reflect_direction, 1.0f);
 
-			DrawLine(center - scaled_direction, center, colorBBoxLocal);
-			DrawLine(center + scaled_reflection,center, colorBBoxWorld);
+			//DrawLine(v_center_projected - scaled_direction, v_center_projected, colorBBoxLocal);
+			//DrawLine(v_center_projected + scaled_reflection, v_center_projected, colorBBoxWorld);
 
 		DrawCircle(light_projected, 100, 10, colorAxisLocal);
 		drawTriangles(verticeModel0, verticeModel1, verticeModel2, result);
