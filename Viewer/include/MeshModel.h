@@ -62,6 +62,8 @@ public:
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;
+	std::vector<glm::vec3> vertexNormals;
+
 	glm::mat4 objectTransform;
 	glm::mat4 worldTransform;
 	glm::vec3 vCenter;

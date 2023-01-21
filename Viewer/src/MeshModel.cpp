@@ -27,17 +27,34 @@ MeshModel::MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, s
 {
 	for (int i = 0; i < faces.size(); i++)
 	{
-		for (int i = 0; i < faces.size(); i++)
-		{
-			float rand1 = glm::linearRand(0.0f, 1.0f);
-			float rand2 = glm::linearRand(0.0f, 1.0f);
-			float rand3 = glm::linearRand(0.0f, 1.0f);
+		float rand1 = glm::linearRand(0.0f, 1.0f);
+		float rand2 = glm::linearRand(0.0f, 1.0f);
+		float rand3 = glm::linearRand(0.0f, 1.0f);
 
-			glm::vec3 color = glm::vec3(rand1, rand2, rand3);
-			meshColors.push_back(color);
-		}
+		glm::vec3 color = glm::vec3(rand1, rand2, rand3);
+		meshColors.push_back(color);
 	}
+	glm::vec3 normal, v;
+	int counter = 0, i = 0;
+	for (i = 0, v = this->vertices[i], counter = 0;i < this->vertices.size();i++)
+	{
+		normal = glm::vec3(0.0f, 0.0f, 0.0f);
+		for (int j = 0; j < this->GetFacesCount(); j++)
+		{
+			for (int t = 0; t < 3; t++)
+				if (i + 1 == this->GetFace(j).GetVertexIndex(t))
+				{
+					glm::vec3 v1 = vertices[this->GetFace(j).GetVertexIndex(0)], v2 = vertices[this->GetFace(j).GetVertexIndex(1)],
+						v3 = vertices[this->GetFace(j).GetVertexIndex(2)];
+					normal += glm::normalize(glm::cross(v2 - v1, v3 - v1));						counter++;
 
+				}
+		}
+		normal = glm::normalize(normal / float(counter));
+		vertexNormals.push_back(normal);
+
+
+	}
 }
 
 MeshModel::~MeshModel()

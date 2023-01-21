@@ -25,8 +25,8 @@ private:
 		, bool fillTriangle=false ,glm::vec3 &v1=glm::vec3(0,0,0), glm::vec3& v2= glm::vec3(0, 0, 0), glm::vec3& v3= glm::vec3(0, 0, 0));
 	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color, 
 		bool fillTriangle = false, glm::vec3& v1 = glm::vec3(0, 0, 0), glm::vec3& v2 = glm::vec3(0, 0, 0), glm::vec3& v3 = glm::vec3(0, 0, 0));
-	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
-	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
+	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3 colorv1, glm::vec3 colorv2, glm::vec3 colorv3);
+	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3 colorv1, glm::vec3 colorv2, glm::vec3 colorv3);
 	//void putFlower(int radius, int x, const glm::vec3& color, int stemLen);
 	void Renderer::DrawCircle(const glm::ivec2& center, const int& radius, const int& stepSize, const glm::vec3& color);
 	void drawModel(MeshModel& myModel, Scene& scene);

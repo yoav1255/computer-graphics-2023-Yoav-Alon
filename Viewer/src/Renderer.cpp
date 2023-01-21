@@ -536,7 +536,7 @@ glm::vec3 Renderer::drawFacesNormals(MeshModel& myModel, Scene& scene, const glm
 		return face_norm_projected;
 	}
 }
-void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3 colorv1, glm::vec3 colorv2, glm::vec3 colorv3)
 {
 	int e, dx, dy, reflect = 1;
 	glm::vec3 currI = aI;
@@ -555,10 +555,17 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 		}
 		if (testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1)))
 		{
-			float to_norm = 1;
+			float det = (v2.y - v3.y) * (v1.x - v3.x) + (v3.x - v2.x) * (v1.y - v3.y);
+
+			float l1 = ((v2.y - v3.y) * (x1 - v3.x) + (v3.x - v2.x) * (y1 - v3.y)) / det;
+			float l2 = ((v3.y - v1.y) * (x1 - v3.x) + (v1.x - v3.x) * (y1 - v3.y)) / det;
+			float l3 = 1.0f - l1 - l2;
+			glm::vec3 color = colorv1 * l1 + colorv2 * l2 + colorv3 * l3;
+			//
+			float to_norm = 1.0f;
 			to_norm = (1.0f / (y2 - starting_point));
-			currI = to_norm * (aI * glm::mat3(y2 - y1) + bI * glm::mat3(y1 - starting_point));
-			PutPixel(x1, y1, currI);
+			currI = to_norm * (aI * float(y2 - y1) + bI * float(y1 - starting_point));
+			PutPixel(x1, y1, color);
 		}
 		y1 += 1;
 		e += 2 * dx * reflect;
@@ -566,7 +573,7 @@ void Renderer::DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::v
 }
 
 
-void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3)
+void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3,glm::vec3 colorv1, glm::vec3 colorv2, glm::vec3 colorv3)
 {
 	float x1 = 0, x2 = 0, y1 = 0, y2 = 0, e = 0, dx = 0, dy = 0, reflect = 1; // we init some flags
 	glm::vec3 currI=aI;
@@ -589,9 +596,9 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 	if (abs(dy) > abs(dx)) // deceiding if need to run the algo. with reversed axis for slopes that are bigger than abs(1)
 	{
 		if (y1 < y2) // same as we did for p1.x and p2.x above
-			DrawLineReversedAxis(x1, y1, x2, y2, aI, bI, v1, v2, v3);
+			DrawLineReversedAxis(x1, y1, x2, y2, aI, bI, v1, v2, v3,colorv1,colorv2,colorv3);
 		else
-			DrawLineReversedAxis(x2, y2, x1, y1, aI, bI, v1, v2, v3);
+			DrawLineReversedAxis(x2, y2, x1, y1, aI, bI, v1, v2, v3, colorv1, colorv2, colorv3);
 		return;
 	}
 	if (y1 > y2) // if the slope is negative
@@ -607,10 +614,13 @@ void Renderer::DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::v
 		}
 		if (testAndSetZBuffer(int(x1), int(y1), calculateZ(v1, v2, v3, x1, y1)))
 		{
-			float to_norm = 1;
-			to_norm = (1.0f / (x2 - starting_point));
-			currI = to_norm * (aI * (x2 - x1) + bI * (x1 - starting_point));
-			PutPixel(x1, y1, currI);
+			float det = (v2.y - v3.y) * (v1.x - v3.x) + (v3.x - v2.x) * (v1.y - v3.y);
+			float l1 = ((v2.y - v3.y) * (x1 - v3.x) + (v3.x - v2.x) * (y1 - v3.y)) / det;
+			float l2 = ((v3.y - v1.y) * (x1 - v3.x) + (v1.x - v3.x) * (y1 - v3.y)) / det;
+			float l3 = 1.0f - l1 - l2;
+			glm::vec3 color = colorv1 * l1 + colorv2 * l2 + colorv3 * l3;
+
+			PutPixel(x1, y1, color);
 		}
 		
 		x1 += 1;
@@ -665,15 +675,25 @@ void Renderer::colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, 
 	float currx2 = v1.x;
 	glm::vec3  aI, bI;
 	glm::ivec2 iv1, iv2;
-	for (int y_line = round(v1.y); y_line < v2.y; y_line++)
+	for (int y_line = round(v1.y); y_line < v3.y; y_line++)
 	{
 		iv1.x = currx1;
 		iv1.y = y_line;
 		iv2.x = currx2;
 		iv2.y = y_line;
+		//float d1 = glm::distance(v1, glm::vec3((currx1 + currx2) / 2.0f, y_line, 0));
+		//float d2 = glm::distance(v2, glm::vec3((currx1 + currx2) / 2.0f, y_line, 0));
+		//float d3 = glm::distance(v3, glm::vec3((currx1 + currx2) / 2.0f, y_line, 0));
+		//float d12 = glm::distance(v1, v2);
+		//float d13 = glm::distance(v1, v3);
+
+
 		aI = (1.0f / (v1.y - v2.y)) * ((v1I * (y_line - v2.y) + v2I * (v1.y - y_line)));
 		bI = (1.0f / (v1.y - v3.y)) * ((v1I * (y_line - v3.y) + v3I * (v1.y - y_line)));
-		DrawLine(iv1, iv2, aI, bI, v1, v2, v3);
+
+		//aI = (1.0f / d12) * ((v1I * d2 + v2I * d1));
+		//bI = (1.0f / d13) * ((v1I * d3 + v3I * d1));
+		DrawLine(iv1, iv2, aI, bI, v1, v2, v3,v1I,v2I,v3I);
 		currx1 += invslope1;
 		currx2 += invslope2;
 
@@ -695,9 +715,19 @@ void Renderer::colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm
 		iv1.y = y_line;
 		iv2.x = currx2;
 		iv2.y = y_line;
+		//float d1 = glm::distance(v1, glm::vec3((currx1 + currx2) / 2.0f, y_line, 0));
+		//float d2 = glm::distance(v2, glm::vec3((currx1 + currx2) / 2.0f, y_line, 0));
+		//float d3 = glm::distance(v3, glm::vec3((currx1 + currx2) / 2.0f, y_line, 0));
+		//float d13 = glm::distance(v1, v3);
+		//float d23 = glm::distance(v2, v3);
+
+
 		aI = (1.0f / (v1.y - v3.y)) * ((v1I * (y_line - v3.y) + v3I * (v1.y - y_line)));
 		bI = (1.0f / (v2.y - v3.y)) * ((v2I * (y_line - v3.y) + v3I * (v2.y - y_line)));
-		DrawLine(iv1, iv2, aI, bI, v1, v2, v3);
+
+		//aI = (1.0f / d13) * (v1I * d3 + v3I * d1);
+		//bI = (1.0f / d23) * (v2I * d3 + v3I * d2);
+		DrawLine(iv1, iv2, aI, bI, v1, v2, v3, v1I, v2I, v3I);
 		currx1 -= invslope1;
 		currx2 -= invslope2;
 	}
@@ -797,7 +827,6 @@ void Renderer::shadeTrianglesGouraud(std::vector<glm::vec3> intensities, std::ve
 		//DrawLine(my_v2, my_v4, color);
 	}
 
-
 }
 
 void Renderer::drawModel( MeshModel& myModel,Scene &scene)
@@ -851,7 +880,7 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 
 		glm::vec3 normal = glm::cross(v1-v0,v2-v0);
 		glm::mat4 view_transform = view * Transformation;
-
+		
 		glm::vec3 verticeModel0 = glm::project(v0, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 verticeModel1 = glm::project(v1, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
 		glm::vec3 verticeModel2 = glm::project(v2, view_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
@@ -918,27 +947,25 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 			// Ambient 
 			float ambientStrength = light_test.ambient_strength;
 			glm::vec3 ambient_color = ambientStrength * light_test.ambient * myModel.ambient;
-			glm::vec3 result_ambient = ambient_color * color;
 
 			//Diffuse
 			float diffuseStrength = light_test.diffuse_strength;
 			glm::vec3 light_position = light_test.position;
 			glm::mat4 light_transform = light_test.get_transform();
 			glm::vec3 light_projected = glm::project(light_position, view * light_transform, projection, glm::vec4(0, 0, viewport_width, viewport_height));
-			glm::vec3 light_direction = light_projected -vertexNormals[j];
+			glm::vec3 light_direction = light_projected - my_vertices[j];
 			glm::vec3 norm_light_direction = glm::normalize(light_direction);
 			float diffuse = glm::dot(vertexNormals[j], norm_light_direction);
 			diffuse = glm::max(diffuse, 0.0f);
 			glm::vec3 diffuse_color = diffuseStrength * diffuse * light_test.diffuse * myModel.diffuse;
-			//glm::vec3 result_diffuse = diffuse_color * color;
 			glm::vec3 result_defuse_and_ambient = diffuse_color + ambient_color;
 			
 			//Specular
 			float specularStrength = light_test.specular_strength;
-			glm::vec3 view_direction = glm::normalize(cam.my_eye - center);
+			glm::vec3 view_direction = glm::normalize((my_vertices[j]-cam.my_eye));
 			glm::vec3 reflect_direction = glm::reflect(-norm_light_direction, vertexNormals[j]);
 			glm::vec3 norm_reflect_direction = glm::normalize(reflect_direction);
-			float exponent = 32.0f;
+			float exponent = 64.0f;
 			float specular = glm::pow(glm::max(glm::dot(view_direction, norm_reflect_direction), 0.0f), exponent);
 			glm::vec3 specular_color = specularStrength * specular * light_test.specular * myModel.specular;
 			intensities[j] = result_defuse_and_ambient + specular_color;
