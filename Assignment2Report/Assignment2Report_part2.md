@@ -22,6 +22,12 @@ We can see that the Gouraud shading smoothens the lighting and the coloring of t
 
 ![Screenshot (32)](https://user-images.githubusercontent.com/108798956/213910147-4560df4e-3b1c-4f59-bf00-cfe7014968dd.png)
 
+![3a](https://user-images.githubusercontent.com/101698622/213911138-73b399bb-2b32-46a5-80ff-4074df962aaf.png)
+
+### 4. lights and reflections:
+
+![4](https://user-images.githubusercontent.com/101698622/213911160-22a11ede-dcc5-4b40-8abc-c81bdfbaf18d.png)
+
 ### 5. Phong shading:
 ![Screenshot (34)](https://user-images.githubusercontent.com/108798956/213910963-730723e4-3f15-4d95-a169-fdd00822f34d.png)
 
