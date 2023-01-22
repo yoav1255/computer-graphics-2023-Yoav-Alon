@@ -22,3 +22,4 @@ We can see that the Gouraud shading smoothens the lighting and the coloring of t
 
 ![Screenshot (32)](https://user-images.githubusercontent.com/108798956/213910147-4560df4e-3b1c-4f59-bf00-cfe7014968dd.png)
 
+![3a](https://user-images.githubusercontent.com/101698622/213910982-6f6dddb2-fae1-4728-b2c8-821438ef5ea8.png)
