@@ -74,7 +74,6 @@ int main(int argc, char **argv)
 	light_test->specular_strength = 0.5f;
 	light_test->ambient_strength = 0.1f;
 	light_test->diffuse_strength = 0.3f;
-	light_test->is_on = false;
 	scene.AddLight(light_test);
 	scene.SetActiveLightIndex(0);
 
@@ -702,9 +701,11 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 			static bool emerald = true;
 			static bool gold = false;
 			static bool ruby = false;
-			//glm::vec3 mat_ambient = model.ambient;
-			//glm::vec3 mat_diffuse = model.diffuse;
-			//glm::vec3 mat_specular = model.specular;
+
+			 bool flat = light_test.flat_shading;
+			 bool gouraud = light_test.gouraud_shading;
+			 bool phong = light_test.phong_shading;
+
 
 			if (light_controllers)
 			{
@@ -753,16 +754,15 @@ void DrawImguiMenus(ImGuiIO& io, Scene& scene)
 					model.specular = glm::vec3(0.727811, 0.626959, 0.626959);
 				}
 
+				if (ImGui::RadioButton("Flat shading", flat)) { flat = true;gouraud = false;phong = false; }
+				if (ImGui::RadioButton("Gouraud shading", gouraud)) { flat = false;gouraud = true;phong = false; }
+				if (ImGui::RadioButton("Phong shading", phong)) { flat = false;gouraud = false;phong = true; }
+
+				if (flat) { light_test.flat_shading = true;light_test.gouraud_shading = false;light_test.phong_shading = false; }
+				if (gouraud) { light_test.flat_shading = false;light_test.gouraud_shading = true;light_test.phong_shading = false; }
+				if (phong) { light_test.flat_shading = false;light_test.gouraud_shading = false;light_test.phong_shading = true; }
 
 
-				//ImGui::ColorEdit3("material ambient", (float*)&mat_ambient);
-				//model.ambient = mat_ambient;
-
-				//ImGui::ColorEdit3("material diffuse", (float*)&mat_diffuse);
-				//model.diffuse = mat_diffuse;
-
-				//ImGui::ColorEdit3("material specular", (float*)&mat_specular);
-				//model.specular = mat_specular;
 			}
 		}
 	}

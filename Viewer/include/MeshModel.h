@@ -58,11 +58,11 @@ public:
 	void SetScaleWorld(const glm::vec3 scaleVec) { scaleWorld = scaleVec; }
 	void SetRotationWorld(const glm::vec3 rotationVec) { rotationWorld = rotationVec; }
 
-	
+	void initNormals();
 	std::vector<Face> faces;
 	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec3> normals;
 	std::vector<glm::vec3> vertexNormals;
+	std::vector<glm::vec3> normals;
 
 	glm::mat4 objectTransform;
 	glm::mat4 worldTransform;

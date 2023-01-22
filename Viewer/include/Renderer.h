@@ -25,8 +25,8 @@ private:
 		, bool fillTriangle=false ,glm::vec3 &v1=glm::vec3(0,0,0), glm::vec3& v2= glm::vec3(0, 0, 0), glm::vec3& v3= glm::vec3(0, 0, 0));
 	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& color, 
 		bool fillTriangle = false, glm::vec3& v1 = glm::vec3(0, 0, 0), glm::vec3& v2 = glm::vec3(0, 0, 0), glm::vec3& v3 = glm::vec3(0, 0, 0));
-	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3 colorv1, glm::vec3 colorv2, glm::vec3 colorv3);
-	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& aI, const glm::vec3& bI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3 colorv1, glm::vec3 colorv2, glm::vec3 colorv3);
+	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& aI, const glm::vec3& bI, const glm::vec3& cI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
+	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& aI, const glm::vec3& bI, const glm::vec3& cI, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3);
 	//void putFlower(int radius, int x, const glm::vec3& color, int stemLen);
 	void Renderer::DrawCircle(const glm::ivec2& center, const int& radius, const int& stepSize, const glm::vec3& color);
 	void drawModel(MeshModel& myModel, Scene& scene);
@@ -43,6 +43,17 @@ private:
 	void shadeTrianglesGouraud(std::vector<glm::vec3> intensities, std::vector<glm::vec3> vertices);
 	void colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& v1I, glm::vec3& v2I, glm::vec3& v3I);
 	void colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& v1I, glm::vec3& v2I, glm::vec3& v3I);
+	void Renderer::shadeTrianglesPhong(std::vector<glm::vec3> vertexNormals, std::vector<glm::vec3> vertices, Camera cam, glm::vec3 diffuse_color, glm::vec3 ambient_color,
+		glm::vec3 light_projected, glm::vec3 specular_color);
+	void colorTopTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& v1N, glm::vec3& v2N, glm::vec3& v3N,
+		Camera cam, glm::vec3 diffuse_color, glm::vec3 ambient_color, glm::vec3 light_projected, glm::vec3 specular_color);
+	void colorBottomTriangle(glm::vec3& v1, glm::vec3& v2, glm::vec3& v3, glm::vec3& v1N, glm::vec3& v2N, glm::vec3& v3N,
+		Camera cam, glm::vec3 diffuse_color, glm::vec3 ambient_color, glm::vec3 light_projected, glm::vec3 specular_color);
+	void DrawLine(const glm::ivec2& p1, const glm::ivec2& p2, const glm::vec3& aN, const glm::vec3& bN, const glm::vec3& cN, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3,
+		Camera cam, glm::vec3 diffuse_color, glm::vec3 ambient_color, glm::vec3 light_projected, glm::vec3 specular_color);
+	void DrawLineReversedAxis(int x1, int y1, int x2, int y2, const glm::vec3& aN, const glm::vec3& bN, const glm::vec3& cN, glm::vec3& v1, glm::vec3& v2, glm::vec3& v3,
+		Camera cam, glm::vec3 diffuse_color, glm::vec3 ambient_color, glm::vec3 light_projected, glm::vec3 specular_color);
+
 
 
 

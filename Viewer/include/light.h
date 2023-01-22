@@ -22,7 +22,9 @@ public:
 	glm::vec3 specular;
 	glm::vec3 translation;
 	glm::mat4 transform;
-	bool is_on;
+	bool flat_shading;
+	bool phong_shading;
+	bool gouraud_shading;
 	float ambient_strength;
 	float diffuse_strength;
 	float specular_strength;

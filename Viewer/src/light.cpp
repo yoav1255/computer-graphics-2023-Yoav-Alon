@@ -8,6 +8,9 @@ specular(spec)
 {
 	translation = glm::vec3(0.3f,0.1f,1.0f);
 	transform = glm::mat4(1.0f);
+	flat_shading = false;
+	gouraud_shading = false;
+	phong_shading = true;
 }
 light::~light()
 {
