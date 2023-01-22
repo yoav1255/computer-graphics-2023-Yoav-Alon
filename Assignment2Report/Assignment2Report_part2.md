@@ -1,9 +1,10 @@
 ### 1. Ambient component:
+we picked white ambient lighting.
+the bunny's object is made of emerald, while the chain is made of ruby.
+therefore the lighting will color the objects with their material's color.
 
 
-![1c](https://user-images.githubusercontent.com/101698622/213910401-84fb1bc6-6798-4bc7-9b33-2cfae9cb7bb5.png)
-
-![1d](https://user-images.githubusercontent.com/101698622/213910408-a62bdc63-190d-447b-b30e-f6c866149f2b.png)
+![1aaa](https://user-images.githubusercontent.com/101698622/213910810-8d6dcbcf-1aaa-4509-be89-20cf6e007178.png)
 
 
 ### 2. Diffuse component with flat shading:
