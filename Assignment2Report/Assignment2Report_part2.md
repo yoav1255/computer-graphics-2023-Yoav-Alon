@@ -1,3 +1,11 @@
+### 1. Ambient component:
+
+
+![1c](https://user-images.githubusercontent.com/101698622/213910401-84fb1bc6-6798-4bc7-9b33-2cfae9cb7bb5.png)
+
+![1d](https://user-images.githubusercontent.com/101698622/213910408-a62bdc63-190d-447b-b30e-f6c866149f2b.png)
+
+
 ### 2. Diffuse component with flat shading:
 
 ![Screenshot (38)](https://user-images.githubusercontent.com/108798956/213910130-ecd78a1b-1250-417f-b1fd-3697c08c4d8d.png)
