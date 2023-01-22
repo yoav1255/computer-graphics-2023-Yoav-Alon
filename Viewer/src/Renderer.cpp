@@ -1159,7 +1159,14 @@ void Renderer::drawModel( MeshModel& myModel,Scene &scene)
 			glm::vec3 norm_reflect_direction = glm::normalize(reflect_direction);
 			float specular = glm::pow(glm::max(glm::dot(view_direction, norm_reflect_direction), 0.0f), exponent);
 			glm::vec3 specular_color = specular * specular_color_to_phong;
-			result = result_defuse_and_ambient + specular_color;
+			//result = result_defuse_and_ambient + specular_color;
+			result = ambient_color;
+
+			//if (diffuse > 0.0f)
+			//{
+			//	DrawLine(center + norm_light_direction * 200.0f, center, colorBBoxLocal);
+			//	DrawLine(center - norm_reflect_direction * 200.0f, center, colorBBoxWorld);
+			//}
 		}
 		else if (light_test.gouraud_shading)
 		{
