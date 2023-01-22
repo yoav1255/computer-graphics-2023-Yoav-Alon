@@ -22,4 +22,13 @@ We can see that the Gouraud shading smoothens the lighting and the coloring of t
 
 ![Screenshot (32)](https://user-images.githubusercontent.com/108798956/213910147-4560df4e-3b1c-4f59-bf00-cfe7014968dd.png)
 
-![3a](https://user-images.githubusercontent.com/101698622/213910982-6f6dddb2-fae1-4728-b2c8-821438ef5ea8.png)
+### 5. Phong shading:
+![Screenshot (34)](https://user-images.githubusercontent.com/108798956/213910963-730723e4-3f15-4d95-a169-fdd00822f34d.png)
+
+### 6. Different models, lights and shadings:
+![Screenshot (39)](https://user-images.githubusercontent.com/108798956/213910981-23fed407-abb8-4848-a6e8-44970027bb51.png)
+![Screenshot (35)](https://user-images.githubusercontent.com/108798956/213910984-3bc7ca07-b3a8-441e-b93d-4165592cd97b.png)
+![Screenshot (41)](https://user-images.githubusercontent.com/108798956/213910987-fc93ff6b-758c-4810-afd9-f0f1ddf78b52.png)
+![Screenshot (36)](https://user-images.githubusercontent.com/108798956/213910989-e2f9e8d8-0862-4829-b9de-14be1dcf132c.png)
+![Screenshot (37)](https://user-images.githubusercontent.com/108798956/213910992-b1048a6c-d89c-4826-9512-6413e78fcb6f.png)
+![Screenshot (40)](https://user-images.githubusercontent.com/108798956/213910996-6727125a-a9a6-46e6-aedf-25edd1a1cba9.png)
