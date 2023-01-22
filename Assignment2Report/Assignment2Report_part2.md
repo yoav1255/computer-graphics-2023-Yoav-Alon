@@ -1,4 +1,4 @@
-### 2. Diffuce component with flat shading:
+### 2. Diffuse component with flat shading:
 
 ![Screenshot (38)](https://user-images.githubusercontent.com/108798956/213910130-ecd78a1b-1250-417f-b1fd-3697c08c4d8d.png)
 
