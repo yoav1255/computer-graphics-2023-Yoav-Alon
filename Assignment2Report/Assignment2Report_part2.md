@@ -7,6 +7,9 @@ therefore the lighting will color the objects with their material's color.
 ![1aaa](https://user-images.githubusercontent.com/101698622/213910810-8d6dcbcf-1aaa-4509-be89-20cf6e007178.png)
 
 
+![ss](https://user-images.githubusercontent.com/101698622/213910878-37787b9c-c716-4414-a8c4-373f9458365f.png)
+
+
 ### 2. Diffuse component with flat shading:
 
 ![Screenshot (38)](https://user-images.githubusercontent.com/108798956/213910130-ecd78a1b-1250-417f-b1fd-3697c08c4d8d.png)
