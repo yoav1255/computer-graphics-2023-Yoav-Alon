@@ -8,11 +8,11 @@
 #include <iostream>
 #include <glm/gtc/random.hpp>
 
-class light
+class Light
 {
 public:
-	light(glm::vec3 pos = glm::vec3(1, 1, 1), glm::vec3 amb = glm::vec3(1, 1, 1), glm::vec3 dif = glm::vec3(0, 0, 0), glm::vec3 spec = glm::vec3(0,0,0));
-	virtual ~light();
+	Light(glm::vec3 pos = glm::vec3(1, 1, 1), glm::vec3 amb = glm::vec3(1, 1, 1), glm::vec3 dif = glm::vec3(0, 0, 0), glm::vec3 spec = glm::vec3(0,0,0));
+	virtual ~Light();
 	glm::mat4 get_transform();
 	void set_transform(glm::vec3 trans);
 

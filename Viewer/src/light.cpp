@@ -1,6 +1,6 @@
-#include "light.h"
+#include "Light.h"
 
-light::light(glm::vec3 pos, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec):
+Light::Light(glm::vec3 pos, glm::vec3 amb, glm::vec3 dif, glm::vec3 spec):
 position(pos),
 ambient(amb),
 diffuse(dif),
@@ -12,15 +12,15 @@ specular(spec)
 	gouraud_shading = false;
 	phong_shading = true;
 }
-light::~light()
+Light::~Light()
 {
 
 }
-glm::mat4 light::get_transform()
+glm::mat4 Light::get_transform()
 {
 	return transform;
 }
-void light::set_transform(glm::vec3 trans)
+void Light::set_transform(glm::vec3 trans)
 {
 	transform = glm::translate(glm::mat4(1.0f), trans);;
 }

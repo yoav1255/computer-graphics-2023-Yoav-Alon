@@ -1,29 +1,80 @@
 #pragma once
+
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <string>
+#include <memory>
+#include "MeshModel.h"
 #include "Face.h"
-#include <glm/glm.hpp>
-#include <glm/gtx/transform.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <iostream>
-#include <glm/gtc/random.hpp>
+
+
+struct Vertex
+{
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec2 textureCoords;
+};
+
 class MeshModel
 {
 public:
-	MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, const std::string& model_name);
-	virtual ~MeshModel();
+	std::vector<Face> faces;
+	std::vector<glm::vec3> vertices;
+	std::vector<glm::vec3> normals;
+	std::vector<glm::vec3> textureCoords;
+
+	std::vector<Vertex> modelVertices;
+
+	glm::mat4 objectTransform;
+	glm::mat4 worldTransform;
+	glm::vec3 vCenter;
+	glm::vec3 translationObject;
+	glm::vec3 scaleObject;
+	glm::vec3 rotationObject;
+	glm::vec3 translationWorld;
+	glm::vec3 scaleWorld;
+	glm::vec3 rotationWorld;
+
+	std::string modelName;
+
+	glm::vec3 color;
+
+	GLuint vbo;
+	GLuint vao;
+
+
+	MeshModel(std::vector<Face> faces, std::vector<glm::vec3> vertices, std::vector<glm::vec3> normals, std::vector<glm::vec2> textureCoords, const std::string& modelName = "");	virtual ~MeshModel();
 	const Face& GetFace(int index) const;
 	std::vector<glm::vec3> GetVertices() const;
 	void setVertices(const glm::mat4 mat);
 	int GetFacesCount() const;
 	const std::string& GetModelName() const;
 	friend std::ostream& operator<<(std::ostream &os, const std::shared_ptr<MeshModel> &myModel);
-	 glm::mat4x4 GetTransform();
-	 glm::mat4x4 GetObjectTransform();
-	 glm::mat4x4 GetWorldTransform();
+	glm::mat4	 GetTransform();
+	 glm::mat4 GetObjectTransform();
+	 glm::mat4 GetWorldTransform();
 	void SetObjectTransform();
 	void SetWorldTransform();
 	std::vector<glm::vec3> meshColors;
+	const std::vector<Vertex>& GetModelVertices();
+	void TranslateModel(const glm::vec3& translationVector);
+	void TranslateWorld(const glm::vec3& translationVector);
+
+	void RotateXModel(double angle);
+	void RotateYModel(double angle);
+	void RotateZModel(double angle);
+	void ScaleXModel(double factor);
+	void ScaleYModel(double factor);
+	void ScaleZModel(double factor);
+	void ScaleModel(double factor);
+
+	void RotateXWorld(double angle);
+	void RotateYWorld(double angle);
+	void RotateZWorld(double angle);
+	void ScaleXWorld(double factor);
+	void ScaleYWorld(double factor);
+	void ScaleZWorld(double factor);
+	void ScaleWorld(double factor);
 
 	const glm::vec3& GetTranslationObject() const { return translationObject; }
 	const glm::vec3& GetScaleObject() const { return scaleObject; }
@@ -48,32 +99,18 @@ public:
 
 	const glm::vec3& GetVCenter() const { return vCenter; }
 
-	bool getAxisLocal() { return axisLocal; }
-	bool getAxisWorld() { return axisWorld; }
-	bool getbBoxLocal() { return bounding_box_local; }
-	bool getbBoxWorld() { return bounding_box_world; }
-	std::vector<glm::vec3> GetVertexNormals() const;
-
+	
 	void SetTranslationWorld(const glm::vec3 translationVec) { translationWorld = translationVec; }
 	void SetScaleWorld(const glm::vec3 scaleVec) { scaleWorld = scaleVec; }
 	void SetRotationWorld(const glm::vec3 rotationVec) { rotationWorld = rotationVec; }
 
 	void initNormals();
-	std::vector<Face> faces;
-	std::vector<glm::vec3> vertices;
-	std::vector<glm::vec3> vertexNormals;
-	std::vector<glm::vec3> normals;
+	const glm::vec3& GetColor() const;
+	void SetColor(const glm::vec3& color);
+	
+	GLuint GetVAO() const;
 
-	glm::mat4 objectTransform;
-	glm::mat4 worldTransform;
-	glm::vec3 vCenter;
-	glm::vec3 translationObject;
-	glm::vec3 scaleObject;
-	glm::vec3 rotationObject;
-	glm::vec3 translationWorld;
-	glm::vec3 scaleWorld;
-	glm::vec3 rotationWorld;
-	std::string model_name;
+	
 	bool axisLocal;
 	bool axisWorld;
 	bool bounding_box_local;
