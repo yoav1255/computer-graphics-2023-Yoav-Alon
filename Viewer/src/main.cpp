@@ -196,32 +196,32 @@ void HandleImguiInput()
 	{
 		if (imgui->KeysDown[49]) // 1
 		{
-			scene->GetActiveModel()->RotateXModel(M_PI / 200);
+			scene->GetActiveModel()->RotateXModel(M_PI / 300);
 		}
 
 		if (imgui->KeysDown[50]) // 2
 		{
-			scene->GetActiveModel()->RotateXModel(-M_PI / 200);
+			scene->GetActiveModel()->RotateXModel(-M_PI / 300);
 		}
 
 		if (imgui->KeysDown[51]) // 3
 		{
-			scene->GetActiveModel()->RotateYModel(M_PI / 200);
+			scene->GetActiveModel()->RotateYModel(M_PI / 300);
 		}
 
 		if (imgui->KeysDown[52]) // 4
 		{
-			scene->GetActiveModel()->RotateYModel(-M_PI / 200);
+			scene->GetActiveModel()->RotateYModel(-M_PI / 300);
 		}
 
 		if (imgui->KeysDown[53]) // 5
 		{
-			scene->GetActiveModel()->RotateZModel(M_PI / 200);
+			scene->GetActiveModel()->RotateZModel(M_PI / 300);
 		}
 
 		if (imgui->KeysDown[54]) // 6
 		{
-			scene->GetActiveModel()->RotateZModel(-M_PI / 200);
+			scene->GetActiveModel()->RotateZModel(-M_PI / 300);
 		}
 
 		if (imgui->KeysDown[45]) // -

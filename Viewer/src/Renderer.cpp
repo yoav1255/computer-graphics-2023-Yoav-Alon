@@ -57,10 +57,10 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 			colorShader.setUniform("color", glm::vec3(0, 0, 0));
 
 			// Drag our model's faces (triangles) in line mode (wireframe)
-			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			/*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glBindVertexArray(currentModel->GetVAO());
 			glDrawArrays(GL_TRIANGLES, 0, currentModel->GetModelVertices().size());
-			glBindVertexArray(0);
+			glBindVertexArray(0);*/
 		}
 	}
 }
@@ -72,9 +72,9 @@ void Renderer::LoadShaders()
 
 void Renderer::LoadTextures()
 {
-	if (!texture1.loadTexture("bin\\Debug\\crate.jpg", true))
+	if (!texture1.loadTexture("bin\\Debug\\skin.jpg", true))
 	{
-		texture1.loadTexture("bin\\Release\\crate.jpg", true);
+		texture1.loadTexture("bin\\Release\\brick_wall.jpg", true);
 	}
 }
 

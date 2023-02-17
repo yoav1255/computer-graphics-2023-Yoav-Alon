@@ -49,7 +49,16 @@ void main()
         
     vec3 result = (ambient + diffuse + specular) * objectColor;
      // frag_color = vec4(result, 1.0);
-     textureColor=textureColor*result;
+    // textureColor=textureColor*result;
+    //  textureColor = vec3(texture(material.textureMap, vec2(orig_fragPos.x, orig_fragPos.y))); // Plane projection 
+     //textureColor = vec3(texture(material.textureMap, vec2(atan(orig_fragPos.z / orig_fragPos.x), orig_fragPos.y))); // Cylinder projection
+      // Sphere projection:
+     float r = sqrt(pow(orig_fragPos.x, 2) + pow(orig_fragPos.y, 2) + pow(orig_fragPos.z, 2));
+	 float cos = orig_fragPos.z / r;
+	 float t = acos(cos);
+     float fi = atan(orig_fragPos.y / orig_fragPos.x);
+     //textureColor = vec3(texture(material.textureMap, vec2(fi, t)));
+      
      frag_color = vec4(textureColor, 1.0);
     // frag_color = vec4(orig_fragPos,1);
 }
