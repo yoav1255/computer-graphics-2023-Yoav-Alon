@@ -86,5 +86,42 @@ Result:
 
 ![const_color4](https://user-images.githubusercontent.com/108798956/219660711-99dcb005-b13e-486b-8f78-163c97e69386.PNG)
 
+### 5):
+```
+colorShader.setUniform("model", currentModel->GetWorldTransform() * currentModel->GetObjectTransform());
+colorShader.setUniform("view", camera.GetViewTransformation());
+colorShader.setUniform("projection", camera.GetProjectionTransformation());
+colorShader.setUniform("material.textureMap", 0);
+colorShader.setUniform("objectColor", currentModel->GetColor());
+colorShader.setUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+colorShader.setUniform("lightPos", currLight->translation);
+colorShader.setUniform("viewPos", camera.pos);
 
+// Set 'texture1' as the active texture at slot #0
+texture1.bind(0);
 
+// Drag our model's faces (triangles) in fill mode
+glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+glBindVertexArray(currentModel->GetVAO());
+glDrawArrays(GL_TRIANGLES, 0, currentModel->GetModelVertices().size());
+glBindVertexArray(0);
+
+```
+
+https://user-images.githubusercontent.com/108798956/219663644-bcf603a2-92cf-4612-8449-5c9bb3cb6460.mp4
+
+### 6):
+Video of appying diffrent lights and view points to the Monster.obj :
+
+https://user-images.githubusercontent.com/108798956/219666047-42577eaf-8908-41b1-881b-bcc1cc6b9ae7.mp4
+
+### 7):
+
+Plane texture projection:
+![plane](https://user-images.githubusercontent.com/108798956/219666343-fa9819cf-26aa-4b37-b190-683b40d1347f.PNG)
+
+Sphere texture projection:
+![sphere](https://user-images.githubusercontent.com/108798956/219666367-63bbb7d0-b28b-4f48-8bd4-d83dc531cca8.PNG)
+
+Cylinder texture projection:
+![cylinder](https://user-images.githubusercontent.com/108798956/219666389-9bd7ce3f-dc53-49d3-9456-b2959e3a2b59.PNG)
