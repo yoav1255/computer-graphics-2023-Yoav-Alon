@@ -6,6 +6,7 @@ The data is now loaded to the gpu.
 
 ### 3):
 Code from the Vertex Shader :
+```
 #version 330 core
 
 layout(location = 0) in vec3 pos;
@@ -38,15 +39,17 @@ void main()
 	// This is an internal OpenGL variable, we must set a value to this variable
 	gl_Position = projection * view *  model * vec4(pos, 1.0f);
 }
+```
 
 Code from Renderer.cpp :
-
+```
 colorShader.setUniform("model", currentModel->GetWorldTransform() * currentModel->GetObjectTransform());
 colorShader.setUniform("view", camera.GetViewTransformation());
 colorShader.setUniform("projection", camera.GetProjectionTransformation());
-
+```
 ### 4):
 Code:
+```
 #version 330 core
 
 struct Material
@@ -78,9 +81,10 @@ void main()
 {
 	  frag_color = vec4(color, 1.0);
 }
-
+```
 Result:
 
+![const_color4](https://user-images.githubusercontent.com/108798956/219660711-99dcb005-b13e-486b-8f78-163c97e69386.PNG)
 
 
 
