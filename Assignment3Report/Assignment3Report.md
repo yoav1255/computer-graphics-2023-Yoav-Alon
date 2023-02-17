@@ -127,5 +127,7 @@ Cylinder texture projection:
 ![cylinder](https://user-images.githubusercontent.com/108798956/219666389-9bd7ce3f-dc53-49d3-9456-b2959e3a2b59.PNG)
 
 Image used:
+
+
 ![brick_wall](https://user-images.githubusercontent.com/108798956/219666826-14987904-5274-4247-b192-8bd70394b12e.jpg)
 
