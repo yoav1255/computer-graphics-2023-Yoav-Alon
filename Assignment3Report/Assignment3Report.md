@@ -128,6 +128,9 @@ Cylinder texture projection:
 
 Image used:
 
-
 ![brick_wall](https://user-images.githubusercontent.com/108798956/219666826-14987904-5274-4247-b192-8bd70394b12e.jpg)
+
+
+In addition - Apple.obj found online with texture coordinates:
+![apple with texture](https://user-images.githubusercontent.com/108798956/219671690-11cd2180-5d9e-4571-ab7a-9853145629c0.PNG)
 
