@@ -133,4 +133,16 @@ Image used:
 
 In addition - Apple.obj found online with texture coordinates:
 ![apple with texture](https://user-images.githubusercontent.com/108798956/219671690-11cd2180-5d9e-4571-ab7a-9853145629c0.PNG)
+ 
+### 8):
 
+Normal Mapping :
+![normal_mapping_brickwall](https://user-images.githubusercontent.com/108798956/219712654-91bb11f8-7865-45cc-ac64-d111563fd541.PNG)
+
+Image of the brickwall and the corresponding normal brickwall :
+![brickwall](https://user-images.githubusercontent.com/108798956/219712809-cca394ee-845c-482f-9584-f27d31defab3.jpg)
+![brickwall_normal](https://user-images.githubusercontent.com/108798956/219712992-1a6b3b99-74a9-40fe-8e19-75fc7630355c.jpg)
+
+
+Toon Shading:
+![toon_shading](https://user-images.githubusercontent.com/108798956/219713119-052744ff-21bd-4efd-b172-c60cce19a1b7.PNG)
