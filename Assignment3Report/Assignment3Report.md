@@ -143,6 +143,9 @@ Image of the brickwall and the corresponding normal brickwall :
 ![brickwall](https://user-images.githubusercontent.com/108798956/219712809-cca394ee-845c-482f-9584-f27d31defab3.jpg)
 ![brickwall_normal](https://user-images.githubusercontent.com/108798956/219712992-1a6b3b99-74a9-40fe-8e19-75fc7630355c.jpg)
 
+Environment mapping:
+![environment mapping](https://user-images.githubusercontent.com/108798956/220354495-787cbb33-b37e-43ba-8a88-c639d4d541e3.PNG)
 
 Toon Shading:
 ![toon_shading](https://user-images.githubusercontent.com/108798956/219713119-052744ff-21bd-4efd-b172-c60cce19a1b7.PNG)
+
