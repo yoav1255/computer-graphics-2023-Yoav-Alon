@@ -15,10 +15,14 @@ Renderer::~Renderer()
 {
 
 }
-
+bool normal_mapping = false;
 void Renderer::Render(const std::shared_ptr<Scene>& scene)
 {
 	int cameraCount = scene->GetCameraCount(), lightCount = scene->GetLightCount();
+	int diffuseMap = 1, normalMap = 0;
+	bool plane=FALSE, sphere= FALSE, cylindar = FALSE, toon_shading = FALSE;
+
+	
 	if (cameraCount > 0 && lightCount>0)
 	{
 		int modelCount = scene->GetModelCount();
@@ -38,18 +42,42 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 			colorShader.setUniform("material.textureMap", 0);
 			colorShader.setUniform("objectColor", currentModel->GetColor());
 			colorShader.setUniform("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+			colorShader.setUniform("ambientStrength", currLight->ambient_strength);
+			colorShader.setUniform("diffuseStrength", currLight->diffuse_strength);
+			colorShader.setUniform("specularStrength", currLight->specular_strength);
 			colorShader.setUniform("lightPos", currLight->translation);
 			colorShader.setUniform("viewPos", camera.pos);
+			colorShader.setUniform("plane", camera.pos);
+			colorShader.setUniform("sphere", camera.pos);
+			colorShader.setUniform("cylindar", camera.pos);
+			colorShader.setUniform("toon_shading", camera.pos);
 			
-
+			
 			// Set 'texture1' as the active texture at slot #0
 			texture1.bind(0);
 
 			// Drag our model's faces (triangles) in fill mode
-			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			glBindVertexArray(currentModel->GetVAO());
-			glDrawArrays(GL_TRIANGLES, 0, currentModel->GetModelVertices().size());
-			glBindVertexArray(0);
+			if (normal_mapping)
+			{
+				setInt("diffuseMap", 1);
+				setInt("normalMap", 0);
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				glBindVertexArray(currentModel->GetVAO());
+				glDrawArrays(GL_TRIANGLES, 0, currentModel->GetModelVertices().size());
+				glBindVertexArray(0);
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, normalMap);
+
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, diffuseMap);
+			}
+			else
+			{
+				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				glBindVertexArray(currentModel->GetVAO());
+				glDrawArrays(GL_TRIANGLES, 0, currentModel->GetModelVertices().size());
+				glBindVertexArray(0);
+			}
 
 			// Unset 'texture1' as the active texture at slot #0
 			texture1.unbind(0);
@@ -61,10 +89,14 @@ void Renderer::Render(const std::shared_ptr<Scene>& scene)
 			glBindVertexArray(currentModel->GetVAO());
 			glDrawArrays(GL_TRIANGLES, 0, currentModel->GetModelVertices().size());
 			glBindVertexArray(0);*/
+
 		}
 	}
 }
-
+void Renderer::setInt(const std::string& name, int value)
+{
+	glUniform1i(glGetUniformLocation(0, name.c_str()), value);
+}
 void Renderer::LoadShaders()
 {
 	colorShader.loadShaders("vshader.glsl", "fshader.glsl");
@@ -72,9 +104,17 @@ void Renderer::LoadShaders()
 
 void Renderer::LoadTextures()
 {
-	if (!texture1.loadTexture("bin\\Debug\\skin.jpg", true))
+	if (!normal_mapping && !texture1.loadTexture("bin\\Debug\\front.jpg", true))
 	{
-		texture1.loadTexture("bin\\Release\\brick_wall.jpg", true);
+		texture1.loadTexture("bin\\Release\\front.jpg", true);
+	}
+	if (normal_mapping && !texture1.loadTexture("bin\\Debug\\brickwall_normal.jpg", true))
+	{
+		texture1.loadTexture("bin\\Release\\brickwall_normal.jpg", true);
+	}
+	if (normal_mapping && !texture1.loadTexture("bin\\Debug\\brickwall.jpg", true))
+	{
+		texture1.loadTexture("bin\\Release\\brickwall.jpg", true);
 	}
 }
 

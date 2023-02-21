@@ -17,12 +17,14 @@ out vec2 fragTexCoords;
 
 void main()
 {
+	
+   
 	// Apply the model transformation to the 'position' and 'normal' properties of the vertex,
 	// so the interpolated values of these properties will be available for usi n the fragment shader
 	orig_fragPos = vec3(vec4(pos, 1.0f));
 	fragPos = vec3(model * vec4(pos, 1.0f));
 	fragNormal = mat3(model) * normal;
-
+	//fragNormal = mat3(transpose(inverse(model))) * normal;
 	// Pass the vertex texture coordinates property as it is. Its interpolated value
 	// will be avilable for us in the fragment shader
 	fragTexCoords = texCoords;

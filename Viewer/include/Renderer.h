@@ -22,6 +22,7 @@ public:
 
 	void Render(const std::shared_ptr<Scene>& scene);
 	void LoadShaders();
+	void setInt(const std::string& name, int value);
 	void LoadTextures();
 //	Renderer(int viewportWidth, int viewportHeight);
 //	virtual ~Renderer();
